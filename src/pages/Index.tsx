@@ -10,11 +10,71 @@ import shopOffersImage from '@/assets/shop-offers.jpg';
 
 // Mock data for demonstration
 const mockOffers = [
+  // Food & Dining (5 offers)
   {
     id: '1',
+    shopName: 'Murugan Idli Shop',
+    offerTitle: 'Buy 2 Get 1 Free Idli Sets',
+    description: 'Authentic South Indian breakfast with amazing taste and quality.',
+    discount: 'B2G1 FREE',
+    expiryDate: '25 Dec 2024',
+    location: 'Chennai',
+    category: 'food',
+    isTrending: true,
+    image: shopOffersImage
+  },
+  {
+    id: '2',
+    shopName: 'Annapoorna Restaurant',
+    offerTitle: 'Family Feast Package',
+    description: 'Complete meals for family with traditional Tamil Nadu dishes.',
+    discount: '25% OFF',
+    expiryDate: '28 Dec 2024',
+    location: 'Coimbatore',
+    category: 'food',
+    image: shopOffersImage
+  },
+  {
+    id: '3',
+    shopName: 'Hotel Buhari',
+    offerTitle: 'Biryani Special Combo',
+    description: 'Best biryani in town with free raita and pickle.',
+    discount: '₹100 OFF',
+    expiryDate: '30 Dec 2024',
+    location: 'Madurai',
+    category: 'food',
+    isHot: true,
+    image: shopOffersImage
+  },
+  {
+    id: '4',
+    shopName: 'A2B Restaurant',
+    offerTitle: 'South Indian Thali Special',
+    description: 'Unlimited South Indian meals with variety of dishes.',
+    discount: '30% OFF',
+    expiryDate: '2 Jan 2025',
+    location: 'Salem',
+    category: 'food',
+    image: shopOffersImage
+  },
+  {
+    id: '5',
+    shopName: 'Adyar Ananda Bhavan',
+    offerTitle: 'Sweet Box Combo',
+    description: 'Mixed sweets box perfect for festivals and celebrations.',
+    discount: '20% OFF',
+    expiryDate: '5 Jan 2025',
+    location: 'Tirupur',
+    category: 'food',
+    image: shopOffersImage
+  },
+
+  // Fashion & Clothing (5 offers)
+  {
+    id: '6',
     shopName: 'Saravana Stores',
     offerTitle: '50% Off on Traditional Wear',
-    description: 'Huge discount on sarees, dhotis, and traditional clothing. Limited time offer!',
+    description: 'Huge discount on sarees, dhotis, and traditional clothing.',
     discount: '50% OFF',
     expiryDate: '31 Dec 2024',
     location: 'Chennai',
@@ -23,61 +83,226 @@ const mockOffers = [
     image: shopOffersImage
   },
   {
-    id: '2',
-    shopName: 'Murugan Idli Shop',
-    offerTitle: 'Buy 2 Get 1 Free Idli Sets',
-    description: 'Authentic South Indian breakfast with amazing taste and quality.',
-    discount: 'B2G1 FREE',
-    expiryDate: '25 Dec 2024',
-    location: 'Coimbatore',
-    category: 'food',
-    isTrending: true,
-    image: shopOffersImage
-  },
-  {
-    id: '3',
-    shopName: 'Poorvika Mobiles',
-    offerTitle: 'Smartphone Festival Sale',
-    description: 'Latest smartphones with exchange offers and EMI options available.',
-    discount: '₹5000 OFF',
-    expiryDate: '30 Dec 2024',
-    location: 'Madurai',
-    category: 'electronics',
-    image: shopOffersImage
-  },
-  {
-    id: '4',
+    id: '7',
     shopName: 'Kumaran Textiles',
     offerTitle: 'Wedding Collection Special',
     description: 'Premium silk sarees and wedding collection with exclusive designs.',
     discount: '40% OFF',
     expiryDate: '15 Jan 2025',
-    location: 'Salem',
+    location: 'Coimbatore',
     category: 'fashion',
     isHot: true,
     image: shopOffersImage
   },
   {
-    id: '5',
-    shopName: 'Annapoorna Restaurant',
-    offerTitle: 'Family Feast Package',
-    description: 'Complete meals for family with traditional Tamil Nadu dishes.',
-    discount: '25% OFF',
-    expiryDate: '28 Dec 2024',
-    location: 'Tirupur',
-    category: 'food',
+    id: '8',
+    shopName: 'GRT Jewellers',
+    offerTitle: 'Gold Coin with Every Purchase',
+    description: 'Free gold coin on jewelry purchase above ₹50,000.',
+    discount: 'FREE COIN',
+    expiryDate: '31 Dec 2024',
+    location: 'Madurai',
+    category: 'fashion',
+    isTrending: true,
     image: shopOffersImage
   },
   {
-    id: '6',
-    shopName: 'GRT Jewellers',
-    offerTitle: 'Gold Coin with Every Purchase',
-    description: 'Free gold coin on jewelry purchase above ₹50,000. Limited period offer.',
-    discount: 'FREE COIN',
-    expiryDate: '31 Dec 2024',
-    location: 'Chennai',
+    id: '9',
+    shopName: 'Pothys',
+    offerTitle: 'Designer Saree Collection',
+    description: 'Latest designer sarees with modern and traditional patterns.',
+    discount: '35% OFF',
+    expiryDate: '10 Jan 2025',
+    location: 'Salem',
     category: 'fashion',
+    image: shopOffersImage
+  },
+  {
+    id: '10',
+    shopName: 'Chennai Silks',
+    offerTitle: 'Bridal Wear Exclusive',
+    description: 'Complete bridal collection with matching accessories.',
+    discount: '45% OFF',
+    expiryDate: '20 Jan 2025',
+    location: 'Tirupur',
+    category: 'fashion',
+    image: shopOffersImage
+  },
+
+  // Electronics (5 offers)
+  {
+    id: '11',
+    shopName: 'Poorvika Mobiles',
+    offerTitle: 'Smartphone Festival Sale',
+    description: 'Latest smartphones with exchange offers and EMI options.',
+    discount: '₹5000 OFF',
+    expiryDate: '30 Dec 2024',
+    location: 'Chennai',
+    category: 'electronics',
+    image: shopOffersImage
+  },
+  {
+    id: '12',
+    shopName: 'Vijay Sales',
+    offerTitle: 'Home Appliance Mega Sale',
+    description: 'Refrigerators, washing machines, and ACs at best prices.',
+    discount: '₹8000 OFF',
+    expiryDate: '3 Jan 2025',
+    location: 'Coimbatore',
+    category: 'electronics',
+    isHot: true,
+    image: shopOffersImage
+  },
+  {
+    id: '13',
+    shopName: 'Reliance Digital',
+    offerTitle: 'Laptop & Desktop Deals',
+    description: 'Best deals on laptops, desktops and computer accessories.',
+    discount: '₹10000 OFF',
+    expiryDate: '7 Jan 2025',
+    location: 'Madurai',
+    category: 'electronics',
     isTrending: true,
+    image: shopOffersImage
+  },
+  {
+    id: '14',
+    shopName: 'Croma',
+    offerTitle: 'Gaming Console Special',
+    description: 'PlayStation and Xbox consoles with free games.',
+    discount: '₹3000 OFF',
+    expiryDate: '12 Jan 2025',
+    location: 'Salem',
+    category: 'electronics',
+    image: shopOffersImage
+  },
+  {
+    id: '15',
+    shopName: 'Sangeetha Mobiles',
+    offerTitle: 'Tablet & Smartwatch Combo',
+    description: 'Buy tablet and get smartwatch at special price.',
+    discount: 'B1G1 50%',
+    expiryDate: '15 Jan 2025',
+    location: 'Tirupur',
+    category: 'electronics',
+    image: shopOffersImage
+  },
+
+  // Services (5 offers)
+  {
+    id: '16',
+    shopName: 'Apollo Pharmacy',
+    offerTitle: 'Health Checkup Package',
+    description: 'Complete health checkup with free consultation.',
+    discount: '40% OFF',
+    expiryDate: '25 Dec 2024',
+    location: 'Chennai',
+    category: 'services',
+    image: shopOffersImage
+  },
+  {
+    id: '17',
+    shopName: 'Urban Company',
+    offerTitle: 'Home Cleaning Service',
+    description: 'Professional home cleaning with eco-friendly products.',
+    discount: '₹500 OFF',
+    expiryDate: '1 Jan 2025',
+    location: 'Coimbatore',
+    category: 'services',
+    isTrending: true,
+    image: shopOffersImage
+  },
+  {
+    id: '18',
+    shopName: 'Byju\'s Learning Hub',
+    offerTitle: 'Online Course Discount',
+    description: 'Premium online courses for students with live classes.',
+    discount: '60% OFF',
+    expiryDate: '10 Jan 2025',
+    location: 'Madurai',
+    category: 'services',
+    isHot: true,
+    image: shopOffersImage
+  },
+  {
+    id: '19',
+    shopName: 'OYO Hotels',
+    offerTitle: 'Weekend Stay Special',
+    description: 'Book weekend stays at premium hotels with breakfast.',
+    discount: '35% OFF',
+    expiryDate: '31 Dec 2024',
+    location: 'Salem',
+    category: 'services',
+    image: shopOffersImage
+  },
+  {
+    id: '20',
+    shopName: 'Zomato Pro',
+    offerTitle: 'Food Delivery Free',
+    description: 'Free delivery on all orders above ₹199 for 3 months.',
+    discount: 'FREE DELIVERY',
+    expiryDate: '5 Jan 2025',
+    location: 'Tirupur',
+    category: 'services',
+    image: shopOffersImage
+  },
+
+  // Groceries (5 offers)
+  {
+    id: '21',
+    shopName: 'More Supermarket',
+    offerTitle: 'Fresh Vegetables Special',
+    description: 'Farm fresh vegetables delivered to your doorstep.',
+    discount: '25% OFF',
+    expiryDate: '28 Dec 2024',
+    location: 'Chennai',
+    category: 'groceries',
+    image: shopOffersImage
+  },
+  {
+    id: '22',
+    shopName: 'Spencer\'s Retail',
+    offerTitle: 'Monthly Grocery Pack',
+    description: 'Complete monthly grocery needs at discounted rates.',
+    discount: '₹1000 OFF',
+    expiryDate: '2 Jan 2025',
+    location: 'Coimbatore',
+    category: 'groceries',
+    isHot: true,
+    image: shopOffersImage
+  },
+  {
+    id: '23',
+    shopName: 'Big Bazaar',
+    offerTitle: 'Buy 3 Get 1 Free',
+    description: 'Buy any 3 items and get 1 absolutely free on selected items.',
+    discount: 'B3G1 FREE',
+    expiryDate: '8 Jan 2025',
+    location: 'Madurai',
+    category: 'groceries',
+    isTrending: true,
+    image: shopOffersImage
+  },
+  {
+    id: '24',
+    shopName: 'Reliance Fresh',
+    offerTitle: 'Organic Products Sale',
+    description: 'Premium organic products for healthy living.',
+    discount: '30% OFF',
+    expiryDate: '12 Jan 2025',
+    location: 'Salem',
+    category: 'groceries',
+    image: shopOffersImage
+  },
+  {
+    id: '25',
+    shopName: 'Amma Mini Market',
+    offerTitle: 'Local Products Special',
+    description: 'Support local vendors with special prices on traditional items.',
+    discount: '20% OFF',
+    expiryDate: '18 Jan 2025',
+    location: 'Tirupur',
+    category: 'groceries',
     image: shopOffersImage
   }
 ];
@@ -91,7 +316,8 @@ const Index = () => {
     const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
     const matchesSearch = offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
-    return matchesCategory && matchesSearch;
+    const matchesLocation = !selectedDistrict || offer.location === selectedDistrict;
+    return matchesCategory && matchesSearch && matchesLocation;
   });
 
   const hotOffers = mockOffers.filter(offer => offer.isHot);
@@ -100,6 +326,7 @@ const Index = () => {
   const handleClearFilters = () => {
     setSelectedCategory('all');
     setSearchQuery('');
+    setSelectedDistrict('');
   };
 
   return (
@@ -109,11 +336,11 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-tamil-gradient rounded-lg flex items-center justify-center">
+              <div className="w-10 h-10 bg-blue-orange-gradient rounded-lg flex items-center justify-center">
                 <Store className="h-6 w-6 text-white" />
               </div>
               <div>
-                <h1 className="text-xl font-bold bg-tamil-gradient bg-clip-text text-transparent">
+                <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
                   Namma OOru Offers
                 </h1>
                 <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
@@ -136,7 +363,7 @@ const Index = () => {
             <div className="space-y-6">
               <div className="space-y-4">
                 <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
-                  <span className="bg-tamil-gradient bg-clip-text text-transparent">
+                  <span className="bg-blue-orange-gradient bg-clip-text text-transparent">
                     Namma OOru
                   </span>
                   <br />
@@ -175,11 +402,11 @@ const Index = () => {
               </div>
 
               <div className="flex flex-col sm:flex-row gap-4">
-                <Button variant="tamil" size="xl" className="flex-1">
+                <Button variant="default" size="xl" className="flex-1">
                   <Search className="h-5 w-5 mr-2" />
                   Explore Offers
                 </Button>
-                <Button variant="merchant" size="xl" className="flex-1">
+                <Button variant="secondary" size="xl" className="flex-1">
                   <Users className="h-5 w-5 mr-2" />
                   Become a Merchant
                 </Button>
@@ -348,11 +575,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-tamil-gradient rounded-lg flex items-center justify-center">
+              <div className="w-8 h-8 bg-blue-orange-gradient rounded-lg flex items-center justify-center">
                 <Store className="h-5 w-5 text-white" />
               </div>
               <div>
-                <div className="font-bold bg-tamil-gradient bg-clip-text text-transparent">
+                <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
                   Namma OOru Offers
                 </div>
                 <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
