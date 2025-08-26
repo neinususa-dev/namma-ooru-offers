@@ -60,8 +60,10 @@ const MerchantPostOffer: React.FC = () => {
 
   // Redirect if not authenticated or not a merchant
   React.useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'merchant')) {
+    if (!loading && !user) {
       navigate('/auth');
+    } else if (!loading && user && profile?.role !== 'merchant') {
+      navigate('/');
     }
   }, [user, profile, loading, navigate]);
 
