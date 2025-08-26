@@ -98,7 +98,7 @@ const CustomerAnalytics = () => {
       };
 
       // Category breakdown
-      const categoryCounts = {};
+      const categoryCounts: Record<string, number> = {};
       [...(savedOffers || []), ...(redeemedOffers || [])].forEach(item => {
         const category = item.offers?.category || 'other';
         categoryCounts[category] = (categoryCounts[category] || 0) + 1;
@@ -137,12 +137,12 @@ const CustomerAnalytics = () => {
       });
 
       // Top categories with percentages
-      const total = Object.values(categoryCounts).reduce((sum: number, count: unknown) => sum + (typeof count === 'number' ? count : 0), 0);
+      const total = Object.values(categoryCounts).reduce((sum: number, count: number) => sum + count, 0);
       const topCategories = Object.entries(categoryCounts)
         .map(([category, count]) => ({
           category: category.charAt(0).toUpperCase() + category.slice(1),
-          count: typeof count === 'number' ? count : 0,
-          percentage: total > 0 ? Math.round((typeof count === 'number' ? count : 0) / total * 100) : 0
+          count: count,
+          percentage: total > 0 ? Math.round((count / total) * 100) : 0
         }))
         .sort((a, b) => b.count - a.count)
         .slice(0, 5);

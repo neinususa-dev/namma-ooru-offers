@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Gift, Store, BarChart3, Plus } from 'lucide-react';
+import { Gift, Store, BarChart3, Plus, Flame, MapPin, Heart } from 'lucide-react';
 import { AuthButton } from './AuthButton';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ showNavigation = true, activeSection, onSectionChange }: HeaderProps) {
-  const { user, profile } = useAuth();
+  const { user, profile, isCustomer, isMerchant } = useAuth();
 
   const navigationItems = [
     { id: 'home', label: 'Home' },
@@ -58,16 +58,25 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                     {item.label}
                   </button>
                 ))}
-                {user && profile?.role === 'customer' && (
-                  <Link 
-                    to="/your-offers"
-                    className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                  >
-                    <Gift className="h-4 w-4" />
-                    Your Offers
-                  </Link>
+                {user && isCustomer && (
+                  <>
+                    <Link 
+                      to="/your-offers"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <Gift className="h-4 w-4" />
+                      Your Offers
+                    </Link>
+                    <Link 
+                      to="/customer-analytics"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Analytics
+                    </Link>
+                  </>
                 )}
-                {user && profile?.role === 'merchant' && (
+                {user && isMerchant && (
                   <>
                     <Link 
                       to="/merchant-dashboard"
@@ -97,16 +106,25 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                 >
                   Home
                 </Link>
-                {profile?.role === 'customer' && (
-                  <Link 
-                    to="/your-offers"
-                    className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                  >
-                    <Gift className="h-4 w-4" />
-                    Your Offers
-                  </Link>
+                {isCustomer && (
+                  <>
+                    <Link 
+                      to="/your-offers"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <Gift className="h-4 w-4" />
+                      Your Offers
+                    </Link>
+                    <Link 
+                      to="/customer-analytics"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Analytics
+                    </Link>
+                  </>
                 )}
-                {profile?.role === 'merchant' && (
+                {isMerchant && (
                   <>
                     <Link 
                       to="/merchant-dashboard"
