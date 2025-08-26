@@ -24,9 +24,11 @@ export type Database = {
           expiry_date: string
           id: string
           is_active: boolean
+          listing_type: string | null
           location: string | null
           merchant_id: string
           original_price: number | null
+          redemption_mode: string | null
           title: string
           updated_at: string
         }
@@ -39,9 +41,11 @@ export type Database = {
           expiry_date: string
           id?: string
           is_active?: boolean
+          listing_type?: string | null
           location?: string | null
           merchant_id: string
           original_price?: number | null
+          redemption_mode?: string | null
           title: string
           updated_at?: string
         }
@@ -54,9 +58,11 @@ export type Database = {
           expiry_date?: string
           id?: string
           is_active?: boolean
+          listing_type?: string | null
           location?: string | null
           merchant_id?: string
           original_price?: number | null
+          redemption_mode?: string | null
           title?: string
           updated_at?: string
         }
@@ -75,6 +81,7 @@ export type Database = {
           created_at: string
           email: string
           id: string
+          is_premium: boolean | null
           name: string
           role: Database["public"]["Enums"]["user_role"]
           updated_at: string
@@ -83,6 +90,7 @@ export type Database = {
           created_at?: string
           email: string
           id: string
+          is_premium?: boolean | null
           name: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string
@@ -91,6 +99,7 @@ export type Database = {
           created_at?: string
           email?: string
           id?: string
+          is_premium?: boolean | null
           name?: string
           role?: Database["public"]["Enums"]["user_role"]
           updated_at?: string

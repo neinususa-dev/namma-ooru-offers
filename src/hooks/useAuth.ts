@@ -7,6 +7,7 @@ export interface Profile {
   name: string;
   email: string;
   role: 'customer' | 'merchant';
+  is_premium: boolean;
   created_at: string;
   updated_at: string;
 }

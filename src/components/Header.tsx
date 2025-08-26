@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Gift, Store } from 'lucide-react';
+import { Gift, Store, BarChart3, Plus } from 'lucide-react';
 import { AuthButton } from './AuthButton';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -11,7 +11,7 @@ interface HeaderProps {
 }
 
 export function Header({ showNavigation = true, activeSection, onSectionChange }: HeaderProps) {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
 
   const navigationItems = [
     { id: 'home', label: 'Home' },
@@ -58,7 +58,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                     {item.label}
                   </button>
                 ))}
-                {user && (
+                {user && profile?.role === 'customer' && (
                   <Link 
                     to="/your-offers"
                     className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
@@ -66,6 +66,24 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                     <Gift className="h-4 w-4" />
                     Your Offers
                   </Link>
+                )}
+                {user && profile?.role === 'merchant' && (
+                  <>
+                    <Link 
+                      to="/merchant-dashboard"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                    <Link 
+                      to="/merchant-post-offer"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Post Offer
+                    </Link>
+                  </>
                 )}
               </nav>
             )}
@@ -79,13 +97,33 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                 >
                   Home
                 </Link>
-                <Link 
-                  to="/your-offers"
-                  className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                >
-                  <Gift className="h-4 w-4" />
-                  Your Offers
-                </Link>
+                {profile?.role === 'customer' && (
+                  <Link 
+                    to="/your-offers"
+                    className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                  >
+                    <Gift className="h-4 w-4" />
+                    Your Offers
+                  </Link>
+                )}
+                {profile?.role === 'merchant' && (
+                  <>
+                    <Link 
+                      to="/merchant-dashboard"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <BarChart3 className="h-4 w-4" />
+                      Dashboard
+                    </Link>
+                    <Link 
+                      to="/merchant-post-offer"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <Plus className="h-4 w-4" />
+                      Post Offer
+                    </Link>
+                  </>
+                )}
               </nav>
             )}
           </div>
