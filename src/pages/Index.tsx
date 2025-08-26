@@ -360,6 +360,75 @@ const mockOffers = [
     location: 'Avadi',
     category: 'groceries',
     image: groceryOfferImage
+  },
+
+  // Sathyamangalam Offers (5 offers across categories)
+  {
+    id: '26',
+    shopName: 'Sathya Restaurant',
+    offerTitle: 'Traditional South Indian Meals',
+    description: 'Authentic Tamil meals with fresh ingredients and traditional recipes.',
+    discount: '25% OFF',
+    expiryDate: '30 Dec 2024',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'food',
+    isHot: true,
+    image: foodOfferImage
+  },
+  {
+    id: '27',
+    shopName: 'Mangalam Textiles',
+    offerTitle: 'Wedding Saree Collection',
+    description: 'Beautiful handloom sarees for weddings and special occasions.',
+    discount: '40% OFF',
+    expiryDate: '15 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'fashion',
+    isTrending: true,
+    image: fashionOfferImage
+  },
+  {
+    id: '28',
+    shopName: 'Tech World Sathya',
+    offerTitle: 'Mobile & Accessories Sale',
+    description: 'Latest smartphones with cases, chargers and screen guards.',
+    discount: '₹2000 OFF',
+    expiryDate: '5 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'electronics',
+    image: electronicsOfferImage
+  },
+  {
+    id: '29',
+    shopName: 'Sathya Health Clinic',
+    offerTitle: 'Complete Health Checkup',
+    description: 'Full body checkup with blood tests and doctor consultation.',
+    discount: '50% OFF',
+    expiryDate: '20 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'services',
+    image: homeOfferImage
+  },
+  {
+    id: '30',
+    shopName: 'Mangalam Grocery Store',
+    offerTitle: 'Monthly Essentials Pack',
+    description: 'Rice, dal, oil and spices combo pack for monthly needs.',
+    discount: '₹500 OFF',
+    expiryDate: '25 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'groceries',
+    image: groceryOfferImage
   }
 ];
 
@@ -600,9 +669,25 @@ const Index = () => {
       {/* All Offers Section */}
       <section className="py-12 bg-background">
         <div className="container mx-auto px-4">
-          <div className="mb-8">
-            <h3 className="text-3xl font-bold text-foreground mb-2">All Offers</h3>
-            <p className="text-muted-foreground">Discover all available offers from local shops</p>
+          <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+            <div>
+              <h3 className="text-3xl font-bold text-foreground mb-2">All Offers</h3>
+              <p className="text-muted-foreground">Discover all available offers from local shops</p>
+            </div>
+            
+            {/* Search Offers - moved to right side */}
+            <div className="lg:w-96">
+              <label className="block text-sm font-medium text-foreground mb-2">Search Offers</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search for shops, offers, or categories..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
+                />
+              </div>
+            </div>
           </div>
 
           {/* District, City Selection & Search */}
@@ -613,7 +698,7 @@ const Index = () => {
                 <p className="text-muted-foreground">Select your location to discover amazing deals nearby</p>
               </div>
               
-              <div className="grid md:grid-cols-4 gap-4">
+              <div className="grid md:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-foreground mb-2">District</label>
                   <DistrictSelect 
@@ -631,17 +716,13 @@ const Index = () => {
                     placeholder="Select city/town"
                   />
                 </div>
-                <div className="md:col-span-2 space-y-2">
-                  <label className="block text-sm font-medium text-foreground">Search Offers</label>
-                  <div className="relative">
-                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                    <Input
-                      placeholder="Search for shops, offers, or categories..."
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
-                    />
-                  </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">Filter by Category</label>
+                  <OfferFilters
+                    selectedCategory={selectedCategory}
+                    onCategoryChange={setSelectedCategory}
+                    onClearFilters={handleClearFilters}
+                  />
                 </div>
               </div>
               
@@ -669,13 +750,6 @@ const Index = () => {
             </div>
           </div>
 
-          <div className="mb-6">
-            <OfferFilters
-              selectedCategory={selectedCategory}
-              onCategoryChange={setSelectedCategory}
-              onClearFilters={handleClearFilters}
-            />
-          </div>
 
           <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {filteredOffers.map(offer => (
