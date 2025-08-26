@@ -8,7 +8,7 @@ import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import { StoreList } from '@/components/StoreList';
-import { AuthButton } from '@/components/AuthButton';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
 import heroImage from '@/assets/hero-marketplace.jpg';
@@ -918,88 +918,11 @@ const Index = () => {
 
   return (
     <div className="min-h-screen bg-sunset-gradient">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b border-primary/10 sticky top-0 z-50">
-        <div className="container mx-auto px-4 py-4">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-8">
-              <button 
-                onClick={() => setActiveSection('home')}
-                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
-              >
-                <img 
-                  src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
-                  alt="Namma OOru Offers Logo" 
-                  className="w-12 h-12 rounded-lg"
-                />
-                <div>
-                  <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
-                    Namma OOru Offers
-                  </h1>
-                  <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
-                </div>
-              </button>
-              
-              {/* Navigation Links */}
-              <nav className="hidden md:flex items-center gap-6">
-                <button
-                  onClick={() => setActiveSection('home')}
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    activeSection === 'home' 
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Home
-                </button>
-                <button
-                  onClick={() => setActiveSection('hot-deals')}
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    activeSection === 'hot-deals' 
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Hot Deals
-                </button>
-                <button
-                  onClick={() => setActiveSection('local-deals')}
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    activeSection === 'local-deals' 
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Local Deals
-                </button>
-                <button
-                  onClick={() => setActiveSection('store-list')}
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    activeSection === 'store-list' 
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Store List
-                </button>
-                {user && (
-                  <Link 
-                    to="/your-offers"
-                    className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                  >
-                    <Gift className="h-4 w-4" />
-                    Your Offers
-                  </Link>
-                )}
-              </nav>
-            </div>
-            
-            <div className="flex items-center gap-3">
-              <AuthButton />
-            </div>
-          </div>
-        </div>
-      </header>
+      <Header 
+        showNavigation={true}
+        activeSection={activeSection}
+        onSectionChange={setActiveSection}
+      />
 
       {/* Dynamic Content */}
       {renderContent()}

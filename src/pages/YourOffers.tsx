@@ -1,5 +1,6 @@
 import React from 'react';
 import { Clock, Gift, Heart, Trash2, ArrowLeft } from 'lucide-react';
+import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -55,24 +56,26 @@ export default function YourOffers() {
 
   return (
     <div className="min-h-screen bg-background">
-      <div className="container mx-auto px-4 py-8">
-        {/* Header */}
-        <div className="flex items-center gap-4 mb-8">
-          <Button variant="ghost" size="sm" asChild>
-            <Link to="/">
-              <ArrowLeft className="h-4 w-4 mr-2" />
-              Back to Home
-            </Link>
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold bg-primary-gradient bg-clip-text text-transparent">
-              Your Offers
-            </h1>
-            <p className="text-muted-foreground">
-              Manage your saved and redeemed offers
-            </p>
+        <Header showNavigation={false} />
+
+        {/* Page Header */}
+        <div className="container mx-auto px-4 py-8">
+          <div className="flex items-center gap-4 mb-8">
+            <Button variant="ghost" size="sm" asChild>
+              <Link to="/">
+                <ArrowLeft className="h-4 w-4 mr-2" />
+                Back to Home
+              </Link>
+            </Button>
+            <div>
+              <h1 className="text-4xl font-bold bg-primary-gradient bg-clip-text text-transparent">
+                Your Offers
+              </h1>
+              <p className="text-muted-foreground">
+                Manage your saved and redeemed offers
+              </p>
+            </div>
           </div>
-        </div>
 
         {/* Tabs */}
         <Tabs defaultValue="saved" className="space-y-6">
@@ -174,8 +177,8 @@ export default function YourOffers() {
               </div>
             )}
           </TabsContent>
-        </Tabs>
-      </div>
+          </Tabs>
+        </div>
     </div>
   );
 }

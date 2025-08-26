@@ -8,7 +8,8 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Lock, Store } from 'lucide-react';
+import { User, Mail, Lock } from 'lucide-react';
+import { Header } from '@/components/Header';
 import { useEffect } from 'react';
 
 export default function Auth() {
@@ -87,17 +88,7 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen bg-sunset-gradient flex flex-col">
-      {/* Header */}
-      <header className="bg-card/80 backdrop-blur-sm border-b">
-        <div className="container mx-auto px-4 py-4 flex justify-between items-center">
-          <Link to="/" className="flex items-center space-x-2">
-            <div className="w-8 h-8 bg-primary-gradient rounded-lg flex items-center justify-center">
-              <Store className="w-5 h-5 text-primary-foreground" />
-            </div>
-            <span className="text-xl font-bold text-primary">Namma Ooru Offers</span>
-          </Link>
-        </div>
-      </header>
+      <Header showNavigation={false} />
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-4">
