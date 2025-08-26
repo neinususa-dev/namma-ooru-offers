@@ -24,7 +24,9 @@ const mockOffers = [
     description: 'Authentic South Indian breakfast with amazing taste and quality.',
     discount: 'B2G1 FREE',
     expiryDate: '25 Dec 2024',
-    location: 'Chennai',
+    district: 'Chennai',
+    city: 'chennai-city',
+    location: 'Chennai City',
     category: 'food',
     isTrending: true,
     image: foodOfferImage
@@ -36,7 +38,9 @@ const mockOffers = [
     description: 'Complete meals for family with traditional Tamil Nadu dishes.',
     discount: '25% OFF',
     expiryDate: '28 Dec 2024',
-    location: 'Coimbatore',
+    district: 'Chennai',
+    city: 'tambaram',
+    location: 'Tambaram',
     category: 'food',
     image: foodOfferImage
   },
@@ -47,7 +51,9 @@ const mockOffers = [
     description: 'Best biryani in town with free raita and pickle.',
     discount: '₹100 OFF',
     expiryDate: '30 Dec 2024',
-    location: 'Madurai',
+    district: 'Coimbatore',
+    city: 'coimbatore-city',
+    location: 'Coimbatore City',
     category: 'food',
     isHot: true,
     image: foodOfferImage
@@ -59,7 +65,9 @@ const mockOffers = [
     description: 'Unlimited South Indian meals with variety of dishes.',
     discount: '30% OFF',
     expiryDate: '2 Jan 2025',
-    location: 'Salem',
+    district: 'Coimbatore',
+    city: 'pollachi',
+    location: 'Pollachi',
     category: 'food',
     image: foodOfferImage
   },
@@ -70,7 +78,9 @@ const mockOffers = [
     description: 'Mixed sweets box perfect for festivals and celebrations.',
     discount: '20% OFF',
     expiryDate: '5 Jan 2025',
-    location: 'Tirupur',
+    district: 'Madurai',
+    city: 'madurai-city',
+    location: 'Madurai City',
     category: 'food',
     image: foodOfferImage
   },
@@ -83,7 +93,9 @@ const mockOffers = [
     description: 'Huge discount on sarees, dhotis, and traditional clothing.',
     discount: '50% OFF',
     expiryDate: '31 Dec 2024',
-    location: 'Chennai',
+    district: 'Chennai',
+    city: 'ambattur',
+    location: 'Ambattur',
     category: 'fashion',
     isHot: true,
     image: fashionOfferImage
@@ -95,7 +107,9 @@ const mockOffers = [
     description: 'Premium silk sarees and wedding collection with exclusive designs.',
     discount: '40% OFF',
     expiryDate: '15 Jan 2025',
-    location: 'Coimbatore',
+    district: 'Salem',
+    city: 'salem-city',
+    location: 'Salem City',
     category: 'fashion',
     isHot: true,
     image: fashionOfferImage
@@ -107,7 +121,9 @@ const mockOffers = [
     description: 'Free gold coin on jewelry purchase above ₹50,000.',
     discount: 'FREE COIN',
     expiryDate: '31 Dec 2024',
-    location: 'Madurai',
+    district: 'Salem',
+    city: 'attur',
+    location: 'Attur',
     category: 'fashion',
     isTrending: true,
     image: fashionOfferImage
@@ -119,7 +135,9 @@ const mockOffers = [
     description: 'Latest designer sarees with modern and traditional patterns.',
     discount: '35% OFF',
     expiryDate: '10 Jan 2025',
-    location: 'Salem',
+    district: 'Tirupur',
+    city: 'tirupur-city',
+    location: 'Tirupur City',
     category: 'fashion',
     image: fashionOfferImage
   },
@@ -130,7 +148,9 @@ const mockOffers = [
     description: 'Complete bridal collection with matching accessories.',
     discount: '45% OFF',
     expiryDate: '20 Jan 2025',
-    location: 'Tirupur',
+    district: 'Tirupur',
+    city: 'avinashi',
+    location: 'Avinashi',
     category: 'fashion',
     image: fashionOfferImage
   },
@@ -143,7 +163,9 @@ const mockOffers = [
     description: 'Latest smartphones with exchange offers and EMI options.',
     discount: '₹5000 OFF',
     expiryDate: '30 Dec 2024',
-    location: 'Chennai',
+    district: 'Vellore',
+    city: 'vellore-city',
+    location: 'Vellore City',
     category: 'electronics',
     image: electronicsOfferImage
   },
@@ -154,7 +176,9 @@ const mockOffers = [
     description: 'Refrigerators, washing machines, and ACs at best prices.',
     discount: '₹8000 OFF',
     expiryDate: '3 Jan 2025',
-    location: 'Coimbatore',
+    district: 'Vellore',
+    city: 'katpadi',
+    location: 'Katpadi',
     category: 'electronics',
     isHot: true,
     image: electronicsOfferImage
@@ -166,7 +190,9 @@ const mockOffers = [
     description: 'Best deals on laptops, desktops and computer accessories.',
     discount: '₹10000 OFF',
     expiryDate: '7 Jan 2025',
-    location: 'Madurai',
+    district: 'Thanjavur',
+    city: 'thanjavur-city',
+    location: 'Thanjavur City',
     category: 'electronics',
     isTrending: true,
     image: electronicsOfferImage
@@ -178,7 +204,9 @@ const mockOffers = [
     description: 'PlayStation and Xbox consoles with free games.',
     discount: '₹3000 OFF',
     expiryDate: '12 Jan 2025',
-    location: 'Salem',
+    district: 'Thanjavur',
+    city: 'kumbakonam',
+    location: 'Kumbakonam',
     category: 'electronics',
     image: electronicsOfferImage
   },
@@ -189,7 +217,9 @@ const mockOffers = [
     description: 'Buy tablet and get smartwatch at special price.',
     discount: 'B1G1 50%',
     expiryDate: '15 Jan 2025',
-    location: 'Tirupur',
+    district: 'Erode',
+    city: 'erode-city',
+    location: 'Erode City',
     category: 'electronics',
     image: electronicsOfferImage
   },
@@ -202,7 +232,9 @@ const mockOffers = [
     description: 'Complete health checkup with free consultation.',
     discount: '40% OFF',
     expiryDate: '25 Dec 2024',
-    location: 'Chennai',
+    district: 'Erode',
+    city: 'gobichettipalayam',
+    location: 'Gobichettipalayam',
     category: 'services',
     image: homeOfferImage
   },
@@ -213,7 +245,9 @@ const mockOffers = [
     description: 'Professional home cleaning with eco-friendly products.',
     discount: '₹500 OFF',
     expiryDate: '1 Jan 2025',
-    location: 'Coimbatore',
+    district: 'Kanyakumari',
+    city: 'nagercoil',
+    location: 'Nagercoil',
     category: 'services',
     isTrending: true,
     image: homeOfferImage
@@ -225,7 +259,9 @@ const mockOffers = [
     description: 'Premium online courses for students with live classes.',
     discount: '60% OFF',
     expiryDate: '10 Jan 2025',
-    location: 'Madurai',
+    district: 'Kanyakumari',
+    city: 'kanyakumari-town',
+    location: 'Kanyakumari Town',
     category: 'services',
     isHot: true,
     image: homeOfferImage
@@ -237,7 +273,9 @@ const mockOffers = [
     description: 'Book weekend stays at premium hotels with breakfast.',
     discount: '35% OFF',
     expiryDate: '31 Dec 2024',
-    location: 'Salem',
+    district: 'Tirunelveli',
+    city: 'tirunelveli-city',
+    location: 'Tirunelveli City',
     category: 'services',
     image: homeOfferImage
   },
@@ -248,7 +286,9 @@ const mockOffers = [
     description: 'Free delivery on all orders above ₹199 for 3 months.',
     discount: 'FREE DELIVERY',
     expiryDate: '5 Jan 2025',
-    location: 'Tirupur',
+    district: 'Tirunelveli',
+    city: 'palayamkottai',
+    location: 'Palayamkottai',
     category: 'services',
     image: homeOfferImage
   },
@@ -261,7 +301,9 @@ const mockOffers = [
     description: 'Farm fresh vegetables delivered to your doorstep.',
     discount: '25% OFF',
     expiryDate: '28 Dec 2024',
-    location: 'Chennai',
+    district: 'Cuddalore',
+    city: 'cuddalore-city',
+    location: 'Cuddalore City',
     category: 'groceries',
     image: groceryOfferImage
   },
@@ -272,7 +314,9 @@ const mockOffers = [
     description: 'Complete monthly grocery needs at discounted rates.',
     discount: '₹1000 OFF',
     expiryDate: '2 Jan 2025',
-    location: 'Coimbatore',
+    district: 'Cuddalore',
+    city: 'chidambaram',
+    location: 'Chidambaram',
     category: 'groceries',
     isHot: true,
     image: groceryOfferImage
@@ -284,7 +328,9 @@ const mockOffers = [
     description: 'Buy any 3 items and get 1 absolutely free on selected items.',
     discount: 'B3G1 FREE',
     expiryDate: '8 Jan 2025',
-    location: 'Madurai',
+    district: 'Tiruchirappalli',
+    city: 'trichy-city',
+    location: 'Trichy City',
     category: 'groceries',
     isTrending: true,
     image: groceryOfferImage
@@ -296,7 +342,9 @@ const mockOffers = [
     description: 'Premium organic products for healthy living.',
     discount: '30% OFF',
     expiryDate: '12 Jan 2025',
-    location: 'Salem',
+    district: 'Tiruchirappalli',
+    city: 'srirangam',
+    location: 'Srirangam',
     category: 'groceries',
     image: groceryOfferImage
   },
@@ -307,7 +355,9 @@ const mockOffers = [
     description: 'Support local vendors with special prices on traditional items.',
     discount: '20% OFF',
     expiryDate: '18 Jan 2025',
-    location: 'Tirupur',
+    district: 'Chennai',
+    city: 'avadi',
+    location: 'Avadi',
     category: 'groceries',
     image: groceryOfferImage
   }
@@ -324,6 +374,8 @@ const Index = () => {
     if (!showFiltered) {
       return mockOffers; // Show all offers by default
     }
+
+    console.log('Filtering with:', { selectedDistrict, selectedCity, selectedCategory, searchQuery });
 
     return mockOffers.filter(offer => {
       const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
@@ -376,8 +428,13 @@ const Index = () => {
         return district ? district.name : '';
       })();
       
-      const matchesLocation = !selectedDistrict || offer.location === districtName;
-      return matchesCategory && matchesSearch && matchesLocation;
+      // Updated filtering logic to include both district and city
+      const matchesDistrict = !selectedDistrict || offer.district === districtName;
+      const matchesCity = !selectedCity || offer.city === selectedCity;
+      
+      console.log('Offer:', offer.shopName, 'District match:', matchesDistrict, 'City match:', matchesCity);
+      
+      return matchesCategory && matchesSearch && matchesDistrict && matchesCity;
     });
   };
 
