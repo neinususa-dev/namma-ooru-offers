@@ -46,7 +46,20 @@ export const OfferCard: React.FC<OfferCardProps> = ({
 
   const handleGetCoupon = async () => {
     // Always save the offer first, regardless of login status
-    await saveOffer(id);
+    const offerData = {
+      id,
+      shopName,
+      offerTitle,
+      description,
+      discount,
+      expiryDate,
+      location,
+      category,
+      isHot,
+      isTrending,
+      image
+    };
+    await saveOffer(id, offerData);
   };
 
   const handleRedeemOffer = async () => {

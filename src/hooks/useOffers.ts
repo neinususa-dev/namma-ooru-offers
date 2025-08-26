@@ -103,7 +103,7 @@ export function useOffers() {
     }
   };
 
-  const saveOffer = async (offerId: string) => {
+  const saveOffer = async (offerId: string, offerData?: any) => {
     if (!user) {
       toast({
         title: "Please login",
@@ -132,20 +132,25 @@ export function useOffers() {
         return false;
       }
 
-      // For demo purposes, we'll create a minimal offer record first
-      const { data: offerData, error: offerError } = await supabase
+      // Create offer record using actual offer data
+      const discountValue = offerData?.discount ? 
+        parseInt(offerData.discount.replace(/[^\d]/g, '')) || 20 : 20;
+      
+      const { data: createdOffer, error: offerError } = await supabase
         .from('offers')
         .insert({
           id: uuidOfferId,
           merchant_id: user.id, // Using current user as merchant for demo
-          title: `Mock Offer ${offerId}`,
-          description: 'This is a demo offer saved from the marketplace.',
-          category: 'general',
-          location: 'Demo Location',
-          discount_percentage: 20,
+          title: offerData?.offerTitle || `Offer ${offerId}`,
+          description: offerData?.description || 'Special offer from marketplace.',
+          category: offerData?.category || 'general',
+          location: offerData?.location || 'Local Area',
+          discount_percentage: discountValue,
           original_price: 100,
-          discounted_price: 80,
-          expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          discounted_price: Math.max(100 - discountValue, 10),
+          expiry_date: offerData?.expiryDate ? 
+            new Date(offerData.expiryDate).toISOString() : 
+            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
           is_active: true
         })
         .select()

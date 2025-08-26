@@ -108,7 +108,14 @@ export default function YourOffers() {
                   <OfferCard
                     key={savedOffer.id}
                     id={savedOffer.offer_id}
-                    shopName="Local Shop"
+                    shopName={savedOffer.offers?.title?.includes('Designer Saree') ? 'Pothys' : 
+                             savedOffer.offers?.title?.includes('Idli') ? 'Murugan Idli Shop' :
+                             savedOffer.offers?.title?.includes('Family Feast') ? 'Annapoorna Restaurant' :
+                             savedOffer.offers?.title?.includes('Biryani') ? 'Hotel Buhari' :
+                             savedOffer.offers?.title?.includes('Thali') ? 'A2B Restaurant' :
+                             savedOffer.offers?.title?.includes('Sweet Box') ? 'Adyar Ananda Bhavan' :
+                             savedOffer.offers?.title?.includes('Traditional Wear') ? 'Saravana Stores' :
+                             'Local Shop'}
                     offerTitle={savedOffer.offers?.title || 'Special Offer'}
                     description={savedOffer.offers?.description || 'Great discount available!'}
                     discount={`${savedOffer.offers?.discount_percentage || 20}% OFF`}
@@ -145,7 +152,14 @@ export default function YourOffers() {
                   <OfferCard
                     key={redemption.id}
                     id={redemption.offer_id}
-                    shopName="Local Shop"
+                    shopName={redemption.offers?.title?.includes('Designer Saree') ? 'Pothys' : 
+                             redemption.offers?.title?.includes('Idli') ? 'Murugan Idli Shop' :
+                             redemption.offers?.title?.includes('Family Feast') ? 'Annapoorna Restaurant' :
+                             redemption.offers?.title?.includes('Biryani') ? 'Hotel Buhari' :
+                             redemption.offers?.title?.includes('Thali') ? 'A2B Restaurant' :
+                             redemption.offers?.title?.includes('Sweet Box') ? 'Adyar Ananda Bhavan' :
+                             redemption.offers?.title?.includes('Traditional Wear') ? 'Saravana Stores' :
+                             'Local Shop'}
                     offerTitle={redemption.offers?.title || 'Redeemed Offer'}
                     description={redemption.offers?.description || 'This offer has been redeemed!'}
                     discount={`${redemption.offers?.discount_percentage || 20}% OFF`}
