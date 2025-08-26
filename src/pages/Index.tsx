@@ -7,7 +7,6 @@ import { CitySelect } from '@/components/CitySelect';
 import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
-import { Navigation } from '@/components/Navigation';
 import { StoreList } from '@/components/StoreList';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
@@ -444,18 +443,15 @@ const Index = () => {
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
 
   const getOffersToShow = () => {
-    if (!showFiltered) {
-      return mockOffers; // Show all offers by default
-    }
-
     const filtered = mockOffers.filter(offer => {
       // Category filter
       const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
       
-      // Search filter
+      // Search filter - always apply search filter when there's a search query
       const matchesSearch = searchQuery === '' || 
         offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
+        offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        offer.description.toLowerCase().includes(searchQuery.toLowerCase());
       
       // District filter - convert district ID to name for comparison
       let matchesDistrict = true;
@@ -631,7 +627,10 @@ const Index = () => {
                     <Input
                       placeholder="Search for shops, offers, or categories..."
                       value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
+                      onChange={(e) => {
+                        setSearchQuery(e.target.value);
+                        setShowFiltered(true); // Auto-trigger filtering on search
+                      }}
                       className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
                     />
                   </div>
@@ -668,7 +667,10 @@ const Index = () => {
                       <label className="block text-sm font-medium text-foreground mb-2">Filter by Category</label>
                       <OfferFilters
                         selectedCategory={selectedCategory}
-                        onCategoryChange={setSelectedCategory}
+                        onCategoryChange={(category) => {
+                          setSelectedCategory(category);
+                          setShowFiltered(true); // Auto-trigger filtering on category change
+                        }}
                         onClearFilters={handleClearFilters}
                       />
                     </div>
@@ -732,18 +734,54 @@ const Index = () => {
       <header className="bg-card/80 backdrop-blur-sm border-b border-primary/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <img 
-                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
-                alt="Namma OOru Offers Logo" 
-                className="w-12 h-12 rounded-lg"
-              />
-              <div>
-                <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
-                  Namma OOru Offers
-                </h1>
-                <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
+            <div className="flex items-center gap-8">
+              <div className="flex items-center gap-3">
+                <img 
+                  src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                  alt="Namma OOru Offers Logo" 
+                  className="w-12 h-12 rounded-lg"
+                />
+                <div>
+                  <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
+                    Namma OOru Offers
+                  </h1>
+                  <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
+                </div>
               </div>
+              
+              {/* Navigation Links */}
+              <nav className="hidden md:flex items-center gap-6">
+                <button
+                  onClick={() => setActiveSection('hot-deals')}
+                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                    activeSection === 'hot-deals' 
+                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                      : 'text-blue-600'
+                  }`}
+                >
+                  Hot Deals
+                </button>
+                <button
+                  onClick={() => setActiveSection('local-deals')}
+                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                    activeSection === 'local-deals' 
+                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                      : 'text-blue-600'
+                  }`}
+                >
+                  Local Deals
+                </button>
+                <button
+                  onClick={() => setActiveSection('store-list')}
+                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                    activeSection === 'store-list' 
+                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                      : 'text-blue-600'
+                  }`}
+                >
+                  Store List
+                </button>
+              </nav>
             </div>
             
             <div className="flex items-center gap-3">
@@ -753,9 +791,6 @@ const Index = () => {
           </div>
         </div>
       </header>
-
-      {/* Navigation Menu */}
-      <Navigation activeSection={activeSection} onSectionChange={setActiveSection} />
 
       {/* Dynamic Content */}
       {renderContent()}
