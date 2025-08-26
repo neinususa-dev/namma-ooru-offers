@@ -6,6 +6,7 @@ import { DistrictSelect } from '@/components/DistrictSelect';
 import { CitySelect } from '@/components/CitySelect';
 import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
+import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
 import foodOfferImage from '@/assets/food-offer.jpg';
@@ -629,42 +630,20 @@ const Index = () => {
 
 
       {/* Hot Offers Section */}
-      <section className="py-12 bg-background">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="flex items-center gap-2">
-              <Flame className="h-6 w-6 text-hot-offer animate-pulse" />
-              <h3 className="text-3xl font-bold text-foreground">Today's Hot Offers</h3>
-            </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-hot-offer/50 to-transparent"></div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {hotOffers.map(offer => (
-              <OfferCard key={offer.id} {...offer} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <PaginatedOffersSection
+        title="Today's Hot Offers"
+        icon={<Flame className="h-6 w-6 text-hot-offer animate-pulse" />}
+        offers={hotOffers}
+        sectionClass="py-12 bg-background"
+      />
 
       {/* Trending Offers Section */}
-      <section className="py-12 bg-muted/30">
-        <div className="container mx-auto px-4">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="flex items-center gap-2">
-              <TrendingUp className="h-6 w-6 text-trending animate-bounce" />
-              <h3 className="text-3xl font-bold text-foreground">Top Trending Coupons</h3>
-            </div>
-            <div className="flex-1 h-px bg-gradient-to-r from-trending/50 to-transparent"></div>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {trendingOffers.map(offer => (
-              <OfferCard key={offer.id} {...offer} />
-            ))}
-          </div>
-        </div>
-      </section>
+      <PaginatedOffersSection
+        title="Top Trending Coupons"
+        icon={<TrendingUp className="h-6 w-6 text-trending animate-bounce" />}
+        offers={trendingOffers}
+        sectionClass="py-12 bg-muted/30"
+      />
 
       {/* All Offers Section */}
       <section className="py-12 bg-background">
