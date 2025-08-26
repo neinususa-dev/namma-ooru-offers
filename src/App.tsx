@@ -6,6 +6,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import Index from "./pages/Index";
 import Auth from "./pages/Auth";
 import YourOffers from "./pages/YourOffers";
+import CustomerAnalytics from "./pages/CustomerAnalytics";
 import MerchantDashboard from "./pages/MerchantDashboard";
 import MerchantPostOffer from "./pages/MerchantPostOffer";
 import NotFound from "./pages/NotFound";
@@ -22,6 +23,7 @@ const App = () => (
           <Route path="/" element={<Index />} />
           <Route path="/auth" element={<Auth />} />
           <Route path="/your-offers" element={<YourOffers />} />
+          <Route path="/customer-analytics" element={<CustomerAnalytics />} />
           <Route path="/merchant-dashboard" element={<MerchantDashboard />} />
           <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}

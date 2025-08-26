@@ -10,6 +10,7 @@ import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import { StoreList } from '@/components/StoreList';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
+import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Link } from 'react-router-dom';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
@@ -439,6 +440,7 @@ const mockOffers = [
 
 const Index = () => {
   const { user } = useAuth();
+  const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
   const [activeSection, setActiveSection] = useState<string>('home');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
@@ -446,57 +448,42 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
 
-  const getOffersToShow = () => {
-    const filtered = mockOffers.filter(offer => {
-      // Category filter
-      const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
-      
-      // Search filter - enhanced to include location and city fields
-      const matchesSearch = searchQuery === '' || 
-        offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        offer.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        offer.location.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        offer.city.toLowerCase().includes(searchQuery.toLowerCase());
-      
-      // Location filter logic - only apply when "Find Offers" is clicked or location filters are set
-      let matchesLocation = true;
-      if (showFiltered && (selectedDistrict || selectedCity)) {
-        // District filter - convert district ID to name for comparison
-        let matchesDistrict = true;
-        if (selectedDistrict) {
-          const tamilNaduDistricts = [
-            { id: 'chennai', name: 'Chennai' },
-            { id: 'coimbatore', name: 'Coimbatore' },
-            { id: 'madurai', name: 'Madurai' },
-            { id: 'salem', name: 'Salem' },
-            { id: 'tirupur', name: 'Tirupur' },
-            { id: 'erode', name: 'Erode' },
-            { id: 'vellore', name: 'Vellore' },
-            { id: 'thanjavur', name: 'Thanjavur' },
-            { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
-            { id: 'kanyakumari', name: 'Kanyakumari' },
-            { id: 'tirunelveli', name: 'Tirunelveli' },
-            { id: 'cuddalore', name: 'Cuddalore' }
-          ];
-          const district = tamilNaduDistricts.find(d => d.id === selectedDistrict);
-          const expectedDistrict = district ? district.name : '';
-          matchesDistrict = offer.district === expectedDistrict;
-        }
-        
-        // City filter
-        let matchesCity = true;
-        if (selectedCity) {
-          matchesCity = offer.city === selectedCity;
-        }
-        
-        matchesLocation = matchesDistrict && matchesCity;
-      }
-      
-      return matchesCategory && matchesSearch && matchesLocation;
-    });
+  const convertToOfferCardProps = (dbOffer: any) => ({
+    id: dbOffer.id,
+    shopName: 'Local Merchant', // You can enhance this by adding merchant names to the database
+    offerTitle: dbOffer.title,
+    description: dbOffer.description,
+    discount: `${dbOffer.discount_percentage}% OFF`,
+    expiryDate: new Date(dbOffer.expiry_date).toLocaleDateString(),
+    location: dbOffer.location,
+    category: dbOffer.category,
+    isHot: dbOffer.listing_type === 'hot_offers',
+    isTrending: dbOffer.listing_type === 'trending'
+  });
 
-    return filtered;
+  const getOffersToShow = () => {
+    let filteredOffers = offers;
+
+    // Apply search filter
+    if (searchQuery.trim()) {
+      filteredOffers = searchOffers(searchQuery);
+    }
+
+    // Apply category filter
+    if (selectedCategory !== 'all') {
+      filteredOffers = getOffersByCategory(selectedCategory);
+    }
+
+    // Location filtering (simplified - you can enhance this based on your location structure)
+    if (showFiltered && (selectedDistrict || selectedCity)) {
+      filteredOffers = filteredOffers.filter(offer => {
+        const locationMatch = selectedDistrict ? 
+          offer.location.toLowerCase().includes(selectedDistrict.toLowerCase()) : true;
+        return locationMatch;
+      });
+    }
+
+    return filteredOffers.map(convertToOfferCardProps);
   };
 
   const filteredOffers = getOffersToShow();
