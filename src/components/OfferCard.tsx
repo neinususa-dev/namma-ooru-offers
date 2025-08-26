@@ -37,13 +37,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   const { saveOffer, redeemOffer } = useOffers();
 
   const handleGetCoupon = async () => {
-    if (!user) {
-      // If not logged in, save the offer
-      await saveOffer(id);
-    } else {
-      // If logged in, redeem the offer
-      await redeemOffer(id);
-    }
+    // Always save the offer first, regardless of login status
+    await saveOffer(id);
   };
   return (
     <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30">
@@ -121,7 +116,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
           onClick={handleGetCoupon}
         >
-          {user ? "Get Coupon" : "Save Offer"}
+          Get Coupon
         </Button>
       </CardFooter>
     </Card>

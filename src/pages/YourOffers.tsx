@@ -10,7 +10,7 @@ import { Link } from 'react-router-dom';
 
 export default function YourOffers() {
   const { user, loading: authLoading } = useAuth();
-  const { savedOffers, redeemedOffers, loading, removeSavedOffer } = useOffers();
+  const { savedOffers, redeemedOffers, loading, removeSavedOffer, redeemOffer } = useOffers();
 
   if (authLoading || loading) {
     return (
@@ -134,8 +134,12 @@ export default function YourOffers() {
                           Saved: {formatDate(savedOffer.saved_at)}
                         </div>
                       </div>
-                      <Button className="w-full" size="sm">
-                        View Offer
+                      <Button 
+                        className="w-full" 
+                        size="sm"
+                        onClick={() => redeemOffer(savedOffer.offer_id)}
+                      >
+                        Redeem Offer
                       </Button>
                     </CardContent>
                   </Card>
