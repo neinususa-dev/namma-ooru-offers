@@ -3,6 +3,7 @@ import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart } from 'lucide-r
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DistrictSelect } from '@/components/DistrictSelect';
+import { CitySelect } from '@/components/CitySelect';
 import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import heroImage from '@/assets/hero-marketplace.jpg';
@@ -314,61 +315,73 @@ const mockOffers = [
 
 const Index = () => {
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
+  const [showFiltered, setShowFiltered] = useState<boolean>(false);
 
-  const filteredOffers = mockOffers.filter(offer => {
-    const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
-    const matchesSearch = offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
-    // Get the district name from the district id for comparison
-    const districtName = !selectedDistrict ? '' : (() => {
-      const tamilNaduDistricts = [
-        { id: 'ariyalur', name: 'Ariyalur' },
-        { id: 'chengalpattu', name: 'Chengalpattu' },
-        { id: 'chennai', name: 'Chennai' },
-        { id: 'coimbatore', name: 'Coimbatore' },
-        { id: 'cuddalore', name: 'Cuddalore' },
-        { id: 'dharmapuri', name: 'Dharmapuri' },
-        { id: 'dindigul', name: 'Dindigul' },
-        { id: 'erode', name: 'Erode' },
-        { id: 'kallakurichi', name: 'Kallakurichi' },
-        { id: 'kanchipuram', name: 'Kanchipuram' },
-        { id: 'kanyakumari', name: 'Kanyakumari' },
-        { id: 'karur', name: 'Karur' },
-        { id: 'krishnagiri', name: 'Krishnagiri' },
-        { id: 'madurai', name: 'Madurai' },
-        { id: 'mayiladuthurai', name: 'Mayiladuthurai' },
-        { id: 'nagapattinam', name: 'Nagapattinam' },
-        { id: 'namakkal', name: 'Namakkal' },
-        { id: 'nilgiris', name: 'Nilgiris' },
-        { id: 'perambalur', name: 'Perambalur' },
-        { id: 'pudukkottai', name: 'Pudukkottai' },
-        { id: 'ramanathapuram', name: 'Ramanathapuram' },
-        { id: 'ranipet', name: 'Ranipet' },
-        { id: 'salem', name: 'Salem' },
-        { id: 'sivaganga', name: 'Sivaganga' },
-        { id: 'tenkasi', name: 'Tenkasi' },
-        { id: 'thanjavur', name: 'Thanjavur' },
-        { id: 'theni', name: 'Theni' },
-        { id: 'thoothukudi', name: 'Thoothukudi' },
-        { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
-        { id: 'tirunelveli', name: 'Tirunelveli' },
-        { id: 'tirupattur', name: 'Tirupattur' },
-        { id: 'tiruppur', name: 'Tiruppur' },
-        { id: 'tiruvallur', name: 'Tiruvallur' },
-        { id: 'tiruvannamalai', name: 'Tiruvannamalai' },
-        { id: 'tiruvarur', name: 'Tiruvarur' },
-        { id: 'vellore', name: 'Vellore' },
-        { id: 'viluppuram', name: 'Viluppuram' },
-        { id: 'virudhunagar', name: 'Virudhunagar' },
-      ];
-      const district = tamilNaduDistricts.find(d => d.id === selectedDistrict);
-      return district ? district.name : '';
-    })();
-    const matchesLocation = !selectedDistrict || offer.location === districtName;
-    return matchesCategory && matchesSearch && matchesLocation;
-  });
+  const getOffersToShow = () => {
+    if (!showFiltered) {
+      return mockOffers; // Show all offers by default
+    }
+
+    return mockOffers.filter(offer => {
+      const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
+      const matchesSearch = offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // Get the district name from the district id for comparison
+      const districtName = !selectedDistrict ? '' : (() => {
+        const tamilNaduDistricts = [
+          { id: 'ariyalur', name: 'Ariyalur' },
+          { id: 'chengalpattu', name: 'Chengalpattu' },
+          { id: 'chennai', name: 'Chennai' },
+          { id: 'coimbatore', name: 'Coimbatore' },
+          { id: 'cuddalore', name: 'Cuddalore' },
+          { id: 'dharmapuri', name: 'Dharmapuri' },
+          { id: 'dindigul', name: 'Dindigul' },
+          { id: 'erode', name: 'Erode' },
+          { id: 'kallakurichi', name: 'Kallakurichi' },
+          { id: 'kanchipuram', name: 'Kanchipuram' },
+          { id: 'kanyakumari', name: 'Kanyakumari' },
+          { id: 'karur', name: 'Karur' },
+          { id: 'krishnagiri', name: 'Krishnagiri' },
+          { id: 'madurai', name: 'Madurai' },
+          { id: 'mayiladuthurai', name: 'Mayiladuthurai' },
+          { id: 'nagapattinam', name: 'Nagapattinam' },
+          { id: 'namakkal', name: 'Namakkal' },
+          { id: 'nilgiris', name: 'Nilgiris' },
+          { id: 'perambalur', name: 'Perambalur' },
+          { id: 'pudukkottai', name: 'Pudukkottai' },
+          { id: 'ramanathapuram', name: 'Ramanathapuram' },
+          { id: 'ranipet', name: 'Ranipet' },
+          { id: 'salem', name: 'Salem' },
+          { id: 'sivaganga', name: 'Sivaganga' },
+          { id: 'tenkasi', name: 'Tenkasi' },
+          { id: 'thanjavur', name: 'Thanjavur' },
+          { id: 'theni', name: 'Theni' },
+          { id: 'thoothukudi', name: 'Thoothukudi' },
+          { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
+          { id: 'tirunelveli', name: 'Tirunelveli' },
+          { id: 'tirupattur', name: 'Tirupattur' },
+          { id: 'tiruppur', name: 'Tiruppur' },
+          { id: 'tiruvallur', name: 'Tiruvallur' },
+          { id: 'tiruvannamalai', name: 'Tiruvannamalai' },
+          { id: 'tiruvarur', name: 'Tiruvarur' },
+          { id: 'vellore', name: 'Vellore' },
+          { id: 'viluppuram', name: 'Viluppuram' },
+          { id: 'virudhunagar', name: 'Virudhunagar' },
+        ];
+        const district = tamilNaduDistricts.find(d => d.id === selectedDistrict);
+        return district ? district.name : '';
+      })();
+      
+      const matchesLocation = !selectedDistrict || offer.location === districtName;
+      return matchesCategory && matchesSearch && matchesLocation;
+    });
+  };
+
+  const filteredOffers = getOffersToShow();
 
   const hotOffers = mockOffers.filter(offer => offer.isHot);
   const trendingOffers = mockOffers.filter(offer => offer.isTrending);
@@ -377,6 +390,18 @@ const Index = () => {
     setSelectedCategory('all');
     setSearchQuery('');
     setSelectedDistrict('');
+    setSelectedCity('');
+    setShowFiltered(false);
+  };
+
+  const handleFindOffers = () => {
+    setShowFiltered(true);
+  };
+
+  // Reset city when district changes
+  const handleDistrictChange = (districtId: string) => {
+    setSelectedDistrict(districtId);
+    setSelectedCity('');
   };
 
   return (
@@ -482,27 +507,67 @@ const Index = () => {
         </div>
       </section>
 
-      {/* District Selection & Search */}
+      {/* District, City Selection & Search */}
       <section className="py-8 bg-card/50">
         <div className="container mx-auto px-4">
-          <div className="max-w-4xl mx-auto">
-            <div className="grid md:grid-cols-3 gap-4">
-              <div className="md:col-span-1">
+          <div className="max-w-6xl mx-auto space-y-6">
+            <div className="text-center">
+              <h2 className="text-2xl font-bold text-foreground mb-2">Find Local Offers</h2>
+              <p className="text-muted-foreground">Select your location to discover amazing deals nearby</p>
+            </div>
+            
+            <div className="grid md:grid-cols-4 gap-4">
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">District</label>
                 <DistrictSelect 
                   value={selectedDistrict}
-                  onValueChange={setSelectedDistrict}
-                  placeholder="Select your district"
+                  onValueChange={handleDistrictChange}
+                  placeholder="Select district"
                 />
               </div>
-              <div className="md:col-span-2 relative">
-                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search for shops, offers, or categories..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
+              <div>
+                <label className="block text-sm font-medium text-foreground mb-2">City/Town</label>
+                <CitySelect
+                  selectedDistrict={selectedDistrict}
+                  value={selectedCity}
+                  onValueChange={setSelectedCity}
+                  placeholder="Select city/town"
                 />
               </div>
+              <div className="md:col-span-2 space-y-2">
+                <label className="block text-sm font-medium text-foreground">Search Offers</label>
+                <div className="relative">
+                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    placeholder="Search for shops, offers, or categories..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
+                  />
+                </div>
+              </div>
+            </div>
+            
+            <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <Button 
+                onClick={handleFindOffers}
+                variant="default" 
+                size="lg"
+                className="min-w-[200px]"
+              >
+                <Search className="h-4 w-4 mr-2" />
+                Find Offers
+              </Button>
+              
+              {showFiltered && (
+                <Button 
+                  onClick={handleClearFilters}
+                  variant="outline" 
+                  size="lg"
+                >
+                  Show All Offers
+                </Button>
+              )}
             </div>
           </div>
         </div>

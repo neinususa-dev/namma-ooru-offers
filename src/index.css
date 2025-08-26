@@ -16,13 +16,13 @@
     --popover: 0 0% 100%;
     --popover-foreground: 210 20% 15%;
 
-    /* Vibrant Blue Primary */
-    --primary: 213 94% 55%;
+    /* Logo Blue Primary */
+    --primary: 210 100% 50%;
     --primary-foreground: 0 0% 100%;
-    --primary-glow: 213 100% 65%;
+    --primary-glow: 210 100% 60%;
 
-    /* Vibrant Orange Secondary */
-    --secondary: 25 95% 55%;
+    /* Logo Orange Secondary */
+    --secondary: 25 100% 55%;
     --secondary-foreground: 0 0% 100%;
 
     /* Deep Blue Accent */
