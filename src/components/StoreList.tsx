@@ -33,9 +33,10 @@ interface Offer {
 
 interface StoreListProps {
   offers: Offer[];
+  showTitle?: boolean;
 }
 
-export const StoreList: React.FC<StoreListProps> = ({ offers }) => {
+export const StoreList: React.FC<StoreListProps> = ({ offers, showTitle = true }) => {
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
 
   // Extract unique stores from offers
@@ -100,11 +101,13 @@ export const StoreList: React.FC<StoreListProps> = ({ offers }) => {
 
   return (
     <div className="container mx-auto px-4 py-8">
-      <div className="flex items-center gap-3 mb-8">
-        <Store className="h-8 w-8 text-primary" />
-        <h2 className="text-3xl font-bold text-foreground">Store Directory</h2>
-        <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent"></div>
-      </div>
+      {showTitle && (
+        <div className="flex items-center gap-3 mb-8">
+          <Store className="h-8 w-8 text-primary" />
+          <h2 className="text-3xl font-bold text-foreground">Store Directory</h2>
+          <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent"></div>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {stores.map(store => (
