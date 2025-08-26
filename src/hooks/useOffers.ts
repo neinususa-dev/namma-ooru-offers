@@ -113,24 +113,27 @@ export function useOffers() {
     }
 
     try {
-      // Generate a proper UUID for the mock offer
-      const uuidOfferId = crypto.randomUUID();
+      // Create a consistent offer identifier based on the original offer data
+      const offerIdentifier = `${offerData?.shopName || 'shop'}-${offerData?.offerTitle || offerId}`.toLowerCase().replace(/\s+/g, '-');
       
-      // Check if already saved by mock offer ID (using a custom field)
-      const { data: existing } = await supabase
-        .from('saved_offers')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('offer_id', uuidOfferId)
-        .maybeSingle();
+      // Check if this specific offer is already saved by this user
+      const { data: existingOffers } = await supabase
+        .from('offers')
+        .select('id, saved_offers!inner(*)')
+        .eq('saved_offers.user_id', user.id)
+        .ilike('title', `%${offerData?.offerTitle || offerId}%`)
+        .limit(1);
 
-      if (existing) {
+      if (existingOffers && existingOffers.length > 0) {
         toast({
           title: "Already saved",
           description: "This offer is already in your saved offers.",
         });
         return false;
       }
+
+      // Generate a proper UUID for the new offer
+      const uuidOfferId = crypto.randomUUID();
 
       // Create offer record using actual offer data
       const discountValue = offerData?.discount ? 
@@ -198,6 +201,15 @@ export function useOffers() {
     }
 
     try {
+      // Get user profile to check if they're premium
+      const { data: profile } = await supabase
+        .from('profiles')
+        .select('role')
+        .eq('id', user.id)
+        .single();
+
+      const isPremium = profile?.role === 'merchant'; // Only merchants have unlimited redemptions
+
       // If offerId is a UUID (from saved offers), use it directly. Otherwise, create a new one
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(offerId);
       let actualOfferId = offerId;
@@ -231,20 +243,48 @@ export function useOffers() {
         }
       }
 
-      // Check if already redeemed
-      const { data: existing } = await supabase
-        .from('redemptions')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('offer_id', actualOfferId)
-        .maybeSingle();
+      // Check if already redeemed (only for free users)
+      if (!isPremium) {
+        const { data: existing } = await supabase
+          .from('redemptions')
+          .select('id')
+          .eq('user_id', user.id)
+          .eq('offer_id', actualOfferId)
+          .maybeSingle();
 
-      if (existing) {
-        toast({
-          title: "Already redeemed",
-          description: "You have already redeemed this offer.",
-        });
-        return false;
+        if (existing) {
+          toast({
+            title: "Already redeemed",
+            description: "Customers can only redeem each offer once. Merchants have unlimited redemptions!",
+            variant: "destructive",
+          });
+          return false;
+        }
+
+        // For free users, also check if they've redeemed a similar offer by title
+        const { data: offerDetails } = await supabase
+          .from('offers')
+          .select('title')
+          .eq('id', actualOfferId)
+          .single();
+
+        if (offerDetails?.title) {
+          const { data: similarRedemptions } = await supabase
+            .from('redemptions')
+            .select('id, offers!inner(title)')
+            .eq('user_id', user.id)
+            .ilike('offers.title', `%${offerDetails.title.split(' ')[0]}%`)
+            .limit(1);
+
+          if (similarRedemptions && similarRedemptions.length > 0) {
+            toast({
+              title: "Similar offer already redeemed",
+              description: "Customers can only redeem each type of offer once. Merchants have unlimited access!",
+              variant: "destructive",
+            });
+            return false;
+          }
+        }
       }
 
       // Add to redemptions
