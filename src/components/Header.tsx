@@ -45,38 +45,8 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
             {/* Navigation Links - only show on home page */}
             {showNavigation && onSectionChange && (
               <nav className="hidden md:flex items-center gap-6">
-                {navigationItems.map((item) => (
-                  <button
-                    key={item.id}
-                    onClick={() => onSectionChange(item.id)}
-                    className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                      activeSection === item.id 
-                        ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                        : 'text-blue-600'
-                    }`}
-                  >
-                    {item.label}
-                  </button>
-                ))}
-                {user && isCustomer && (
-                  <>
-                    <Link 
-                      to="/your-offers"
-                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                    >
-                      <Gift className="h-4 w-4" />
-                      Your Offers
-                    </Link>
-                    <Link 
-                      to="/customer-analytics"
-                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
-                    >
-                      <BarChart3 className="h-4 w-4" />
-                      Analytics
-                    </Link>
-                  </>
-                )}
-                {user && isMerchant && (
+                {user && isMerchant ? (
+                  // Merchant navigation - only Dashboard and Post Offer
                   <>
                     <Link 
                       to="/merchant-dashboard"
@@ -92,6 +62,41 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       <Plus className="h-4 w-4" />
                       Post Offer
                     </Link>
+                  </>
+                ) : (
+                  // Customer/Guest navigation - show all navigation items
+                  <>
+                    {navigationItems.map((item) => (
+                      <button
+                        key={item.id}
+                        onClick={() => onSectionChange(item.id)}
+                        className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                          activeSection === item.id 
+                            ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                            : 'text-blue-600'
+                        }`}
+                      >
+                        {item.label}
+                      </button>
+                    ))}
+                    {user && isCustomer && (
+                      <>
+                        <Link 
+                          to="/your-offers"
+                          className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                        >
+                          <Gift className="h-4 w-4" />
+                          Your Offers
+                        </Link>
+                        <Link 
+                          to="/customer-analytics"
+                          className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                        >
+                          <BarChart3 className="h-4 w-4" />
+                          Analytics
+                        </Link>
+                      </>
+                    )}
                   </>
                 )}
               </nav>
