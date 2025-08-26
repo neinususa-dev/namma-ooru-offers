@@ -3,6 +3,8 @@ import { Calendar, MapPin, Store, Flame, TrendingUp } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { useAuth } from '@/hooks/useAuth';
+import { useOffers } from '@/hooks/useOffers';
 
 interface OfferCardProps {
   id: string;
@@ -19,6 +21,7 @@ interface OfferCardProps {
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({
+  id,
   shopName,
   offerTitle,
   description,
@@ -30,6 +33,18 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   isTrending = false,
   image
 }) => {
+  const { user } = useAuth();
+  const { saveOffer, redeemOffer } = useOffers();
+
+  const handleGetCoupon = async () => {
+    if (!user) {
+      // If not logged in, save the offer
+      await saveOffer(id);
+    } else {
+      // If logged in, redeem the offer
+      await redeemOffer(id);
+    }
+  };
   return (
     <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30">
       {/* Hot/Trending Badges */}
@@ -104,8 +119,9 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         <Button 
           className="w-full" 
           variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
+          onClick={handleGetCoupon}
         >
-          Get Coupon
+          {user ? "Get Coupon" : "Save Offer"}
         </Button>
       </CardFooter>
     </Card>
