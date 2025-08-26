@@ -7,6 +7,11 @@ import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
+import foodOfferImage from '@/assets/food-offer.jpg';
+import fashionOfferImage from '@/assets/fashion-offer.jpg';
+import electronicsOfferImage from '@/assets/electronics-offer.jpg';
+import homeOfferImage from '@/assets/home-offer.jpg';
+import groceryOfferImage from '@/assets/grocery-offer.jpg';
 
 // Mock data for demonstration
 const mockOffers = [
@@ -21,7 +26,7 @@ const mockOffers = [
     location: 'Chennai',
     category: 'food',
     isTrending: true,
-    image: shopOffersImage
+    image: foodOfferImage
   },
   {
     id: '2',
@@ -32,7 +37,7 @@ const mockOffers = [
     expiryDate: '28 Dec 2024',
     location: 'Coimbatore',
     category: 'food',
-    image: shopOffersImage
+    image: foodOfferImage
   },
   {
     id: '3',
@@ -44,7 +49,7 @@ const mockOffers = [
     location: 'Madurai',
     category: 'food',
     isHot: true,
-    image: shopOffersImage
+    image: foodOfferImage
   },
   {
     id: '4',
@@ -55,7 +60,7 @@ const mockOffers = [
     expiryDate: '2 Jan 2025',
     location: 'Salem',
     category: 'food',
-    image: shopOffersImage
+    image: foodOfferImage
   },
   {
     id: '5',
@@ -66,7 +71,7 @@ const mockOffers = [
     expiryDate: '5 Jan 2025',
     location: 'Tirupur',
     category: 'food',
-    image: shopOffersImage
+    image: foodOfferImage
   },
 
   // Fashion & Clothing (5 offers)
@@ -80,7 +85,7 @@ const mockOffers = [
     location: 'Chennai',
     category: 'fashion',
     isHot: true,
-    image: shopOffersImage
+    image: fashionOfferImage
   },
   {
     id: '7',
@@ -92,7 +97,7 @@ const mockOffers = [
     location: 'Coimbatore',
     category: 'fashion',
     isHot: true,
-    image: shopOffersImage
+    image: fashionOfferImage
   },
   {
     id: '8',
@@ -104,7 +109,7 @@ const mockOffers = [
     location: 'Madurai',
     category: 'fashion',
     isTrending: true,
-    image: shopOffersImage
+    image: fashionOfferImage
   },
   {
     id: '9',
@@ -115,7 +120,7 @@ const mockOffers = [
     expiryDate: '10 Jan 2025',
     location: 'Salem',
     category: 'fashion',
-    image: shopOffersImage
+    image: fashionOfferImage
   },
   {
     id: '10',
@@ -126,7 +131,7 @@ const mockOffers = [
     expiryDate: '20 Jan 2025',
     location: 'Tirupur',
     category: 'fashion',
-    image: shopOffersImage
+    image: fashionOfferImage
   },
 
   // Electronics (5 offers)
@@ -139,7 +144,7 @@ const mockOffers = [
     expiryDate: '30 Dec 2024',
     location: 'Chennai',
     category: 'electronics',
-    image: shopOffersImage
+    image: electronicsOfferImage
   },
   {
     id: '12',
@@ -151,7 +156,7 @@ const mockOffers = [
     location: 'Coimbatore',
     category: 'electronics',
     isHot: true,
-    image: shopOffersImage
+    image: electronicsOfferImage
   },
   {
     id: '13',
@@ -163,7 +168,7 @@ const mockOffers = [
     location: 'Madurai',
     category: 'electronics',
     isTrending: true,
-    image: shopOffersImage
+    image: electronicsOfferImage
   },
   {
     id: '14',
@@ -174,7 +179,7 @@ const mockOffers = [
     expiryDate: '12 Jan 2025',
     location: 'Salem',
     category: 'electronics',
-    image: shopOffersImage
+    image: electronicsOfferImage
   },
   {
     id: '15',
@@ -185,7 +190,7 @@ const mockOffers = [
     expiryDate: '15 Jan 2025',
     location: 'Tirupur',
     category: 'electronics',
-    image: shopOffersImage
+    image: electronicsOfferImage
   },
 
   // Services (5 offers)
@@ -198,7 +203,7 @@ const mockOffers = [
     expiryDate: '25 Dec 2024',
     location: 'Chennai',
     category: 'services',
-    image: shopOffersImage
+    image: homeOfferImage
   },
   {
     id: '17',
@@ -210,7 +215,7 @@ const mockOffers = [
     location: 'Coimbatore',
     category: 'services',
     isTrending: true,
-    image: shopOffersImage
+    image: homeOfferImage
   },
   {
     id: '18',
@@ -222,7 +227,7 @@ const mockOffers = [
     location: 'Madurai',
     category: 'services',
     isHot: true,
-    image: shopOffersImage
+    image: homeOfferImage
   },
   {
     id: '19',
@@ -233,7 +238,7 @@ const mockOffers = [
     expiryDate: '31 Dec 2024',
     location: 'Salem',
     category: 'services',
-    image: shopOffersImage
+    image: homeOfferImage
   },
   {
     id: '20',
@@ -244,7 +249,7 @@ const mockOffers = [
     expiryDate: '5 Jan 2025',
     location: 'Tirupur',
     category: 'services',
-    image: shopOffersImage
+    image: homeOfferImage
   },
 
   // Groceries (5 offers)
@@ -257,7 +262,7 @@ const mockOffers = [
     expiryDate: '28 Dec 2024',
     location: 'Chennai',
     category: 'groceries',
-    image: shopOffersImage
+    image: groceryOfferImage
   },
   {
     id: '22',
@@ -269,7 +274,7 @@ const mockOffers = [
     location: 'Coimbatore',
     category: 'groceries',
     isHot: true,
-    image: shopOffersImage
+    image: groceryOfferImage
   },
   {
     id: '23',
@@ -281,7 +286,7 @@ const mockOffers = [
     location: 'Madurai',
     category: 'groceries',
     isTrending: true,
-    image: shopOffersImage
+    image: groceryOfferImage
   },
   {
     id: '24',
@@ -292,7 +297,7 @@ const mockOffers = [
     expiryDate: '12 Jan 2025',
     location: 'Salem',
     category: 'groceries',
-    image: shopOffersImage
+    image: groceryOfferImage
   },
   {
     id: '25',
@@ -303,7 +308,7 @@ const mockOffers = [
     expiryDate: '18 Jan 2025',
     location: 'Tirupur',
     category: 'groceries',
-    image: shopOffersImage
+    image: groceryOfferImage
   }
 ];
 
@@ -316,7 +321,52 @@ const Index = () => {
     const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
     const matchesSearch = offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesLocation = !selectedDistrict || offer.location === selectedDistrict;
+    // Get the district name from the district id for comparison
+    const districtName = !selectedDistrict ? '' : (() => {
+      const tamilNaduDistricts = [
+        { id: 'ariyalur', name: 'Ariyalur' },
+        { id: 'chengalpattu', name: 'Chengalpattu' },
+        { id: 'chennai', name: 'Chennai' },
+        { id: 'coimbatore', name: 'Coimbatore' },
+        { id: 'cuddalore', name: 'Cuddalore' },
+        { id: 'dharmapuri', name: 'Dharmapuri' },
+        { id: 'dindigul', name: 'Dindigul' },
+        { id: 'erode', name: 'Erode' },
+        { id: 'kallakurichi', name: 'Kallakurichi' },
+        { id: 'kanchipuram', name: 'Kanchipuram' },
+        { id: 'kanyakumari', name: 'Kanyakumari' },
+        { id: 'karur', name: 'Karur' },
+        { id: 'krishnagiri', name: 'Krishnagiri' },
+        { id: 'madurai', name: 'Madurai' },
+        { id: 'mayiladuthurai', name: 'Mayiladuthurai' },
+        { id: 'nagapattinam', name: 'Nagapattinam' },
+        { id: 'namakkal', name: 'Namakkal' },
+        { id: 'nilgiris', name: 'Nilgiris' },
+        { id: 'perambalur', name: 'Perambalur' },
+        { id: 'pudukkottai', name: 'Pudukkottai' },
+        { id: 'ramanathapuram', name: 'Ramanathapuram' },
+        { id: 'ranipet', name: 'Ranipet' },
+        { id: 'salem', name: 'Salem' },
+        { id: 'sivaganga', name: 'Sivaganga' },
+        { id: 'tenkasi', name: 'Tenkasi' },
+        { id: 'thanjavur', name: 'Thanjavur' },
+        { id: 'theni', name: 'Theni' },
+        { id: 'thoothukudi', name: 'Thoothukudi' },
+        { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
+        { id: 'tirunelveli', name: 'Tirunelveli' },
+        { id: 'tirupattur', name: 'Tirupattur' },
+        { id: 'tiruppur', name: 'Tiruppur' },
+        { id: 'tiruvallur', name: 'Tiruvallur' },
+        { id: 'tiruvannamalai', name: 'Tiruvannamalai' },
+        { id: 'tiruvarur', name: 'Tiruvarur' },
+        { id: 'vellore', name: 'Vellore' },
+        { id: 'viluppuram', name: 'Viluppuram' },
+        { id: 'virudhunagar', name: 'Virudhunagar' },
+      ];
+      const district = tamilNaduDistricts.find(d => d.id === selectedDistrict);
+      return district ? district.name : '';
+    })();
+    const matchesLocation = !selectedDistrict || offer.location === districtName;
     return matchesCategory && matchesSearch && matchesLocation;
   });
 
