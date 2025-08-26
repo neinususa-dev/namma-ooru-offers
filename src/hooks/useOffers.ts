@@ -193,41 +193,78 @@ export function useOffers() {
     }
 
     try {
-      // Generate a proper UUID for the mock offer
-      const uuidOfferId = crypto.randomUUID();
-      
-      // For demo purposes, create a minimal offer record first if it doesn't exist
-      const { data: offerData, error: offerError } = await supabase
-        .from('offers')
-        .insert({
-          id: uuidOfferId,
-          merchant_id: user.id, // Using current user as merchant for demo
-          title: `Mock Offer ${offerId}`,
-          description: 'This is a demo offer redeemed from the marketplace.',
-          category: 'general', 
-          location: 'Demo Location',
-          discount_percentage: 20,
-          original_price: 100,
-          discounted_price: 80,
-          expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-          is_active: true
-        })
-        .select()
-        .single();
+      // If offerId is a UUID (from saved offers), use it directly. Otherwise, create a new one
+      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(offerId);
+      let actualOfferId = offerId;
 
-      if (offerError && offerError.code !== '23505') { // 23505 is unique violation, which is OK
-        console.error('Error creating offer:', offerError);
-        throw offerError;
+      if (!isUUID) {
+        // Generate a proper UUID for the mock offer
+        actualOfferId = crypto.randomUUID();
+        
+        // For demo purposes, create a minimal offer record first if it doesn't exist
+        const { data: offerData, error: offerError } = await supabase
+          .from('offers')
+          .insert({
+            id: actualOfferId,
+            merchant_id: user.id, // Using current user as merchant for demo
+            title: `Mock Offer ${offerId}`,
+            description: 'This is a demo offer redeemed from the marketplace.',
+            category: 'general', 
+            location: 'Demo Location',
+            discount_percentage: 20,
+            original_price: 100,
+            discounted_price: 80,
+            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+            is_active: true
+          })
+          .select()
+          .single();
+
+        if (offerError && offerError.code !== '23505') { // 23505 is unique violation, which is OK
+          console.error('Error creating offer:', offerError);
+          throw offerError;
+        }
       }
 
+      // Check if already redeemed
+      const { data: existing } = await supabase
+        .from('redemptions')
+        .select('id')
+        .eq('user_id', user.id)
+        .eq('offer_id', actualOfferId)
+        .maybeSingle();
+
+      if (existing) {
+        toast({
+          title: "Already redeemed",
+          description: "You have already redeemed this offer.",
+        });
+        return false;
+      }
+
+      // Add to redemptions
       const { error } = await supabase
         .from('redemptions')
         .insert({
           user_id: user.id,
-          offer_id: uuidOfferId
+          offer_id: actualOfferId
         });
 
       if (error) throw error;
+
+      // If this was redeemed from saved offers, remove it from saved offers
+      if (isUUID) {
+        const { error: removeError } = await supabase
+          .from('saved_offers')
+          .delete()
+          .eq('user_id', user.id)
+          .eq('offer_id', actualOfferId);
+
+        if (removeError) {
+          console.error('Error removing from saved offers:', removeError);
+          // Don't throw error here, redemption was successful
+        }
+      }
 
       toast({
         title: "Offer redeemed!",
@@ -235,6 +272,7 @@ export function useOffers() {
       });
 
       fetchRedeemedOffers();
+      fetchSavedOffers(); // Refresh saved offers to reflect removal
       return true;
     } catch (error) {
       console.error('Error redeeming offer:', error);

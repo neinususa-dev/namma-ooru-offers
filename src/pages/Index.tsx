@@ -1,6 +1,5 @@
-// Namma Ooru Offers - Local Deals Marketplace
 import React, { useState } from 'react';
-import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter } from 'lucide-react';
+import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DistrictSelect } from '@/components/DistrictSelect';
@@ -10,6 +9,8 @@ import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import { StoreList } from '@/components/StoreList';
 import { AuthButton } from '@/components/AuthButton';
+import { useAuth } from '@/hooks/useAuth';
+import { Link } from 'react-router-dom';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
 import foodOfferImage from '@/assets/food-offer.jpg';
@@ -437,6 +438,7 @@ const mockOffers = [
 ];
 
 const Index = () => {
+  const { user } = useAuth();
   const [activeSection, setActiveSection] = useState<string>('home');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
@@ -980,6 +982,15 @@ const Index = () => {
                 >
                   Store List
                 </button>
+                {user && (
+                  <Link 
+                    to="/your-offers"
+                    className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                  >
+                    <Gift className="h-4 w-4" />
+                    Your Offers
+                  </Link>
+                )}
               </nav>
             </div>
             
