@@ -375,67 +375,59 @@ const Index = () => {
       return mockOffers; // Show all offers by default
     }
 
-    console.log('Filtering with:', { selectedDistrict, selectedCity, selectedCategory, searchQuery });
+    console.log('=== FILTERING STARTED ===');
+    console.log('Selected District ID:', selectedDistrict);
+    console.log('Selected City ID:', selectedCity);
+    console.log('Selected Category:', selectedCategory);
+    console.log('Search Query:', searchQuery);
 
-    return mockOffers.filter(offer => {
+    const filtered = mockOffers.filter(offer => {
+      // Category filter
       const matchesCategory = selectedCategory === 'all' || offer.category === selectedCategory;
-      const matchesSearch = offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                           offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
       
-      // Get the district name from the district id for comparison
-      const districtName = !selectedDistrict ? '' : (() => {
+      // Search filter
+      const matchesSearch = searchQuery === '' || 
+        offer.shopName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        offer.offerTitle.toLowerCase().includes(searchQuery.toLowerCase());
+      
+      // District filter - convert district ID to name for comparison
+      let matchesDistrict = true;
+      if (selectedDistrict) {
         const tamilNaduDistricts = [
-          { id: 'ariyalur', name: 'Ariyalur' },
-          { id: 'chengalpattu', name: 'Chengalpattu' },
           { id: 'chennai', name: 'Chennai' },
           { id: 'coimbatore', name: 'Coimbatore' },
-          { id: 'cuddalore', name: 'Cuddalore' },
-          { id: 'dharmapuri', name: 'Dharmapuri' },
-          { id: 'dindigul', name: 'Dindigul' },
-          { id: 'erode', name: 'Erode' },
-          { id: 'kallakurichi', name: 'Kallakurichi' },
-          { id: 'kanchipuram', name: 'Kanchipuram' },
-          { id: 'kanyakumari', name: 'Kanyakumari' },
-          { id: 'karur', name: 'Karur' },
-          { id: 'krishnagiri', name: 'Krishnagiri' },
           { id: 'madurai', name: 'Madurai' },
-          { id: 'mayiladuthurai', name: 'Mayiladuthurai' },
-          { id: 'nagapattinam', name: 'Nagapattinam' },
-          { id: 'namakkal', name: 'Namakkal' },
-          { id: 'nilgiris', name: 'Nilgiris' },
-          { id: 'perambalur', name: 'Perambalur' },
-          { id: 'pudukkottai', name: 'Pudukkottai' },
-          { id: 'ramanathapuram', name: 'Ramanathapuram' },
-          { id: 'ranipet', name: 'Ranipet' },
           { id: 'salem', name: 'Salem' },
-          { id: 'sivaganga', name: 'Sivaganga' },
-          { id: 'tenkasi', name: 'Tenkasi' },
-          { id: 'thanjavur', name: 'Thanjavur' },
-          { id: 'theni', name: 'Theni' },
-          { id: 'thoothukudi', name: 'Thoothukudi' },
-          { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
-          { id: 'tirunelveli', name: 'Tirunelveli' },
-          { id: 'tirupattur', name: 'Tirupattur' },
-          { id: 'tiruppur', name: 'Tiruppur' },
-          { id: 'tiruvallur', name: 'Tiruvallur' },
-          { id: 'tiruvannamalai', name: 'Tiruvannamalai' },
-          { id: 'tiruvarur', name: 'Tiruvarur' },
+          { id: 'tirupur', name: 'Tirupur' },
+          { id: 'erode', name: 'Erode' },
           { id: 'vellore', name: 'Vellore' },
-          { id: 'viluppuram', name: 'Viluppuram' },
-          { id: 'virudhunagar', name: 'Virudhunagar' },
+          { id: 'thanjavur', name: 'Thanjavur' },
+          { id: 'tiruchirappalli', name: 'Tiruchirappalli' },
+          { id: 'kanyakumari', name: 'Kanyakumari' },
+          { id: 'tirunelveli', name: 'Tirunelveli' },
+          { id: 'cuddalore', name: 'Cuddalore' }
         ];
         const district = tamilNaduDistricts.find(d => d.id === selectedDistrict);
-        return district ? district.name : '';
-      })();
+        const expectedDistrict = district ? district.name : '';
+        matchesDistrict = offer.district === expectedDistrict;
+        console.log(`District check for ${offer.shopName}: offer.district="${offer.district}" vs expected="${expectedDistrict}" = ${matchesDistrict}`);
+      }
       
-      // Updated filtering logic to include both district and city
-      const matchesDistrict = !selectedDistrict || offer.district === districtName;
-      const matchesCity = !selectedCity || offer.city === selectedCity;
+      // City filter
+      let matchesCity = true;
+      if (selectedCity) {
+        matchesCity = offer.city === selectedCity;
+        console.log(`City check for ${offer.shopName}: offer.city="${offer.city}" vs selected="${selectedCity}" = ${matchesCity}`);
+      }
       
-      console.log('Offer:', offer.shopName, 'District match:', matchesDistrict, 'City match:', matchesCity);
+      const passesAllFilters = matchesCategory && matchesSearch && matchesDistrict && matchesCity;
+      console.log(`${offer.shopName}: Category(${matchesCategory}) + Search(${matchesSearch}) + District(${matchesDistrict}) + City(${matchesCity}) = ${passesAllFilters}`);
       
-      return matchesCategory && matchesSearch && matchesDistrict && matchesCity;
+      return passesAllFilters;
     });
+
+    console.log(`=== FILTERING COMPLETE: ${filtered.length} offers found ===`);
+    return filtered;
   };
 
   const filteredOffers = getOffersToShow();
@@ -452,6 +444,8 @@ const Index = () => {
   };
 
   const handleFindOffers = () => {
+    console.log('Find Offers clicked! Setting showFiltered to true');
+    console.log('Current selections:', { selectedDistrict, selectedCity, selectedCategory, searchQuery });
     setShowFiltered(true);
   };
 
