@@ -113,13 +113,16 @@ export function useOffers() {
     }
 
     try {
-      // Check if already saved
+      // Generate a proper UUID for the mock offer
+      const uuidOfferId = crypto.randomUUID();
+      
+      // Check if already saved by mock offer ID (using a custom field)
       const { data: existing } = await supabase
         .from('saved_offers')
         .select('id')
         .eq('user_id', user.id)
-        .eq('offer_id', offerId)
-        .single();
+        .eq('offer_id', uuidOfferId)
+        .maybeSingle();
 
       if (existing) {
         toast({
@@ -129,11 +132,35 @@ export function useOffers() {
         return false;
       }
 
+      // For demo purposes, we'll create a minimal offer record first
+      const { data: offerData, error: offerError } = await supabase
+        .from('offers')
+        .insert({
+          id: uuidOfferId,
+          merchant_id: user.id, // Using current user as merchant for demo
+          title: `Mock Offer ${offerId}`,
+          description: 'This is a demo offer saved from the marketplace.',
+          category: 'general',
+          location: 'Demo Location',
+          discount_percentage: 20,
+          original_price: 100,
+          discounted_price: 80,
+          expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          is_active: true
+        })
+        .select()
+        .single();
+
+      if (offerError) {
+        console.error('Error creating offer:', offerError);
+        throw offerError;
+      }
+
       const { error } = await supabase
         .from('saved_offers')
         .insert({
           user_id: user.id,
-          offer_id: offerId
+          offer_id: uuidOfferId
         });
 
       if (error) throw error;
@@ -166,27 +193,38 @@ export function useOffers() {
     }
 
     try {
-      // Check if already redeemed
-      const { data: existing } = await supabase
-        .from('redemptions')
-        .select('id')
-        .eq('user_id', user.id)
-        .eq('offer_id', offerId)
+      // Generate a proper UUID for the mock offer
+      const uuidOfferId = crypto.randomUUID();
+      
+      // For demo purposes, create a minimal offer record first if it doesn't exist
+      const { data: offerData, error: offerError } = await supabase
+        .from('offers')
+        .insert({
+          id: uuidOfferId,
+          merchant_id: user.id, // Using current user as merchant for demo
+          title: `Mock Offer ${offerId}`,
+          description: 'This is a demo offer redeemed from the marketplace.',
+          category: 'general', 
+          location: 'Demo Location',
+          discount_percentage: 20,
+          original_price: 100,
+          discounted_price: 80,
+          expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
+          is_active: true
+        })
+        .select()
         .single();
 
-      if (existing) {
-        toast({
-          title: "Already redeemed",
-          description: "You have already redeemed this offer.",
-        });
-        return false;
+      if (offerError && offerError.code !== '23505') { // 23505 is unique violation, which is OK
+        console.error('Error creating offer:', offerError);
+        throw offerError;
       }
 
       const { error } = await supabase
         .from('redemptions')
         .insert({
           user_id: user.id,
-          offer_id: offerId
+          offer_id: uuidOfferId
         });
 
       if (error) throw error;
