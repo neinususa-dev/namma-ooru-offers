@@ -512,10 +512,30 @@ const Index = () => {
     setShowFiltered(true);
   };
 
-  // Reset city when district changes
+  // Reset city when district changes and clear search
   const handleDistrictChange = (districtId: string) => {
     setSelectedDistrict(districtId);
     setSelectedCity('');
+    setSearchQuery(''); // Clear search when district is selected
+  };
+
+  // Handle city change and clear search
+  const handleCityChange = (cityId: string) => {
+    setSelectedCity(cityId);
+    setSearchQuery(''); // Clear search when city is selected
+  };
+
+  // Handle search change and clear location filters
+  const handleSearchChange = (value: string) => {
+    setSearchQuery(value);
+    if (value.trim() !== '') {
+      setSelectedDistrict('');
+      setSelectedCity('');
+      setShowFiltered(false); // Reset show filtered when searching
+    }
+    if (value.trim() !== '' || selectedDistrict || selectedCity) {
+      setShowFiltered(true); // Auto-trigger filtering
+    }
   };
 
   const renderContent = () => {
@@ -633,10 +653,7 @@ const Index = () => {
                       <Input
                         placeholder="Search for shops, offers, or categories..."
                         value={searchQuery}
-                        onChange={(e) => {
-                          setSearchQuery(e.target.value);
-                          setShowFiltered(true); // Auto-trigger filtering on search
-                        }}
+                         onChange={(e) => handleSearchChange(e.target.value)}
                         className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
                       />
                     </div>
@@ -665,7 +682,7 @@ const Index = () => {
                         <CitySelect
                           selectedDistrict={selectedDistrict}
                           value={selectedCity}
-                          onValueChange={setSelectedCity}
+                           onValueChange={handleCityChange}
                           placeholder="Select city/town"
                         />
                       </div>
@@ -798,10 +815,7 @@ const Index = () => {
                     <Input
                       placeholder="Search for shops, offers, or categories..."
                       value={searchQuery}
-                      onChange={(e) => {
-                        setSearchQuery(e.target.value);
-                        setShowFiltered(true); // Auto-trigger filtering on search
-                      }}
+                       onChange={(e) => handleSearchChange(e.target.value)}
                       className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
                     />
                   </div>
@@ -830,7 +844,7 @@ const Index = () => {
                       <CitySelect
                         selectedDistrict={selectedDistrict}
                         value={selectedCity}
-                        onValueChange={setSelectedCity}
+                        onValueChange={handleCityChange}
                         placeholder="Select city/town"
                       />
                     </div>
