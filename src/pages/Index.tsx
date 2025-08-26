@@ -9,6 +9,7 @@ import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import { StoreList } from '@/components/StoreList';
+import { AuthButton } from '@/components/AuthButton';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
 import foodOfferImage from '@/assets/food-offer.jpg';
@@ -983,8 +984,7 @@ const Index = () => {
             </div>
             
             <div className="flex items-center gap-3">
-              <Button variant="outline" size="sm">Login</Button>
-              <Button variant="hero" size="sm">Sign Up</Button>
+              <AuthButton />
             </div>
           </div>
         </div>
