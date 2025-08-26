@@ -7,6 +7,9 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Badge } from '@/components/ui/badge';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
 import { useToast } from '@/hooks/use-toast';
 import { 
   Plus, 
@@ -21,8 +24,10 @@ import {
   Heart,
   Download,
   Store,
-  Globe
+  Globe,
+  Filter
 } from 'lucide-react';
+import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
 interface MerchantOffer {
   id: string;
@@ -56,6 +61,14 @@ const MerchantDashboard: React.FC = () => {
   const [offers, setOffers] = useState<MerchantOffer[]>([]);
   const [analytics, setAnalytics] = useState<OfferAnalytics[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  
+  // Filter states
+  const [categoryFilter, setCategoryFilter] = useState<string>('all');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [dateRange, setDateRange] = useState<string>('all');
+
+  // Chart colors
+  const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
 
   // Redirect if not authenticated or not a merchant
   React.useEffect(() => {
@@ -181,10 +194,61 @@ const MerchantDashboard: React.FC = () => {
     }
   };
 
+  // Filter offers based on selected filters
+  const filteredOffers = offers.filter(offer => {
+    const categoryMatch = categoryFilter === 'all' || offer.category === categoryFilter;
+    const statusMatch = statusFilter === 'all' || 
+      (statusFilter === 'active' && offer.is_active) || 
+      (statusFilter === 'inactive' && !offer.is_active);
+    
+    let dateMatch = true;
+    if (dateRange !== 'all') {
+      const now = new Date();
+      const offerDate = new Date(offer.created_at);
+      const daysDiff = Math.floor((now.getTime() - offerDate.getTime()) / (1000 * 60 * 60 * 24));
+      
+      switch (dateRange) {
+        case '7days':
+          dateMatch = daysDiff <= 7;
+          break;
+        case '30days':
+          dateMatch = daysDiff <= 30;
+          break;
+        case '90days':
+          dateMatch = daysDiff <= 90;
+          break;
+      }
+    }
+    
+    return categoryMatch && statusMatch && dateMatch;
+  });
+
   const totalSaves = analytics.reduce((sum, item) => sum + item.saves_count, 0);
   const totalRedemptions = analytics.reduce((sum, item) => sum + item.redemptions_count, 0);
   const totalOnlineRedemptions = analytics.reduce((sum, item) => sum + item.online_redemptions, 0);
   const totalStoreRedemptions = analytics.reduce((sum, item) => sum + item.store_redemptions, 0);
+
+  // Chart data
+  const redemptionModeData = [
+    { name: 'Online', value: totalOnlineRedemptions, color: COLORS[0] },
+    { name: 'In-Store', value: totalStoreRedemptions, color: COLORS[1] }
+  ];
+
+  const categoryData = offers.reduce((acc: any[], offer) => {
+    const existing = acc.find(item => item.category === offer.category);
+    if (existing) {
+      existing.offers += 1;
+    } else {
+      acc.push({ category: offer.category, offers: 1 });
+    }
+    return acc;
+  }, []);
+
+  const performanceData = analytics.slice(0, 5).map(item => ({
+    name: item.offer_title.substring(0, 20) + '...',
+    saves: item.saves_count,
+    redemptions: item.redemptions_count
+  }));
 
   if (loading || isLoading) {
     return (
@@ -214,6 +278,70 @@ const MerchantDashboard: React.FC = () => {
           </Button>
         </div>
 
+        {/* Filters */}
+        <Card className="mb-8">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Filter className="h-5 w-5" />
+              Filters
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="space-y-2">
+                <Label>Date Range</Label>
+                <Select value={dateRange} onValueChange={setDateRange}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Time</SelectItem>
+                    <SelectItem value="7days">Last 7 Days</SelectItem>
+                    <SelectItem value="30days">Last 30 Days</SelectItem>
+                    <SelectItem value="90days">Last 90 Days</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Category</Label>
+                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Categories</SelectItem>
+                    <SelectItem value="electronics">Electronics</SelectItem>
+                    <SelectItem value="fashion">Fashion</SelectItem>
+                    <SelectItem value="food">Food & Dining</SelectItem>
+                    <SelectItem value="grocery">Grocery</SelectItem>
+                    <SelectItem value="home">Home & Garden</SelectItem>
+                    <SelectItem value="beauty">Beauty & Health</SelectItem>
+                    <SelectItem value="sports">Sports & Fitness</SelectItem>
+                    <SelectItem value="travel">Travel</SelectItem>
+                    <SelectItem value="entertainment">Entertainment</SelectItem>
+                    <SelectItem value="other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+              
+              <div className="space-y-2">
+                <Label>Status</Label>
+                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Status</SelectItem>
+                    <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="inactive">Inactive</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
         {/* Overview Cards */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <Card>
@@ -221,7 +349,7 @@ const MerchantDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Offers</p>
-                  <p className="text-2xl font-bold">{offers.length}</p>
+                  <p className="text-2xl font-bold animate-fade-in">{filteredOffers.length}</p>
                 </div>
                 <ShoppingBag className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -233,7 +361,7 @@ const MerchantDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Saves</p>
-                  <p className="text-2xl font-bold">{totalSaves}</p>
+                  <p className="text-2xl font-bold animate-fade-in">{totalSaves}</p>
                 </div>
                 <Heart className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -245,7 +373,7 @@ const MerchantDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Total Redemptions</p>
-                  <p className="text-2xl font-bold">{totalRedemptions}</p>
+                  <p className="text-2xl font-bold animate-fade-in">{totalRedemptions}</p>
                 </div>
                 <Download className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -257,7 +385,7 @@ const MerchantDashboard: React.FC = () => {
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-sm font-medium text-muted-foreground">Active Offers</p>
-                  <p className="text-2xl font-bold">{offers.filter(offer => offer.is_active).length}</p>
+                  <p className="text-2xl font-bold animate-fade-in">{filteredOffers.filter(offer => offer.is_active).length}</p>
                 </div>
                 <TrendingUp className="h-8 w-8 text-muted-foreground" />
               </div>
@@ -279,7 +407,7 @@ const MerchantDashboard: React.FC = () => {
                 <CardDescription>Manage and monitor your posted offers</CardDescription>
               </CardHeader>
               <CardContent>
-                {offers.length === 0 ? (
+                {filteredOffers.length === 0 ? (
                   <div className="text-center py-8">
                     <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
                     <h3 className="text-lg font-semibold mb-2">No offers yet</h3>
@@ -291,7 +419,7 @@ const MerchantDashboard: React.FC = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {offers.map((offer) => (
+                    {filteredOffers.map((offer) => (
                       <div key={offer.id} className="border rounded-lg p-4 space-y-3">
                         <div className="flex justify-between items-start">
                           <div className="flex-1">
@@ -356,20 +484,96 @@ const MerchantDashboard: React.FC = () => {
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <PieChart>
+                      <Pie
+                        data={redemptionModeData}
+                        cx="50%"
+                        cy="50%"
+                        innerRadius={60}
+                        outerRadius={80}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {redemptionModeData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} />
+                        ))}
+                      </Pie>
+                      <Tooltip />
+                      <Legend />
+                    </PieChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Users className="h-5 w-5" />
+                    Category Distribution
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={200}>
+                    <BarChart data={categoryData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="category" />
+                      <YAxis />
+                      <Tooltip />
+                      <Bar dataKey="offers" fill="hsl(var(--primary))" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+
+            <Card>
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <TrendingUp className="h-5 w-5" />
+                  Top Performing Offers
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={performanceData}>
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="saves" fill="hsl(var(--primary))" name="Saves" />
+                    <Bar dataKey="redemptions" fill="hsl(var(--secondary))" name="Redemptions" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </Card>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Heart className="h-5 w-5" />
+                    Engagement Metrics
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span className="flex items-center gap-2">
-                        <Globe className="h-4 w-4" />
-                        Online Redemptions
+                      <span>Conversion Rate</span>
+                      <span className="font-semibold text-primary">
+                        {totalSaves > 0 ? ((totalRedemptions / totalSaves) * 100).toFixed(1) : 0}%
                       </span>
-                      <span className="font-semibold">{totalOnlineRedemptions}</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="flex items-center gap-2">
-                        <Store className="h-4 w-4" />
-                        In-Store Redemptions
+                      <span>Avg. Saves per Offer</span>
+                      <span className="font-semibold text-primary">
+                        {offers.length > 0 ? (totalSaves / offers.length).toFixed(1) : 0}
                       </span>
-                      <span className="font-semibold">{totalStoreRedemptions}</span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Total Engagement</span>
+                      <span className="font-semibold text-primary">{totalSaves + totalRedemptions}</span>
                     </div>
                   </div>
                 </CardContent>
@@ -378,22 +582,28 @@ const MerchantDashboard: React.FC = () => {
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Users className="h-5 w-5" />
-                    Engagement Summary
+                    <Calendar className="h-5 w-5" />
+                    Quick Stats
                   </CardTitle>
                 </CardHeader>
                 <CardContent>
                   <div className="space-y-4">
                     <div className="flex justify-between items-center">
-                      <span>Conversion Rate</span>
-                      <span className="font-semibold">
-                        {totalSaves > 0 ? ((totalRedemptions / totalSaves) * 100).toFixed(1) : 0}%
+                      <span>Active Offers</span>
+                      <span className="font-semibold text-green-600">
+                        {offers.filter(offer => offer.is_active).length}
                       </span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span>Avg. Saves per Offer</span>
-                      <span className="font-semibold">
-                        {offers.length > 0 ? (totalSaves / offers.length).toFixed(1) : 0}
+                      <span>Expired Offers</span>
+                      <span className="font-semibold text-red-600">
+                        {offers.filter(offer => new Date(offer.expiry_date) < new Date()).length}
+                      </span>
+                    </div>
+                    <div className="flex justify-between items-center">
+                      <span>Premium Listings</span>
+                      <span className="font-semibold text-orange-600">
+                        {offers.filter(offer => offer.listing_type !== 'local_deals').length}
                       </span>
                     </div>
                   </div>
