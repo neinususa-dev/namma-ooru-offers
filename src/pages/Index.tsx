@@ -531,10 +531,12 @@ const Index = () => {
       <header className="bg-card/80 backdrop-blur-sm border-b border-primary/10 sticky top-0 z-50">
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <div className="w-10 h-10 bg-blue-orange-gradient rounded-lg flex items-center justify-center">
-                <Store className="h-6 w-6 text-white" />
-              </div>
+            <div className="flex items-center gap-3">
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma OOru Offers Logo" 
+                className="w-12 h-12 rounded-lg"
+              />
               <div>
                 <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
                   Namma OOru Offers
@@ -793,9 +795,11 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <div className="flex items-center gap-2 mb-4 md:mb-0">
-              <div className="w-8 h-8 bg-blue-orange-gradient rounded-lg flex items-center justify-center">
-                <Store className="h-5 w-5 text-white" />
-              </div>
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma OOru Offers Logo" 
+                className="w-8 h-8 rounded"
+              />
               <div>
                 <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
                   Namma OOru Offers

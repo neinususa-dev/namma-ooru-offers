@@ -45,13 +45,13 @@ export const PaginatedOffersSection: React.FC<PaginatedOffersSectionProps> = ({
   const offersPerPage = 4;
   const totalPages = Math.ceil(offers.length / offersPerPage);
 
-  // Auto-scrolling effect
+  // Auto-scrolling effect with smooth 5-second intervals
   useEffect(() => {
     if (!isAutoScrolling || totalPages <= 1) return;
 
     const interval = setInterval(() => {
       setCurrentPage(prev => (prev + 1) % totalPages);
-    }, 2000);
+    }, 5000);
 
     return () => clearInterval(interval);
   }, [isAutoScrolling, totalPages]);
@@ -99,8 +99,59 @@ export const PaginatedOffersSection: React.FC<PaginatedOffersSectionProps> = ({
           <div className="flex-1 h-px bg-gradient-to-r from-primary/50 to-transparent"></div>
         </div>
         
-        {/* Offers Grid - Always show 4 columns */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+        {/* Header with Pagination on Right */}
+        <div className="flex items-center justify-between mb-8">
+          <div></div>
+          
+          {/* Pagination Controls - Right Side */}
+          {totalPages > 1 && (
+            <div className="flex items-center gap-2">
+              {/* Previous Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handlePrevious}
+                disabled={totalPages <= 1}
+                className="h-8 w-8 p-0 border-primary/30 hover:bg-primary hover:text-primary-foreground"
+              >
+                <ChevronLeft className="h-4 w-4" />
+              </Button>
+
+              {/* Page Numbers */}
+              <div className="flex items-center gap-1">
+                {Array.from({ length: totalPages }).map((_, index) => (
+                  <Button
+                    key={index}
+                    variant={currentPage === index ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => handlePageClick(index)}
+                    className={`h-8 w-8 p-0 text-sm ${
+                      currentPage === index 
+                        ? "bg-primary text-primary-foreground" 
+                        : "border-primary/30 hover:bg-primary hover:text-primary-foreground"
+                    }`}
+                  >
+                    {index + 1}
+                  </Button>
+                ))}
+              </div>
+
+              {/* Next Button */}
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={handleNext}
+                disabled={totalPages <= 1}
+                className="h-8 w-8 p-0 border-primary/30 hover:bg-primary hover:text-primary-foreground"
+              >
+                <ChevronRight className="h-4 w-4" />
+              </Button>
+            </div>
+          )}
+        </div>
+        
+        {/* Offers Grid - Always show 4 columns with smooth transition */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 transition-all duration-700 ease-in-out">
           {getCurrentOffers().map(offer => (
             <OfferCard key={offer.id} {...offer} />
           ))}
@@ -110,58 +161,12 @@ export const PaginatedOffersSection: React.FC<PaginatedOffersSectionProps> = ({
           ))}
         </div>
 
-        {/* Pagination Controls */}
-        {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-4">
-            {/* Previous Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handlePrevious}
-              disabled={totalPages <= 1}
-              className="flex items-center gap-2"
-            >
-              <ChevronLeft className="h-4 w-4" />
-              Previous
-            </Button>
-
-            {/* Page Indicators */}
-            <Pagination>
-              <PaginationContent>
-                {Array.from({ length: totalPages }).map((_, index) => (
-                  <PaginationItem key={index}>
-                    <PaginationLink
-                      onClick={() => handlePageClick(index)}
-                      isActive={currentPage === index}
-                      className="cursor-pointer"
-                    >
-                      {index + 1}
-                    </PaginationLink>
-                  </PaginationItem>
-                ))}
-              </PaginationContent>
-            </Pagination>
-
-            {/* Next Button */}
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleNext}
-              disabled={totalPages <= 1}
-              className="flex items-center gap-2"
-            >
-              Next
-              <ChevronRight className="h-4 w-4" />
-            </Button>
-          </div>
-        )}
-
         {/* Auto-scroll indicator */}
         {totalPages > 1 && (
           <div className="flex items-center justify-center mt-4">
             <div className="flex items-center gap-2 text-sm text-muted-foreground">
-              <div className={`w-2 h-2 rounded-full ${isAutoScrolling ? 'bg-primary animate-pulse' : 'bg-muted-foreground'}`}></div>
-              <span>{isAutoScrolling ? 'Auto-scrolling every 2s' : 'Auto-scroll paused'}</span>
+              <div className={`w-2 h-2 rounded-full transition-all duration-300 ${isAutoScrolling ? 'bg-primary animate-pulse' : 'bg-muted-foreground'}`}></div>
+              <span>{isAutoScrolling ? 'Auto-scrolling every 5s' : 'Auto-scroll paused'}</span>
             </div>
           </div>
         )}
