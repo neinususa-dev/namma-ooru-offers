@@ -14,7 +14,161 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      offers: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          discount_percentage: number | null
+          discounted_price: number | null
+          expiry_date: string
+          id: string
+          is_active: boolean
+          location: string | null
+          merchant_id: string
+          original_price: number | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          discounted_price?: number | null
+          expiry_date: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          merchant_id: string
+          original_price?: number | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          discount_percentage?: number | null
+          discounted_price?: number | null
+          expiry_date?: string
+          id?: string
+          is_active?: boolean
+          location?: string | null
+          merchant_id?: string
+          original_price?: number | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "offers_merchant_id_fkey"
+            columns: ["merchant_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string
+          id: string
+          name: string
+          role: Database["public"]["Enums"]["user_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          email: string
+          id: string
+          name: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          email?: string
+          id?: string
+          name?: string
+          role?: Database["public"]["Enums"]["user_role"]
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      redemptions: {
+        Row: {
+          id: string
+          offer_id: string
+          redeemed_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          offer_id: string
+          redeemed_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          offer_id?: string
+          redeemed_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "redemptions_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "redemptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      saved_offers: {
+        Row: {
+          id: string
+          offer_id: string
+          saved_at: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          offer_id: string
+          saved_at?: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          offer_id?: string
+          saved_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "saved_offers_offer_id_fkey"
+            columns: ["offer_id"]
+            isOneToOne: false
+            referencedRelation: "offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "saved_offers_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
@@ -23,7 +177,7 @@ export type Database = {
       [_ in never]: never
     }
     Enums: {
-      [_ in never]: never
+      user_role: "customer" | "merchant"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -150,6 +304,8 @@ export type CompositeTypes<
 
 export const Constants = {
   public: {
-    Enums: {},
+    Enums: {
+      user_role: ["customer", "merchant"],
+    },
   },
 } as const
