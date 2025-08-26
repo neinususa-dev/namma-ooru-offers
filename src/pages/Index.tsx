@@ -735,7 +735,10 @@ const Index = () => {
         <div className="container mx-auto px-4 py-4">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
-              <div className="flex items-center gap-3">
+              <button 
+                onClick={() => setActiveSection('hot-deals')}
+                className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
+              >
                 <img 
                   src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
                   alt="Namma OOru Offers Logo" 
@@ -747,10 +750,20 @@ const Index = () => {
                   </h1>
                   <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
                 </div>
-              </div>
+              </button>
               
               {/* Navigation Links */}
               <nav className="hidden md:flex items-center gap-6">
+                <button
+                  onClick={() => setActiveSection('hot-deals')}
+                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                    activeSection === 'hot-deals' 
+                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                      : 'text-blue-600'
+                  }`}
+                >
+                  Home
+                </button>
                 <button
                   onClick={() => setActiveSection('hot-deals')}
                   className={`text-sm font-medium transition-colors hover:text-orange-500 ${
@@ -838,7 +851,10 @@ const Index = () => {
       <footer className="bg-card border-t border-primary/10 py-8">
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
-            <div className="flex items-center gap-2 mb-4 md:mb-0">
+            <button 
+              onClick={() => setActiveSection('hot-deals')}
+              className="flex items-center gap-2 mb-4 md:mb-0 hover:opacity-80 transition-opacity cursor-pointer"
+            >
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
                 alt="Namma OOru Offers Logo" 
@@ -850,7 +866,7 @@ const Index = () => {
                 </div>
                 <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
               </div>
-            </div>
+            </button>
             
             <div className="text-sm text-muted-foreground text-center md:text-right">
               <p>© 2024 Namma OOru Offers. Supporting local businesses across Tamil Nadu.</p>
