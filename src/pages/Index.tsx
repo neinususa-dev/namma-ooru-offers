@@ -558,71 +558,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* District, City Selection & Search */}
-      <section className="py-8 bg-card/50">
-        <div className="container mx-auto px-4">
-          <div className="max-w-6xl mx-auto space-y-6">
-            <div className="text-center">
-              <h2 className="text-2xl font-bold text-foreground mb-2">Find Local Offers</h2>
-              <p className="text-muted-foreground">Select your location to discover amazing deals nearby</p>
-            </div>
-            
-            <div className="grid md:grid-cols-4 gap-4">
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">District</label>
-                <DistrictSelect 
-                  value={selectedDistrict}
-                  onValueChange={handleDistrictChange}
-                  placeholder="Select district"
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-foreground mb-2">City/Town</label>
-                <CitySelect
-                  selectedDistrict={selectedDistrict}
-                  value={selectedCity}
-                  onValueChange={setSelectedCity}
-                  placeholder="Select city/town"
-                />
-              </div>
-              <div className="md:col-span-2 space-y-2">
-                <label className="block text-sm font-medium text-foreground">Search Offers</label>
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    placeholder="Search for shops, offers, or categories..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button 
-                onClick={handleFindOffers}
-                variant="default" 
-                size="lg"
-                className="min-w-[200px]"
-              >
-                <Search className="h-4 w-4 mr-2" />
-                Find Offers
-              </Button>
-              
-              {showFiltered && (
-                <Button 
-                  onClick={handleClearFilters}
-                  variant="outline" 
-                  size="lg"
-                >
-                  Show All Offers
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* Hot Offers Section */}
       <section className="py-12 bg-background">
@@ -668,6 +603,70 @@ const Index = () => {
           <div className="mb-8">
             <h3 className="text-3xl font-bold text-foreground mb-2">All Offers</h3>
             <p className="text-muted-foreground">Discover all available offers from local shops</p>
+          </div>
+
+          {/* District, City Selection & Search */}
+          <div className="mb-8 p-6 bg-card/50 rounded-lg border border-primary/10">
+            <div className="max-w-6xl mx-auto space-y-6">
+              <div className="text-center">
+                <h4 className="text-xl font-bold text-foreground mb-2">Find Local Offers</h4>
+                <p className="text-muted-foreground">Select your location to discover amazing deals nearby</p>
+              </div>
+              
+              <div className="grid md:grid-cols-4 gap-4">
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">District</label>
+                  <DistrictSelect 
+                    value={selectedDistrict}
+                    onValueChange={handleDistrictChange}
+                    placeholder="Select district"
+                  />
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-foreground mb-2">City/Town</label>
+                  <CitySelect
+                    selectedDistrict={selectedDistrict}
+                    value={selectedCity}
+                    onValueChange={setSelectedCity}
+                    placeholder="Select city/town"
+                  />
+                </div>
+                <div className="md:col-span-2 space-y-2">
+                  <label className="block text-sm font-medium text-foreground">Search Offers</label>
+                  <div className="relative">
+                    <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      placeholder="Search for shops, offers, or categories..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="pl-10 bg-card shadow-md border-primary/20 focus:border-primary"
+                    />
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                <Button 
+                  onClick={handleFindOffers}
+                  variant="default" 
+                  size="lg"
+                  className="min-w-[200px]"
+                >
+                  <Search className="h-4 w-4 mr-2" />
+                  Find Offers
+                </Button>
+                
+                {showFiltered && (
+                  <Button 
+                    onClick={handleClearFilters}
+                    variant="outline" 
+                    size="lg"
+                  >
+                    Show All Offers
+                  </Button>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="mb-6">
