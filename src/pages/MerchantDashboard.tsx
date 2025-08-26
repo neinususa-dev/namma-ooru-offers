@@ -3,254 +3,295 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
-import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { useToast } from '@/hooks/use-toast';
 import { 
-  Plus, 
-  BarChart3, 
-  Users, 
-  ShoppingBag, 
-  TrendingUp, 
-  Calendar,
-  MapPin,
-  DollarSign,
-  Eye,
-  Heart,
-  Download,
-  Store,
-  Globe,
-  Filter
+  BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer,
+  PieChart, Pie, Cell, LineChart, Line, AreaChart, Area
+} from 'recharts';
+import { 
+  Plus, BarChart3, TrendingUp, Eye, Heart, ShoppingBag, 
+  Calendar, Filter, Target, Award, Users, Star, DollarSign,
+  Package, Activity, Clock, Globe
 } from 'lucide-react';
-import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer, PieChart, Pie, Cell, LineChart, Line } from 'recharts';
 
-interface MerchantOffer {
-  id: string;
-  title: string;
-  description: string;
+interface MerchantStats {
+  totalOffers: number;
+  totalSaves: number;
+  totalRedemptions: number;
+  totalRevenue: number;
+  categoriesData: Array<{ name: string; value: number; color: string }>;
+  monthlyActivity: Array<{ month: string; offers: number; saves: number; redemptions: number; revenue: number }>;
+  offerPerformance: Array<{ title: string; saves: number; redemptions: number; revenue: number }>;
+  redemptionModes: Array<{ name: string; value: number; color: string }>;
+}
+
+interface Filters {
+  dateRange: string;
   category: string;
-  location: string;
-  original_price: number;
-  discount_percentage: number;
-  discounted_price: number;
-  expiry_date: string;
-  listing_type: string;
-  redemption_mode: string;
-  is_active: boolean;
-  created_at: string;
+  status: string;
 }
 
-interface OfferAnalytics {
-  offer_id: string;
-  offer_title: string;
-  saves_count: number;
-  redemptions_count: number;
-  online_redemptions: number;
-  store_redemptions: number;
-}
-
-const MerchantDashboard: React.FC = () => {
-  const { user, profile, loading } = useAuth();
+const MerchantDashboard = () => {
+  const { user, profile, loading: authLoading } = useAuth();
   const navigate = useNavigate();
-  const { toast } = useToast();
-  const [offers, setOffers] = useState<MerchantOffer[]>([]);
-  const [analytics, setAnalytics] = useState<OfferAnalytics[]>([]);
-  const [isLoading, setIsLoading] = useState(true);
-  
-  // Filter states
-  const [categoryFilter, setCategoryFilter] = useState<string>('all');
-  const [statusFilter, setStatusFilter] = useState<string>('all');
-  const [dateRange, setDateRange] = useState<string>('all');
-
-  // Chart colors
-  const COLORS = ['hsl(var(--primary))', 'hsl(var(--secondary))', 'hsl(var(--accent))', 'hsl(var(--muted))'];
+  const [stats, setStats] = useState<MerchantStats>({
+    totalOffers: 0,
+    totalSaves: 0,
+    totalRedemptions: 0,
+    totalRevenue: 0,
+    categoriesData: [],
+    monthlyActivity: [],
+    offerPerformance: [],
+    redemptionModes: []
+  });
+  const [loading, setLoading] = useState(true);
+  const [filters, setFilters] = useState<Filters>({
+    dateRange: 'all',
+    category: 'all',
+    status: 'all'
+  });
 
   // Redirect if not authenticated or not a merchant
-  React.useEffect(() => {
-    if (!loading && (!user || profile?.role !== 'merchant')) {
+  useEffect(() => {
+    if (!authLoading && !user) {
       navigate('/auth');
+    } else if (!authLoading && user && profile?.role !== 'merchant') {
+      navigate('/');
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, authLoading, navigate]);
 
   useEffect(() => {
     if (user && profile?.role === 'merchant') {
-      fetchMerchantData();
+      fetchMerchantAnalytics();
     }
-  }, [user, profile]);
+  }, [user, profile, filters]);
 
-  const fetchMerchantData = async () => {
+  const fetchMerchantAnalytics = async () => {
     if (!user) return;
-
+    
     try {
-      setIsLoading(true);
-      
-      // Fetch merchant's offers
-      const { data: offersData, error: offersError } = await supabase
+      setLoading(true);
+
+      // Build date filter
+      let dateFilter = '';
+      const now = new Date();
+      if (filters.dateRange === '7d') {
+        dateFilter = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+      } else if (filters.dateRange === '30d') {
+        dateFilter = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000).toISOString();
+      } else if (filters.dateRange === '90d') {
+        dateFilter = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString();
+      }
+
+      // Fetch merchant offers
+      let offersQuery = supabase
         .from('offers')
         .select('*')
-        .eq('merchant_id', user.id)
-        .order('created_at', { ascending: false });
+        .eq('merchant_id', user.id);
 
+      if (dateFilter) {
+        offersQuery = offersQuery.gte('created_at', dateFilter);
+      }
+      if (filters.category !== 'all') {
+        offersQuery = offersQuery.eq('category', filters.category);
+      }
+      if (filters.status !== 'all') {
+        if (filters.status === 'active') {
+          offersQuery = offersQuery.eq('is_active', true).gte('expiry_date', now.toISOString());
+        } else if (filters.status === 'expired') {
+          offersQuery = offersQuery.lt('expiry_date', now.toISOString());
+        } else if (filters.status === 'inactive') {
+          offersQuery = offersQuery.eq('is_active', false);
+        }
+      }
+
+      const { data: offers, error: offersError } = await offersQuery;
       if (offersError) throw offersError;
-      setOffers(offersData || []);
 
-      // Fetch analytics data
-      const offerIds = offersData?.map(offer => offer.id) || [];
-      
-      if (offerIds.length > 0) {
-        // Get saves count
-        const { data: savesData } = await supabase
-          .from('saved_offers')
-          .select('offer_id')
-          .in('offer_id', offerIds);
+      // Fetch saves for merchant offers
+      const { data: saves, error: savesError } = await supabase
+        .from('saved_offers')
+        .select(`
+          id,
+          saved_at,
+          offers (
+            id,
+            title,
+            category,
+            discount_percentage,
+            original_price,
+            discounted_price,
+            merchant_id
+          )
+        `)
+        .eq('offers.merchant_id', user.id);
 
-        // Get redemptions with mode analysis
-        const { data: redemptionsData } = await supabase
-          .from('redemptions')
-          .select('offer_id')
-          .in('offer_id', offerIds);
+      if (savesError) throw savesError;
 
-        // Process analytics
-        const analyticsMap = new Map<string, OfferAnalytics>();
-        
-        offersData?.forEach(offer => {
-          analyticsMap.set(offer.id, {
-            offer_id: offer.id,
-            offer_title: offer.title,
-            saves_count: 0,
-            redemptions_count: 0,
-            online_redemptions: 0,
-            store_redemptions: 0,
-          });
-        });
+      // Fetch redemptions for merchant offers
+      const { data: redemptions, error: redemptionsError } = await supabase
+        .from('redemptions')
+        .select(`
+          id,
+          redeemed_at,
+          offers (
+            id,
+            title,
+            category,
+            discount_percentage,
+            original_price,
+            discounted_price,
+            redemption_mode,
+            merchant_id
+          )
+        `)
+        .eq('offers.merchant_id', user.id);
 
-        // Count saves
-        savesData?.forEach(save => {
-          const analytics = analyticsMap.get(save.offer_id);
-          if (analytics) {
-            analytics.saves_count++;
-          }
-        });
+      if (redemptionsError) throw redemptionsError;
 
-        // Count redemptions
-        redemptionsData?.forEach(redemption => {
-          const analytics = analyticsMap.get(redemption.offer_id);
-          if (analytics) {
-            analytics.redemptions_count++;
-            // For now, we'll split redemptions randomly as we don't track mode yet
-            if (Math.random() > 0.5) {
-              analytics.online_redemptions++;
-            } else {
-              analytics.store_redemptions++;
-            }
-          }
-        });
+      // Process analytics data
+      const categoryColors = {
+        food: '#FF6B6B',
+        fashion: '#4ECDC4', 
+        electronics: '#45B7D1',
+        grocery: '#96CEB4',
+        home: '#FFEAA7',
+        beauty: '#DDA0DD',
+        sports: '#FF9FF3',
+        travel: '#54A0FF',
+        entertainment: '#5F27CD',
+        other: '#00D2D3'
+      };
 
-        setAnalytics(Array.from(analyticsMap.values()));
-      }
-    } catch (error) {
-      console.error('Error fetching merchant data:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to load dashboard data.',
-        variant: 'destructive',
+      // Category breakdown from offers
+      const categoryCount: Record<string, number> = {};
+      offers?.forEach(offer => {
+        if (offer.category) {
+          categoryCount[offer.category] = (categoryCount[offer.category] || 0) + 1;
+        }
       });
+
+      const categoriesData = Object.entries(categoryCount).map(([category, count]) => ({
+        name: category,
+        value: count,
+        color: categoryColors[category as keyof typeof categoryColors] || categoryColors.other
+      }));
+
+      // Redemption modes breakdown
+      const redemptionModeCount: Record<string, number> = {};
+      redemptions?.forEach(redemption => {
+        const mode = redemption.offers?.redemption_mode || 'both';
+        redemptionModeCount[mode] = (redemptionModeCount[mode] || 0) + 1;
+      });
+
+      const redemptionModes = Object.entries(redemptionModeCount).map(([mode, count]) => ({
+        name: mode === 'both' ? 'Online & Store' : mode === 'online' ? 'Online Only' : 'Store Only',
+        value: count,
+        color: mode === 'online' ? '#4ECDC4' : mode === 'store' ? '#FF6B6B' : '#45B7D1'
+      }));
+
+      // Monthly activity (last 6 months)
+      const monthlyData: Record<string, { offers: number; saves: number; redemptions: number; revenue: number }> = {};
+      
+      for (let i = 5; i >= 0; i--) {
+        const date = new Date();
+        date.setMonth(date.getMonth() - i);
+        const monthKey = date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        monthlyData[monthKey] = { offers: 0, saves: 0, redemptions: 0, revenue: 0 };
+      }
+
+      // Count offers by month
+      offers?.forEach(offer => {
+        const month = new Date(offer.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        if (monthlyData[month]) {
+          monthlyData[month].offers++;
+        }
+      });
+
+      // Count saves by month
+      saves?.forEach(save => {
+        const month = new Date(save.saved_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        if (monthlyData[month]) {
+          monthlyData[month].saves++;
+        }
+      });
+
+      // Count redemptions and calculate revenue by month
+      redemptions?.forEach(redemption => {
+        const month = new Date(redemption.redeemed_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+        if (monthlyData[month]) {
+          monthlyData[month].redemptions++;
+          const revenue = redemption.offers?.discounted_price || 0;
+          monthlyData[month].revenue += revenue;
+        }
+      });
+
+      const monthlyActivity = Object.entries(monthlyData).map(([month, data]) => ({
+        month,
+        ...data
+      }));
+
+      // Offer performance
+      const offerPerformanceMap: Record<string, { saves: number; redemptions: number; revenue: number; title: string }> = {};
+      
+      offers?.forEach(offer => {
+        offerPerformanceMap[offer.id] = {
+          title: offer.title,
+          saves: 0,
+          redemptions: 0,
+          revenue: 0
+        };
+      });
+
+      saves?.forEach(save => {
+        if (save.offers && offerPerformanceMap[save.offers.id]) {
+          offerPerformanceMap[save.offers.id].saves++;
+        }
+      });
+
+      redemptions?.forEach(redemption => {
+        if (redemption.offers && offerPerformanceMap[redemption.offers.id]) {
+          offerPerformanceMap[redemption.offers.id].redemptions++;
+          offerPerformanceMap[redemption.offers.id].revenue += redemption.offers.discounted_price || 0;
+        }
+      });
+
+      const offerPerformance = Object.values(offerPerformanceMap)
+        .sort((a, b) => (b.saves + b.redemptions) - (a.saves + a.redemptions))
+        .slice(0, 5);
+
+      // Calculate totals
+      const totalOffers = offers?.length || 0;
+      const totalSaves = saves?.length || 0;
+      const totalRedemptions = redemptions?.length || 0;
+      const totalRevenue = redemptions?.reduce((sum, redemption) => 
+        sum + (redemption.offers?.discounted_price || 0), 0) || 0;
+
+      setStats({
+        totalOffers,
+        totalSaves,
+        totalRedemptions,
+        totalRevenue,
+        categoriesData,
+        monthlyActivity,
+        offerPerformance,
+        redemptionModes
+      });
+
+    } catch (error) {
+      console.error('Error fetching merchant analytics:', error);
     } finally {
-      setIsLoading(false);
+      setLoading(false);
     }
   };
 
-  const toggleOfferStatus = async (offerId: string, currentStatus: boolean) => {
-    try {
-      const { error } = await supabase
-        .from('offers')
-        .update({ is_active: !currentStatus })
-        .eq('id', offerId);
-
-      if (error) throw error;
-
-      setOffers(offers.map(offer => 
-        offer.id === offerId 
-          ? { ...offer, is_active: !currentStatus }
-          : offer
-      ));
-
-      toast({
-        title: 'Success',
-        description: `Offer ${!currentStatus ? 'activated' : 'deactivated'} successfully.`,
-      });
-    } catch (error) {
-      console.error('Error toggling offer status:', error);
-      toast({
-        title: 'Error',
-        description: 'Failed to update offer status.',
-        variant: 'destructive',
-      });
-    }
-  };
-
-  // Filter offers based on selected filters
-  const filteredOffers = offers.filter(offer => {
-    const categoryMatch = categoryFilter === 'all' || offer.category === categoryFilter;
-    const statusMatch = statusFilter === 'all' || 
-      (statusFilter === 'active' && offer.is_active) || 
-      (statusFilter === 'inactive' && !offer.is_active);
-    
-    let dateMatch = true;
-    if (dateRange !== 'all') {
-      const now = new Date();
-      const offerDate = new Date(offer.created_at);
-      const daysDiff = Math.floor((now.getTime() - offerDate.getTime()) / (1000 * 60 * 60 * 24));
-      
-      switch (dateRange) {
-        case '7days':
-          dateMatch = daysDiff <= 7;
-          break;
-        case '30days':
-          dateMatch = daysDiff <= 30;
-          break;
-        case '90days':
-          dateMatch = daysDiff <= 90;
-          break;
-      }
-    }
-    
-    return categoryMatch && statusMatch && dateMatch;
-  });
-
-  const totalSaves = analytics.reduce((sum, item) => sum + item.saves_count, 0);
-  const totalRedemptions = analytics.reduce((sum, item) => sum + item.redemptions_count, 0);
-  const totalOnlineRedemptions = analytics.reduce((sum, item) => sum + item.online_redemptions, 0);
-  const totalStoreRedemptions = analytics.reduce((sum, item) => sum + item.store_redemptions, 0);
-
-  // Chart data
-  const redemptionModeData = [
-    { name: 'Online', value: totalOnlineRedemptions, color: COLORS[0] },
-    { name: 'In-Store', value: totalStoreRedemptions, color: COLORS[1] }
-  ];
-
-  const categoryData = offers.reduce((acc: any[], offer) => {
-    const existing = acc.find(item => item.category === offer.category);
-    if (existing) {
-      existing.offers += 1;
-    } else {
-      acc.push({ category: offer.category, offers: 1 });
-    }
-    return acc;
-  }, []);
-
-  const performanceData = analytics.slice(0, 5).map(item => ({
-    name: item.offer_title.substring(0, 20) + '...',
-    saves: item.saves_count,
-    redemptions: item.redemptions_count
-  }));
-
-  if (loading || isLoading) {
+  if (authLoading || loading) {
     return (
       <div className="min-h-screen bg-background">
         <Header showNavigation={false} />
@@ -269,7 +310,7 @@ const MerchantDashboard: React.FC = () => {
           <div>
             <h1 className="text-3xl font-bold text-foreground mb-2">Merchant Dashboard</h1>
             <p className="text-muted-foreground">
-              Welcome back, {profile?.name}! Manage your offers and track performance.
+              Welcome back, {profile?.name}! Track your offers and business performance.
             </p>
           </div>
           <Button onClick={() => navigate('/merchant-post-offer')} className="flex items-center gap-2">
@@ -279,7 +320,7 @@ const MerchantDashboard: React.FC = () => {
         </div>
 
         {/* Filters */}
-        <Card className="mb-8">
+        <Card className="mb-6">
           <CardHeader>
             <CardTitle className="flex items-center gap-2">
               <Filter className="h-5 w-5" />
@@ -288,32 +329,32 @@ const MerchantDashboard: React.FC = () => {
           </CardHeader>
           <CardContent>
             <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="space-y-2">
+              <div>
                 <Label>Date Range</Label>
-                <Select value={dateRange} onValueChange={setDateRange}>
+                <Select value={filters.dateRange} onValueChange={(value) => setFilters(prev => ({ ...prev, dateRange: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Time</SelectItem>
-                    <SelectItem value="7days">Last 7 Days</SelectItem>
-                    <SelectItem value="30days">Last 30 Days</SelectItem>
-                    <SelectItem value="90days">Last 90 Days</SelectItem>
+                    <SelectItem value="7d">Last 7 Days</SelectItem>
+                    <SelectItem value="30d">Last 30 Days</SelectItem>
+                    <SelectItem value="90d">Last 90 Days</SelectItem>
                   </SelectContent>
                 </Select>
               </div>
               
-              <div className="space-y-2">
+              <div>
                 <Label>Category</Label>
-                <Select value={categoryFilter} onValueChange={setCategoryFilter}>
+                <Select value={filters.category} onValueChange={(value) => setFilters(prev => ({ ...prev, category: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="electronics">Electronics</SelectItem>
-                    <SelectItem value="fashion">Fashion</SelectItem>
                     <SelectItem value="food">Food & Dining</SelectItem>
+                    <SelectItem value="fashion">Fashion</SelectItem>
+                    <SelectItem value="electronics">Electronics</SelectItem>
                     <SelectItem value="grocery">Grocery</SelectItem>
                     <SelectItem value="home">Home & Garden</SelectItem>
                     <SelectItem value="beauty">Beauty & Health</SelectItem>
@@ -325,15 +366,16 @@ const MerchantDashboard: React.FC = () => {
                 </Select>
               </div>
               
-              <div className="space-y-2">
+              <div>
                 <Label>Status</Label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
+                <Select value={filters.status} onValueChange={(value) => setFilters(prev => ({ ...prev, status: value }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
                     <SelectItem value="active">Active</SelectItem>
+                    <SelectItem value="expired">Expired</SelectItem>
                     <SelectItem value="inactive">Inactive</SelectItem>
                   </SelectContent>
                 </Select>
@@ -342,166 +384,144 @@ const MerchantDashboard: React.FC = () => {
           </CardContent>
         </Card>
 
-        {/* Overview Cards */}
+        {/* Key Metrics */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Offers</p>
-                  <p className="text-2xl font-bold animate-fade-in">{filteredOffers.length}</p>
-                </div>
-                <ShoppingBag className="h-8 w-8 text-muted-foreground" />
-              </div>
+          <Card className="animate-fade-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Offers</CardTitle>
+              <Package className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-primary">{stats.totalOffers}</div>
+              <p className="text-xs text-muted-foreground">
+                Posted offers
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Saves</p>
-                  <p className="text-2xl font-bold animate-fade-in">{totalSaves}</p>
-                </div>
-                <Heart className="h-8 w-8 text-muted-foreground" />
-              </div>
+          <Card className="animate-fade-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Saves</CardTitle>
+              <Heart className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-secondary">{stats.totalSaves}</div>
+              <p className="text-xs text-muted-foreground">
+                Customers saved offers
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Total Redemptions</p>
-                  <p className="text-2xl font-bold animate-fade-in">{totalRedemptions}</p>
-                </div>
-                <Download className="h-8 w-8 text-muted-foreground" />
-              </div>
+          <Card className="animate-fade-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Redemptions</CardTitle>
+              <ShoppingBag className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-accent">{stats.totalRedemptions}</div>
+              <p className="text-xs text-muted-foreground">
+                Offers redeemed
+              </p>
             </CardContent>
           </Card>
 
-          <Card>
-            <CardContent className="p-6">
-              <div className="flex items-center justify-between">
-                <div>
-                  <p className="text-sm font-medium text-muted-foreground">Active Offers</p>
-                  <p className="text-2xl font-bold animate-fade-in">{filteredOffers.filter(offer => offer.is_active).length}</p>
-                </div>
-                <TrendingUp className="h-8 w-8 text-muted-foreground" />
-              </div>
+          <Card className="animate-fade-in">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Revenue</CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">${stats.totalRevenue.toFixed(2)}</div>
+              <p className="text-xs text-muted-foreground">
+                From redemptions
+              </p>
             </CardContent>
           </Card>
         </div>
 
-        <Tabs defaultValue="offers" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="offers">My Offers</TabsTrigger>
+        {/* Charts and Analytics */}
+        <Tabs defaultValue="performance" className="space-y-6">
+          <TabsList className="grid w-full grid-cols-4">
+            <TabsTrigger value="performance">Performance</TabsTrigger>
             <TabsTrigger value="analytics">Analytics</TabsTrigger>
+            <TabsTrigger value="trends">Trends</TabsTrigger>
+            <TabsTrigger value="breakdown">Breakdown</TabsTrigger>
           </TabsList>
 
-          {/* Offers Tab */}
-          <TabsContent value="offers" className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Your Offers</CardTitle>
-                <CardDescription>Manage and monitor your posted offers</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {filteredOffers.length === 0 ? (
-                  <div className="text-center py-8">
-                    <ShoppingBag className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No offers yet</h3>
-                    <p className="text-muted-foreground mb-4">Start by creating your first offer to attract customers.</p>
-                    <Button onClick={() => navigate('/merchant-post-offer')}>
-                      <Plus className="h-4 w-4 mr-2" />
-                      Post Your First Offer
-                    </Button>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {filteredOffers.map((offer) => (
-                      <div key={offer.id} className="border rounded-lg p-4 space-y-3">
-                        <div className="flex justify-between items-start">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <h3 className="font-semibold text-lg">{offer.title}</h3>
-                              <Badge variant={offer.is_active ? 'default' : 'secondary'}>
-                                {offer.is_active ? 'Active' : 'Inactive'}
-                              </Badge>
-                              <Badge variant="outline">
-                                {offer.listing_type.replace('_', ' ').toUpperCase()}
-                              </Badge>
-                            </div>
-                            <p className="text-muted-foreground text-sm mb-2">{offer.description}</p>
-                            <div className="flex items-center gap-4 text-sm text-muted-foreground">
-                              <span className="flex items-center gap-1">
-                                <MapPin className="h-3 w-3" />
-                                {offer.location}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <DollarSign className="h-3 w-3" />
-                                {offer.discount_percentage}% off
-                              </span>
-                              <span className="flex items-center gap-1">
-                                <Calendar className="h-3 w-3" />
-                                Expires {new Date(offer.expiry_date).toLocaleDateString()}
-                              </span>
-                              <span className="flex items-center gap-1">
-                                {offer.redemption_mode === 'online' ? <Globe className="h-3 w-3" /> : 
-                                 offer.redemption_mode === 'store' ? <Store className="h-3 w-3" /> : 
-                                 <><Globe className="h-3 w-3" /><Store className="h-3 w-3" /></>}
-                                {offer.redemption_mode === 'both' ? 'Online & Store' : 
-                                 offer.redemption_mode.charAt(0).toUpperCase() + offer.redemption_mode.slice(1)}
-                              </span>
-                            </div>
-                          </div>
-                          <div className="flex items-center gap-2">
-                            <Button
-                              variant="outline"
-                              size="sm"
-                              onClick={() => toggleOfferStatus(offer.id, offer.is_active)}
-                            >
-                              {offer.is_active ? 'Deactivate' : 'Activate'}
-                            </Button>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
-          </TabsContent>
-
-          {/* Analytics Tab */}
-          <TabsContent value="analytics" className="space-y-6">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          <TabsContent value="performance" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <BarChart3 className="h-5 w-5" />
-                    Redemption Modes
+                    <Activity className="h-5 w-5" />
+                    Monthly Activity
                   </CardTitle>
+                  <CardDescription>Track your offers, saves, and redemptions over time</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <PieChart>
-                      <Pie
-                        data={redemptionModeData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={60}
-                        outerRadius={80}
-                        paddingAngle={5}
-                        dataKey="value"
-                      >
-                        {redemptionModeData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={stats.monthlyActivity}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
                       <Tooltip />
-                      <Legend />
-                    </PieChart>
+                      <Area type="monotone" dataKey="offers" stackId="1" stroke="#45B7D1" fill="#45B7D1" fillOpacity={0.6} />
+                      <Area type="monotone" dataKey="saves" stackId="1" stroke="#4ECDC4" fill="#4ECDC4" fillOpacity={0.6} />
+                      <Area type="monotone" dataKey="redemptions" stackId="1" stroke="#FF6B6B" fill="#FF6B6B" fillOpacity={0.6} />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <TrendingUp className="h-5 w-5" />
+                    Top Performing Offers
+                  </CardTitle>
+                  <CardDescription>Your most successful offers by engagement</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={stats.offerPerformance} layout="horizontal">
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis type="number" />
+                      <YAxis dataKey="title" type="category" width={80} />
+                      <Tooltip />
+                      <Bar dataKey="saves" fill="#4ECDC4" />
+                      <Bar dataKey="redemptions" fill="#FF6B6B" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="analytics" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Target className="h-5 w-5" />
+                    Revenue Trends
+                  </CardTitle>
+                  <CardDescription>Monthly revenue from redeemed offers</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={stats.monthlyActivity}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="month" />
+                      <YAxis />
+                      <Tooltip formatter={(value) => [`$${value}`, 'Revenue']} />
+                      <Line 
+                        type="monotone" 
+                        dataKey="revenue" 
+                        stroke="#10B981" 
+                        strokeWidth={3}
+                        dot={{ fill: '#10B981', strokeWidth: 2, r: 4 }}
+                      />
+                    </LineChart>
                   </ResponsiveContainer>
                 </CardContent>
               </Card>
@@ -510,148 +530,140 @@ const MerchantDashboard: React.FC = () => {
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
                     <Users className="h-5 w-5" />
-                    Category Distribution
+                    Conversion Rate
                   </CardTitle>
+                  <CardDescription>Saves to redemptions conversion</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ResponsiveContainer width="100%" height={200}>
-                    <BarChart data={categoryData}>
-                      <CartesianGrid strokeDasharray="3 3" />
-                      <XAxis dataKey="category" />
-                      <YAxis />
-                      <Tooltip />
-                      <Bar dataKey="offers" fill="hsl(var(--primary))" />
-                    </BarChart>
-                  </ResponsiveContainer>
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-center">
+                      <span className="text-sm font-medium">Conversion Rate</span>
+                      <span className="text-2xl font-bold text-primary">
+                        {stats.totalSaves > 0 ? ((stats.totalRedemptions / stats.totalSaves) * 100).toFixed(1) : 0}%
+                      </span>
+                    </div>
+                    <div className="w-full bg-secondary rounded-full h-2">
+                      <div 
+                        className="bg-primary h-2 rounded-full transition-all duration-500"
+                        style={{ 
+                          width: `${stats.totalSaves > 0 ? (stats.totalRedemptions / stats.totalSaves) * 100 : 0}%` 
+                        }}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4 pt-4">
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-secondary">{stats.totalSaves}</div>
+                        <div className="text-xs text-muted-foreground">Total Saves</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="text-lg font-semibold text-accent">{stats.totalRedemptions}</div>
+                        <div className="text-xs text-muted-foreground">Total Redemptions</div>
+                      </div>
+                    </div>
+                  </div>
                 </CardContent>
               </Card>
             </div>
+          </TabsContent>
 
+          <TabsContent value="trends" className="space-y-6">
             <Card>
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
-                  <TrendingUp className="h-5 w-5" />
-                  Top Performing Offers
+                  <BarChart3 className="h-5 w-5" />
+                  Engagement Comparison
                 </CardTitle>
+                <CardDescription>Compare saves vs redemptions over time</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={performanceData}>
+                <ResponsiveContainer width="100%" height={400}>
+                  <BarChart data={stats.monthlyActivity}>
                     <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
+                    <XAxis dataKey="month" />
                     <YAxis />
                     <Tooltip />
-                    <Legend />
-                    <Bar dataKey="saves" fill="hsl(var(--primary))" name="Saves" />
-                    <Bar dataKey="redemptions" fill="hsl(var(--secondary))" name="Redemptions" />
+                    <Bar dataKey="saves" fill="#4ECDC4" name="Saves" />
+                    <Bar dataKey="redemptions" fill="#FF6B6B" name="Redemptions" />
                   </BarChart>
                 </ResponsiveContainer>
               </CardContent>
             </Card>
+          </TabsContent>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <TabsContent value="breakdown" className="space-y-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Heart className="h-5 w-5" />
-                    Engagement Metrics
+                    <Package className="h-5 w-5" />
+                    Offers by Category
                   </CardTitle>
+                  <CardDescription>Distribution of your offers across categories</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Conversion Rate</span>
-                      <span className="font-semibold text-primary">
-                        {totalSaves > 0 ? ((totalRedemptions / totalSaves) * 100).toFixed(1) : 0}%
-                      </span>
+                  {stats.categoriesData.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          dataKey="value"
+                          data={stats.categoriesData}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {stats.categoriesData.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                      No category data available
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Avg. Saves per Offer</span>
-                      <span className="font-semibold text-primary">
-                        {offers.length > 0 ? (totalSaves / offers.length).toFixed(1) : 0}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Total Engagement</span>
-                      <span className="font-semibold text-primary">{totalSaves + totalRedemptions}</span>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
 
               <Card>
                 <CardHeader>
                   <CardTitle className="flex items-center gap-2">
-                    <Calendar className="h-5 w-5" />
-                    Quick Stats
+                    <Globe className="h-5 w-5" />
+                    Redemption Modes
                   </CardTitle>
+                  <CardDescription>How customers prefer to redeem your offers</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <div className="space-y-4">
-                    <div className="flex justify-between items-center">
-                      <span>Active Offers</span>
-                      <span className="font-semibold text-green-600">
-                        {offers.filter(offer => offer.is_active).length}
-                      </span>
+                  {stats.redemptionModes.length > 0 ? (
+                    <ResponsiveContainer width="100%" height={300}>
+                      <PieChart>
+                        <Pie
+                          dataKey="value"
+                          data={stats.redemptionModes}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          fill="#8884d8"
+                          label={({ name, percent }) => `${name} ${(percent * 100).toFixed(0)}%`}
+                        >
+                          {stats.redemptionModes.map((entry, index) => (
+                            <Cell key={`cell-${index}`} fill={entry.color} />
+                          ))}
+                        </Pie>
+                        <Tooltip />
+                      </PieChart>
+                    </ResponsiveContainer>
+                  ) : (
+                    <div className="flex items-center justify-center h-[300px] text-muted-foreground">
+                      No redemption data available
                     </div>
-                    <div className="flex justify-between items-center">
-                      <span>Expired Offers</span>
-                      <span className="font-semibold text-red-600">
-                        {offers.filter(offer => new Date(offer.expiry_date) < new Date()).length}
-                      </span>
-                    </div>
-                    <div className="flex justify-between items-center">
-                      <span>Premium Listings</span>
-                      <span className="font-semibold text-orange-600">
-                        {offers.filter(offer => offer.listing_type !== 'local_deals').length}
-                      </span>
-                    </div>
-                  </div>
+                  )}
                 </CardContent>
               </Card>
             </div>
-
-            <Card>
-              <CardHeader>
-                <CardTitle>Offer Performance</CardTitle>
-                <CardDescription>Detailed analytics for each of your offers</CardDescription>
-              </CardHeader>
-              <CardContent>
-                {analytics.length === 0 ? (
-                  <div className="text-center py-8">
-                    <BarChart3 className="h-12 w-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 className="text-lg font-semibold mb-2">No analytics data yet</h3>
-                    <p className="text-muted-foreground">Post some offers to see performance data here.</p>
-                  </div>
-                ) : (
-                  <div className="space-y-4">
-                    {analytics.map((item) => (
-                      <div key={item.offer_id} className="border rounded-lg p-4">
-                        <h4 className="font-semibold mb-3">{item.offer_title}</h4>
-                        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-                          <div className="text-center">
-                            <p className="text-muted-foreground">Saves</p>
-                            <p className="text-2xl font-bold text-primary">{item.saves_count}</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-muted-foreground">Redemptions</p>
-                            <p className="text-2xl font-bold text-primary">{item.redemptions_count}</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-muted-foreground">Online</p>
-                            <p className="text-2xl font-bold text-primary">{item.online_redemptions}</p>
-                          </div>
-                          <div className="text-center">
-                            <p className="text-muted-foreground">In-Store</p>
-                            <p className="text-2xl font-bold text-primary">{item.store_redemptions}</p>
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </CardContent>
-            </Card>
           </TabsContent>
         </Tabs>
       </main>
