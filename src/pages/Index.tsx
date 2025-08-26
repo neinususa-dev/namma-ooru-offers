@@ -435,7 +435,7 @@ const mockOffers = [
 ];
 
 const Index = () => {
-  const [activeSection, setActiveSection] = useState<string>('hot-deals');
+  const [activeSection, setActiveSection] = useState<string>('home');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
@@ -511,7 +511,7 @@ const Index = () => {
 
   const renderContent = () => {
     switch (activeSection) {
-      case 'hot-deals':
+      case 'home':
         return (
           <>
             {/* Hero Section */}
@@ -750,6 +750,27 @@ const Index = () => {
           </>
         );
 
+      case 'hot-deals':
+        return (
+          <>
+            {/* Hot Offers Section */}
+            <PaginatedOffersSection
+              title="Today's Hot Offers"
+              icon={<Flame className="h-6 w-6 text-hot-offer animate-pulse" />}
+              offers={hotOffers}
+              sectionClass="py-12 bg-background"
+            />
+
+            {/* Trending Offers Section */}
+            <PaginatedOffersSection
+              title="Top Trending Coupons"
+              icon={<TrendingUp className="h-6 w-6 text-trending animate-bounce" />}
+              offers={trendingOffers}
+              sectionClass="py-12 bg-muted/30"
+            />
+          </>
+        );
+
       case 'local-deals':
         return (
           <section className="py-12 bg-background">
@@ -877,7 +898,7 @@ const Index = () => {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-8">
               <button 
-                onClick={() => setActiveSection('hot-deals')}
+                onClick={() => setActiveSection('home')}
                 className="flex items-center gap-3 hover:opacity-80 transition-opacity cursor-pointer"
               >
                 <img 
@@ -896,9 +917,9 @@ const Index = () => {
               {/* Navigation Links */}
               <nav className="hidden md:flex items-center gap-6">
                 <button
-                  onClick={() => setActiveSection('hot-deals')}
+                  onClick={() => setActiveSection('home')}
                   className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    activeSection === 'hot-deals' 
+                    activeSection === 'home' 
                       ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
                       : 'text-blue-600'
                   }`}
@@ -993,7 +1014,7 @@ const Index = () => {
         <div className="container mx-auto px-4">
           <div className="flex flex-col md:flex-row items-center justify-between">
             <button 
-              onClick={() => setActiveSection('hot-deals')}
+              onClick={() => setActiveSection('home')}
               className="flex items-center gap-2 mb-4 md:mb-0 hover:opacity-80 transition-opacity cursor-pointer"
             >
               <img 
