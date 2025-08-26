@@ -110,15 +110,45 @@ export function useAuth() {
     }
   };
 
+  const cleanupAuthState = () => {
+    // Remove all Supabase auth keys from localStorage
+    Object.keys(localStorage).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        localStorage.removeItem(key);
+      }
+    });
+    // Remove from sessionStorage if in use
+    Object.keys(sessionStorage || {}).forEach((key) => {
+      if (key.startsWith('supabase.auth.') || key.includes('sb-')) {
+        sessionStorage.removeItem(key);
+      }
+    });
+  };
+
   const signOut = async () => {
     try {
-      const { error } = await supabase.auth.signOut({ scope: 'global' });
-      if (!error) {
-        // Force page reload for clean state
-        window.location.href = '/';
+      // Clean up auth state first
+      cleanupAuthState();
+      
+      // Attempt global sign out (continue even if it fails)
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Sign out error (continuing):', err);
       }
-      return { error };
+      
+      // Clear local state
+      setUser(null);
+      setSession(null);
+      setProfile(null);
+      
+      // Force page reload for clean state
+      window.location.href = '/';
+      
+      return { error: null };
     } catch (error) {
+      // Even if there's an error, still redirect to clean state
+      window.location.href = '/';
       return { error };
     }
   };
