@@ -1,3 +1,4 @@
+// Namma Ooru Offers - Local Deals Marketplace
 import React, { useState } from 'react';
 import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter } from 'lucide-react';
 import { Button } from '@/components/ui/button';
