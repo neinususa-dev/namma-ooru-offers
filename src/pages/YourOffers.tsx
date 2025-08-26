@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OfferCard } from '@/components/OfferCard';
 import { useOffers } from '@/hooks/useOffers';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
@@ -104,45 +105,20 @@ export default function YourOffers() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {savedOffers.map((savedOffer) => (
-                  <Card key={savedOffer.id} className="offer-card">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <Badge variant="outline" className="text-xs">
-                          {savedOffer.offers?.category || 'General'}
-                        </Badge>
-                        <Button
-                          variant="ghost"
-                          size="sm"
-                          onClick={() => removeSavedOffer(savedOffer.id)}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                      <CardTitle className="text-lg">
-                        {savedOffer.offers?.title || 'Offer Title'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {savedOffer.offers?.description || 'No description available'}
-                      </p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                        <span>{savedOffer.offers?.location || 'Location'}</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          Saved: {formatDate(savedOffer.saved_at)}
-                        </div>
-                      </div>
-                      <Button 
-                        className="w-full" 
-                        size="sm"
-                        onClick={() => redeemOffer(savedOffer.offer_id)}
-                      >
-                        Redeem Offer
-                      </Button>
-                    </CardContent>
-                  </Card>
+                  <OfferCard
+                    key={savedOffer.id}
+                    id={savedOffer.offer_id}
+                    shopName="Local Shop"
+                    offerTitle={savedOffer.offers?.title || 'Special Offer'}
+                    description={savedOffer.offers?.description || 'Great discount available!'}
+                    discount={`${savedOffer.offers?.discount_percentage || 20}% OFF`}
+                    expiryDate={savedOffer.offers?.expiry_date ? new Date(savedOffer.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
+                    location={savedOffer.offers?.location || 'Local Area'}
+                    category={savedOffer.offers?.category || 'general'}
+                    displayMode="saved"
+                    onRemove={() => removeSavedOffer(savedOffer.id)}
+                    couponCode={savedOffer.id.substring(0, 8).toUpperCase()}
+                  />
                 ))}
               </div>
             )}
@@ -166,42 +142,20 @@ export default function YourOffers() {
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {redeemedOffers.map((redemption) => (
-                  <Card key={redemption.id} className="offer-card border-trending/20">
-                    <CardHeader>
-                      <div className="flex items-start justify-between">
-                        <Badge className="bg-trending text-trending-foreground">
-                          <Gift className="h-3 w-3 mr-1" />
-                          Redeemed
-                        </Badge>
-                        <div className="text-right">
-                          <div className="text-2xl font-bold text-primary">
-                            {redemption.offers?.discount_percentage}% OFF
-                          </div>
-                        </div>
-                      </div>
-                      <CardTitle className="text-lg">
-                        {redemption.offers?.title || 'Redeemed Offer'}
-                      </CardTitle>
-                    </CardHeader>
-                    <CardContent>
-                      <p className="text-sm text-muted-foreground mb-4 line-clamp-2">
-                        {redemption.offers?.description || 'No description available'}
-                      </p>
-                      <div className="flex items-center justify-between text-xs text-muted-foreground mb-4">
-                        <span>{redemption.offers?.location || 'Location'}</span>
-                        <div className="flex items-center gap-1">
-                          <Clock className="h-3 w-3" />
-                          Redeemed: {formatDate(redemption.redeemed_at)}
-                        </div>
-                      </div>
-                      <div className="p-3 bg-muted/50 rounded-lg text-center">
-                        <p className="text-xs text-muted-foreground mb-1">Coupon Code</p>
-                        <p className="font-mono font-bold text-sm">
-                          {redemption.id.substring(0, 8).toUpperCase()}
-                        </p>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  <OfferCard
+                    key={redemption.id}
+                    id={redemption.offer_id}
+                    shopName="Local Shop"
+                    offerTitle={redemption.offers?.title || 'Redeemed Offer'}
+                    description={redemption.offers?.description || 'This offer has been redeemed!'}
+                    discount={`${redemption.offers?.discount_percentage || 20}% OFF`}
+                    expiryDate={redemption.offers?.expiry_date ? new Date(redemption.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
+                    location={redemption.offers?.location || 'Local Area'}
+                    category={redemption.offers?.category || 'general'}
+                    displayMode="redeemed"
+                    couponCode={redemption.id.substring(0, 8).toUpperCase()}
+                    redeemedDate={new Date(redemption.redeemed_at).toLocaleDateString()}
+                  />
                 ))}
               </div>
             )}

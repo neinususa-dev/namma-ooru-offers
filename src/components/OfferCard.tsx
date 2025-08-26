@@ -1,5 +1,5 @@
 import React from 'react';
-import { Calendar, MapPin, Store, Flame, TrendingUp } from 'lucide-react';
+import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -18,6 +18,10 @@ interface OfferCardProps {
   isHot?: boolean;
   isTrending?: boolean;
   image?: string;
+  displayMode?: 'default' | 'saved' | 'redeemed';
+  onRemove?: () => void;
+  couponCode?: string;
+  redeemedDate?: string;
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({
@@ -31,7 +35,11 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   category,
   isHot = false,
   isTrending = false,
-  image
+  image,
+  displayMode = 'default',
+  onRemove,
+  couponCode,
+  redeemedDate
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
@@ -40,10 +48,14 @@ export const OfferCard: React.FC<OfferCardProps> = ({
     // Always save the offer first, regardless of login status
     await saveOffer(id);
   };
+
+  const handleRedeemOffer = async () => {
+    await redeemOffer(id);
+  };
   return (
     <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30">
       {/* Hot/Trending Badges */}
-      {isHot && (
+      {isHot && displayMode === 'default' && (
         <div className="absolute top-3 right-3 z-10">
           <Badge className="hot-badge bg-hot-offer text-hot-offer-foreground font-bold shadow-lg">
             <Flame className="h-3 w-3 mr-1" />
@@ -52,7 +64,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         </div>
       )}
       
-      {isTrending && (
+      {isTrending && displayMode === 'default' && (
         <div className="absolute top-3 left-3 z-10">
           <Badge className="trending-pulse bg-trending text-trending-foreground font-bold shadow-lg">
             <TrendingUp className="h-3 w-3 mr-1" />
@@ -61,8 +73,32 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         </div>
       )}
 
+      {/* Remove button for saved offers */}
+      {displayMode === 'saved' && onRemove && (
+        <div className="absolute top-3 right-3 z-10">
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onRemove}
+            className="h-8 w-8 p-0 bg-background/80 hover:bg-destructive hover:text-destructive-foreground"
+          >
+            <Trash2 className="h-4 w-4" />
+          </Button>
+        </div>
+      )}
+
+      {/* Redeemed badge */}
+      {displayMode === 'redeemed' && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge className="bg-trending text-trending-foreground font-bold shadow-lg">
+            <Gift className="h-3 w-3 mr-1" />
+            REDEEMED
+          </Badge>
+        </div>
+      )}
+
       {/* Offer Image */}
-      {image && (
+      {image && displayMode === 'default' && (
         <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
           <img 
             src={image} 
@@ -98,26 +134,56 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           {description}
         </p>
         
-        <div className="flex items-center justify-between text-xs text-muted-foreground">
+        <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
             {location}
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
-            Expires: {expiryDate}
+            {displayMode === 'redeemed' && redeemedDate ? `Redeemed: ${redeemedDate}` : `Expires: ${expiryDate}`}
           </div>
         </div>
+
+        {/* Coupon Code Display */}
+        {(displayMode === 'saved' || displayMode === 'redeemed') && couponCode && (
+          <div className="p-3 bg-muted/50 rounded-lg text-center mb-3">
+            <p className="text-xs text-muted-foreground mb-1">Coupon Code</p>
+            <p className="font-mono font-bold text-sm">
+              {couponCode}
+            </p>
+          </div>
+        )}
       </CardContent>
 
       <CardFooter className="pt-3">
-        <Button 
-          className="w-full" 
-          variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
-          onClick={handleGetCoupon}
-        >
-          Get Coupon
-        </Button>
+        {displayMode === 'default' && (
+          <Button 
+            className="w-full" 
+            variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
+            onClick={handleGetCoupon}
+          >
+            Get Coupon
+          </Button>
+        )}
+        
+        {displayMode === 'saved' && (
+          <Button 
+            className="w-full" 
+            variant="hero"
+            onClick={handleRedeemOffer}
+          >
+            Redeem Now
+          </Button>
+        )}
+        
+        {displayMode === 'redeemed' && (
+          <div className="w-full text-center">
+            <p className="text-sm text-muted-foreground">
+              This coupon has been redeemed
+            </p>
+          </div>
+        )}
       </CardFooter>
     </Card>
   );
