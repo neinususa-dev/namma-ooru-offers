@@ -21,7 +21,7 @@ const pricingTiers = [
     icon: Star,
     variant: 'outline' as const,
     popular: false,
-    stripePriceId: null // Free plan
+    razorpayPlanId: null // Free plan
   },
   {
     name: 'Gold',
@@ -37,7 +37,7 @@ const pricingTiers = [
     icon: Crown,
     variant: 'secondary' as const,
     popular: true,
-    stripePriceId: 'price_gold_500' // Will be replaced with actual Stripe price ID
+    razorpayPlanId: 'plan_gold_500' // Will be replaced with actual Razorpay plan ID
   },
   {
     name: 'Platinum',
@@ -54,7 +54,7 @@ const pricingTiers = [
     icon: Zap,
     variant: 'default' as const,
     popular: false,
-    stripePriceId: 'price_platinum_1500' // Will be replaced with actual Stripe price ID
+    razorpayPlanId: 'plan_platinum_1500' // Will be replaced with actual Razorpay plan ID
   }
 ];
 
@@ -86,7 +86,7 @@ export const Billing: React.FC = () => {
 
   const currentTier = profile?.is_premium ? 'Gold' : 'Silver';
 
-  const handlePlanSelection = (planName: string, stripePriceId: string | null) => {
+  const handlePlanSelection = (planName: string, razorpayPlanId: string | null) => {
     if (!user) {
       toast.error('Please sign in to upgrade your plan');
       return;
@@ -111,19 +111,36 @@ export const Billing: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // TODO: Replace with actual Stripe integration
-      toast.info('Stripe integration coming soon! Please set up your Stripe account first.');
+      // TODO: Replace with actual Razorpay integration
+      toast.info('Razorpay integration ready! Please set up your Razorpay account first.');
       
-      // This is where we'll add the Stripe checkout session creation
+      // This is where we'll add the Razorpay subscription creation
       /*
-      const { data, error } = await supabase.functions.invoke('create-checkout', {
-        body: { planName: selectedPlan }
+      const { data, error } = await supabase.functions.invoke('create-razorpay-subscription', {
+        body: { planName: selectedPlan, userId: user.id }
       });
       
       if (error) throw error;
       
-      // Redirect to Stripe checkout
-      window.open(data.url, '_blank');
+      // Open Razorpay checkout
+      const options = {
+        subscription_id: data.subscription_id,
+        handler: function (response) {
+          // Handle successful payment
+          window.location.href = '/payment-success';
+        },
+        prefill: {
+          name: profile?.name || user.email,
+          email: user.email,
+          contact: profile?.phone_number || ''
+        },
+        theme: {
+          color: '#3B82F6'
+        }
+      };
+      
+      const rzp = new window.Razorpay(options);
+      rzp.open();
       */
     } catch (error) {
       toast.error('Failed to initiate payment. Please try again.');
@@ -170,7 +187,7 @@ export const Billing: React.FC = () => {
                 } ${isCurrentTier ? 'bg-primary/5 border-primary' : ''} ${
                   isSelected ? 'ring-2 ring-primary shadow-lg' : ''
                 }`}
-                onClick={() => handlePlanSelection(tier.name, tier.stripePriceId)}
+                onClick={() => handlePlanSelection(tier.name, tier.razorpayPlanId)}
               >
                 {tier.popular && (
                   <div className="absolute top-0 right-0 bg-primary text-primary-foreground px-3 py-1 text-sm font-semibold">
@@ -263,7 +280,7 @@ export const Billing: React.FC = () => {
                   </span>
                 </div>
                 <div className="text-sm text-muted-foreground mt-2">
-                  Secure payment powered by Stripe • Cancel anytime
+                  Secure payment powered by Razorpay • Cancel anytime
                 </div>
               </div>
             </CardContent>
