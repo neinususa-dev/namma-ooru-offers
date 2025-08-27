@@ -11,6 +11,9 @@ import CustomerAnalytics from "./pages/CustomerAnalytics";
 import MerchantDashboard from "./pages/MerchantDashboard";
 import MerchantPostOffer from "./pages/MerchantPostOffer";
 import MerchantEditOffers from "./pages/MerchantEditOffers";
+import { Billing } from "./pages/Billing";
+import { PaymentSuccess } from "./pages/PaymentSuccess";
+import { PaymentCanceled } from "./pages/PaymentCanceled";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -30,6 +33,9 @@ const App = () => (
           <Route path="/merchant-dashboard" element={<MerchantDashboard />} />
           <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
           <Route path="/merchant-edit-offers" element={<MerchantEditOffers />} />
+          <Route path="/billing" element={<Billing />} />
+          <Route path="/payment-success" element={<PaymentSuccess />} />
+          <Route path="/payment-canceled" element={<PaymentCanceled />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>

@@ -170,13 +170,15 @@ export const MerchantHomePage: React.FC = () => {
                   </CardContent>
 
                   <CardFooter>
-                    <Button 
-                      className="w-full" 
-                      variant={isCurrentTier ? "outline" : tier.variant}
-                      disabled={isCurrentTier}
-                    >
-                      {isCurrentTier ? 'Current Plan' : `Upgrade to ${tier.name}`}
-                    </Button>
+                    <Link to="/billing" className="w-full">
+                      <Button 
+                        className="w-full" 
+                        variant={isCurrentTier ? "outline" : tier.variant}
+                        disabled={isCurrentTier}
+                      >
+                        {isCurrentTier ? 'Current Plan' : `Upgrade to ${tier.name}`}
+                      </Button>
+                    </Link>
                   </CardFooter>
                 </Card>
               );
