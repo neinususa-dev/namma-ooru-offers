@@ -350,25 +350,39 @@ const MerchantDashboard = () => {
 
   const approveRedemption = async (redemptionId: string) => {
     try {
+      console.log('Approving redemption:', redemptionId);
+      console.log('Current pending redemptions:', stats.pendingRedemptions);
+      
       const { error } = await supabase
         .from('redemptions')
         .update({ status: 'approved' })
         .eq('id', redemptionId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Database update successful, updating UI...');
       
       // Immediately update the local state to remove from pending
-      setStats(prevStats => ({
-        ...prevStats,
-        pendingRedemptions: prevStats.pendingRedemptions.filter(r => r.id !== redemptionId)
-      }));
-      
-      // Then refresh all data after a short delay
-      setTimeout(async () => {
-        await fetchMerchantAnalytics();
-      }, 300);
+      setStats(prevStats => {
+        const updatedPending = prevStats.pendingRedemptions.filter(r => r.id !== redemptionId);
+        console.log('Updated pending redemptions:', updatedPending);
+        return {
+          ...prevStats,
+          pendingRedemptions: updatedPending
+        };
+      });
       
       console.log('Redemption approved successfully');
+      
+      // Refresh all data after a short delay
+      setTimeout(async () => {
+        console.log('Refreshing analytics data...');
+        await fetchMerchantAnalytics();
+      }, 500);
+      
     } catch (error) {
       console.error('Error approving redemption:', error);
     }
@@ -376,25 +390,39 @@ const MerchantDashboard = () => {
 
   const rejectRedemption = async (redemptionId: string) => {
     try {
+      console.log('Rejecting redemption:', redemptionId);
+      console.log('Current pending redemptions:', stats.pendingRedemptions);
+      
       const { error } = await supabase
         .from('redemptions')
         .update({ status: 'rejected' })
         .eq('id', redemptionId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Supabase error:', error);
+        throw error;
+      }
+      
+      console.log('Database update successful, updating UI...');
       
       // Immediately update the local state to remove from pending
-      setStats(prevStats => ({
-        ...prevStats,
-        pendingRedemptions: prevStats.pendingRedemptions.filter(r => r.id !== redemptionId)
-      }));
-      
-      // Then refresh all data after a short delay
-      setTimeout(async () => {
-        await fetchMerchantAnalytics();
-      }, 300);
+      setStats(prevStats => {
+        const updatedPending = prevStats.pendingRedemptions.filter(r => r.id !== redemptionId);
+        console.log('Updated pending redemptions:', updatedPending);
+        return {
+          ...prevStats,
+          pendingRedemptions: updatedPending
+        };
+      });
       
       console.log('Redemption rejected successfully');
+      
+      // Refresh all data after a short delay
+      setTimeout(async () => {
+        console.log('Refreshing analytics data...');
+        await fetchMerchantAnalytics();
+      }, 500);
+      
     } catch (error) {
       console.error('Error rejecting redemption:', error);
     }
