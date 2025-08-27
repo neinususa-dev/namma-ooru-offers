@@ -29,6 +29,8 @@ interface MerchantStats {
   monthlyActivity: Array<{ month: string; offers: number; saves: number; redemptions: number; revenue: number }>;
   offerPerformance: Array<{ title: string; saves: number; redemptions: number; revenue: number }>;
   redemptionModes: Array<{ name: string; value: number; color: string }>;
+  customerSaves: Array<{ customer_name: string; customer_email: string; offer_title: string; saved_at: string }>;
+  customerRedemptions: Array<{ customer_name: string; customer_email: string; offer_title: string; redeemed_at: string }>;
 }
 
 interface Filters {
@@ -48,7 +50,9 @@ const MerchantDashboard = () => {
     categoriesData: [],
     monthlyActivity: [],
     offerPerformance: [],
-    redemptionModes: []
+    redemptionModes: [],
+    customerSaves: [],
+    customerRedemptions: []
   });
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
@@ -122,21 +126,35 @@ const MerchantDashboard = () => {
           categoriesData: [],
           monthlyActivity: [],
           offerPerformance: [],
-          redemptionModes: []
+          redemptionModes: [],
+          customerSaves: [],
+          customerRedemptions: []
         });
         return;
       }
 
-      // Fetch ALL saves and redemptions for these offers (without date filter first)
+      // Fetch ALL saves and redemptions for these offers with customer information
       const { data: allSaves, error: savesError } = await supabase
         .from('saved_offers')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (
+            name,
+            email
+          )
+        `)
         .in('offer_id', offerIds);
       if (savesError) throw savesError;
 
       const { data: allRedemptions, error: redemptionsError } = await supabase
         .from('redemptions')
-        .select('*')
+        .select(`
+          *,
+          profiles:user_id (
+            name,
+            email
+          )
+        `)
         .in('offer_id', offerIds);
       if (redemptionsError) throw redemptionsError;
 
@@ -259,6 +277,27 @@ const MerchantDashboard = () => {
         return sum + (offer?.discounted_price || 0);
       }, 0);
 
+      // Prepare customer data for display
+      const customerSaves = saves.map(s => {
+        const offer = offers.find(o => o.id === s.offer_id);
+        return {
+          customer_name: s.profiles?.name || 'Unknown',
+          customer_email: s.profiles?.email || 'Unknown',
+          offer_title: offer?.title || 'Unknown Offer',
+          saved_at: new Date(s.saved_at).toLocaleDateString()
+        };
+      });
+
+      const customerRedemptions = redemptions.map(r => {
+        const offer = offers.find(o => o.id === r.offer_id);
+        return {
+          customer_name: r.profiles?.name || 'Unknown',
+          customer_email: r.profiles?.email || 'Unknown',
+          offer_title: offer?.title || 'Unknown Offer',
+          redeemed_at: new Date(r.redeemed_at).toLocaleDateString()
+        };
+      });
+
       setStats({
         totalOffers,
         totalSaves,
@@ -267,7 +306,9 @@ const MerchantDashboard = () => {
         categoriesData,
         monthlyActivity,
         offerPerformance,
-        redemptionModes
+        redemptionModes,
+        customerSaves,
+        customerRedemptions
       });
 
     } catch (error) {
@@ -453,6 +494,71 @@ const MerchantDashboard = () => {
             ))}
           </CardContent>
         </Card>
+
+        {/* Customer Activity */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Heart className="h-5 w-5" />
+                Customer Saves
+              </CardTitle>
+              <CardDescription>Customers who saved your offers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stats.customerSaves.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {stats.customerSaves.map((save, idx) => (
+                    <div key={idx} className="p-3 bg-muted rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold">{save.customer_name}</p>
+                          <p className="text-sm text-muted-foreground">{save.customer_email}</p>
+                          <p className="text-sm font-medium text-primary">{save.offer_title}</p>
+                        </div>
+                        <Badge variant="secondary">{save.saved_at}</Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No saves yet</p>
+              )}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <ShoppingBag className="h-5 w-5" />
+                Customer Redemptions
+              </CardTitle>
+              <CardDescription>Customers who redeemed your offers</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {stats.customerRedemptions.length > 0 ? (
+                <div className="space-y-3 max-h-96 overflow-y-auto">
+                  {stats.customerRedemptions.map((redemption, idx) => (
+                    <div key={idx} className="p-3 bg-muted rounded-lg">
+                      <div className="flex justify-between items-start">
+                        <div>
+                          <p className="font-semibold">{redemption.customer_name}</p>
+                          <p className="text-sm text-muted-foreground">{redemption.customer_email}</p>
+                          <p className="text-sm font-medium text-green-600">{redemption.offer_title}</p>
+                        </div>
+                        <Badge variant="outline" className="border-green-500 text-green-600">
+                          {redemption.redeemed_at}
+                        </Badge>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-muted-foreground text-center py-8">No redemptions yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
       </main>
     </div>
   );
