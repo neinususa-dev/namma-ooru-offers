@@ -14,15 +14,14 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X } from 'lucide-react';
+import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Store } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
-import { DistrictSelect } from '@/components/DistrictSelect';
-import { CitySelect } from '@/components/CitySelect';
 
 const offerSchema = z.object({
+  store_name: z.string().min(1, 'Store name is required'),
   title: z.string().min(1, 'Title is required').max(100, 'Title must be under 100 characters'),
   description: z.string().min(1, 'Description is required').max(500, 'Description must be under 500 characters'),
   category: z.string().min(1, 'Category is required'),
@@ -46,7 +45,7 @@ const MerchantPostOffer: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadedImage, setUploadedImage] = useState<string>('');
-  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
+  
 
   const {
     register,
@@ -75,8 +74,10 @@ const MerchantPostOffer: React.FC = () => {
         navigate('/');
       } else if (user && profile && profile.role === 'merchant') {
         // Prepopulate merchant profile data
+        if (profile.store_name) {
+          setValue('store_name', profile.store_name);
+        }
         if (profile.district) {
-          setSelectedDistrict(profile.district);
           setValue('district', profile.district);
         }
         if (profile.city) {
@@ -149,7 +150,6 @@ const MerchantPostOffer: React.FC = () => {
       reset();
       setSelectedDate(undefined);
       setUploadedImage('');
-      setSelectedDistrict('');
       navigate('/merchant-dashboard');
     } catch (error) {
       console.error('Error posting offer:', error);
@@ -196,6 +196,22 @@ const MerchantPostOffer: React.FC = () => {
                   <CardDescription>Basic information about your offer</CardDescription>
                 </CardHeader>
                 <CardContent className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="store_name" className="flex items-center gap-2">
+                      <Store className="h-4 w-4" />
+                      Store Name *
+                    </Label>
+                    <Input
+                      id="store_name"
+                      placeholder="Enter your store name"
+                      {...register('store_name')}
+                      className={errors.store_name ? 'border-destructive' : ''}
+                    />
+                    {errors.store_name && (
+                      <p className="text-sm text-destructive">{errors.store_name.message}</p>
+                    )}
+                  </div>
+
                   <div className="space-y-2">
                     <Label htmlFor="title">Offer Title *</Label>
                     <Input
@@ -250,14 +266,11 @@ const MerchantPostOffer: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="district">District *</Label>
-                    <DistrictSelect
-                      value={selectedDistrict}
-                      onValueChange={(value) => {
-                        setSelectedDistrict(value);
-                        setValue('district', value);
-                        setValue('city', ''); // Reset city when district changes
-                      }}
-                      placeholder="Select district"
+                    <Input
+                      id="district"
+                      placeholder="Enter district"
+                      {...register('district')}
+                      className={errors.district ? 'border-destructive' : ''}
                     />
                     {errors.district && (
                       <p className="text-sm text-destructive">{errors.district.message}</p>
@@ -266,11 +279,11 @@ const MerchantPostOffer: React.FC = () => {
 
                   <div className="space-y-2">
                     <Label htmlFor="city">City/Town *</Label>
-                    <CitySelect
-                      selectedDistrict={selectedDistrict}
-                      value={watchedValues.city}
-                      onValueChange={(value) => setValue('city', value)}
-                      placeholder="Select city/town"
+                    <Input
+                      id="city"
+                      placeholder="Enter city/town"
+                      {...register('city')}
+                      className={errors.city ? 'border-destructive' : ''}
                     />
                     {errors.city && (
                       <p className="text-sm text-destructive">{errors.city.message}</p>
