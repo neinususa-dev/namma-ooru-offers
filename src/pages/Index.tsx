@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -12,7 +12,7 @@ import { Header } from '@/components/Header';
 import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { generateDefaultImage } from '@/utils/imageUtils';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
@@ -444,12 +444,21 @@ const Index = () => {
   const { user, isMerchant } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<string>('home');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
   const [selectedCategory, setSelectedCategory] = useState<string>('all');
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
+
+  // Handle URL parameters to set active section
+  useEffect(() => {
+    const section = searchParams.get('section');
+    if (section) {
+      setActiveSection(section);
+    }
+  }, [searchParams]);
 
   const convertToOfferCardProps = (dbOffer: any) => {
     console.log('Converting offer:', dbOffer.title, 'merchant_name:', dbOffer.merchant_name);
@@ -1017,7 +1026,19 @@ const Index = () => {
         );
 
       case 'store-list':
-        return <StoresList />;
+        return (
+          <section className="py-16 bg-white">
+            <div className="container mx-auto px-4">
+              <div className="text-center mb-12">
+                <h2 className="text-4xl font-bold text-primary mb-4">Store Directory</h2>
+                <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                  Discover local businesses and browse their latest offers. Connect directly with merchants across Tamil Nadu.
+                </p>
+              </div>
+              <StoresList />
+            </div>
+          </section>
+        );
 
       default:
         return null;
