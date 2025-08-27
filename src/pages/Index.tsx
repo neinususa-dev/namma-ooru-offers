@@ -11,7 +11,7 @@ import { StoreList } from '@/components/StoreList';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { generateDefaultImage } from '@/utils/imageUtils';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
@@ -440,8 +440,9 @@ const mockOffers = [
 ];
 
 const Index = () => {
-  const { user } = useAuth();
+  const { user, isMerchant } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
+  const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('home');
   const [selectedDistrict, setSelectedDistrict] = useState<string>('');
   const [selectedCity, setSelectedCity] = useState<string>('');
@@ -572,6 +573,17 @@ const Index = () => {
     }
     if (value.trim() !== '' || selectedDistrict || selectedCity) {
       setShowFiltered(true); // Auto-trigger filtering
+    }
+  };
+
+  // Handle post offers click - check authentication status
+  const handlePostOffers = () => {
+    if (user && isMerchant) {
+      // User is authenticated and is a merchant - go to post offer page
+      navigate('/merchant-post-offer');
+    } else {
+      // User is not authenticated or not a merchant - go to sign up page
+      navigate('/signup');
     }
   };
 
@@ -973,7 +985,12 @@ const Index = () => {
             </p>
             
             <div className="flex flex-col sm:flex-row gap-4 justify-center max-w-md mx-auto">
-              <Button variant="secondary" size="xl" className="bg-white text-secondary hover:bg-white/90">
+              <Button 
+                variant="secondary" 
+                size="xl" 
+                className="bg-white text-secondary hover:bg-white/90"
+                onClick={handlePostOffers}
+              >
                 <Store className="h-5 w-5 mr-2" />
                 Post Your Offers
               </Button>
