@@ -351,7 +351,7 @@ const MerchantDashboard = () => {
   const approveRedemption = async (redemptionId: string) => {
     try {
       console.log('Approving redemption:', redemptionId);
-      console.log('Current pending redemptions:', stats.pendingRedemptions);
+      console.log('Current stats:', stats);
       
       const { error } = await supabase
         .from('redemptions')
@@ -367,15 +367,17 @@ const MerchantDashboard = () => {
       
       // Immediately update the local state to remove from pending
       setStats(prevStats => {
-        const updatedPending = prevStats.pendingRedemptions.filter(r => r.id !== redemptionId);
-        console.log('Updated pending redemptions:', updatedPending);
+        const currentPending = prevStats.pendingRedemptions || [];
+        const updatedPending = currentPending.filter(r => r.id !== redemptionId);
+        console.log('Filtering pending redemptions:', currentPending.length, '->', updatedPending.length);
+        
         return {
           ...prevStats,
           pendingRedemptions: updatedPending
         };
       });
       
-      console.log('Redemption approved successfully');
+      console.log('State updated successfully');
       
       // Refresh all data after a short delay
       setTimeout(async () => {
@@ -391,7 +393,7 @@ const MerchantDashboard = () => {
   const rejectRedemption = async (redemptionId: string) => {
     try {
       console.log('Rejecting redemption:', redemptionId);
-      console.log('Current pending redemptions:', stats.pendingRedemptions);
+      console.log('Current stats:', stats);
       
       const { error } = await supabase
         .from('redemptions')
@@ -407,15 +409,17 @@ const MerchantDashboard = () => {
       
       // Immediately update the local state to remove from pending
       setStats(prevStats => {
-        const updatedPending = prevStats.pendingRedemptions.filter(r => r.id !== redemptionId);
-        console.log('Updated pending redemptions:', updatedPending);
+        const currentPending = prevStats.pendingRedemptions || [];
+        const updatedPending = currentPending.filter(r => r.id !== redemptionId);
+        console.log('Filtering pending redemptions:', currentPending.length, '->', updatedPending.length);
+        
         return {
           ...prevStats,
           pendingRedemptions: updatedPending
         };
       });
       
-      console.log('Redemption rejected successfully');
+      console.log('State updated successfully');
       
       // Refresh all data after a short delay
       setTimeout(async () => {
