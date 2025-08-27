@@ -450,7 +450,7 @@ const Index = () => {
 
   const convertToOfferCardProps = (dbOffer: any) => ({
     id: dbOffer.id,
-    shopName: 'Local Merchant', // You can enhance this by adding merchant names to the database
+    shopName: dbOffer.merchant_name || 'Local Merchant',
     offerTitle: dbOffer.title,
     description: dbOffer.description,
     discount: `${dbOffer.discount_percentage}% OFF`,

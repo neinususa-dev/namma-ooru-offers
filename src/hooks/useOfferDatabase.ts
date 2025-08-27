@@ -16,6 +16,7 @@ export interface DatabaseOffer {
   is_active: boolean;
   created_at: string;
   merchant_id: string;
+  merchant_name?: string;
 }
 
 export function useOfferDatabase() {
@@ -30,7 +31,10 @@ export function useOfferDatabase() {
 
       const { data, error: fetchError } = await supabase
         .from('offers')
-        .select('*')
+        .select(`
+          *,
+          profiles!offers_merchant_id_fkey(name)
+        `)
         .eq('is_active', true)
         .gte('expiry_date', new Date().toISOString())
         .order('created_at', { ascending: false });
@@ -39,7 +43,11 @@ export function useOfferDatabase() {
         throw fetchError;
       }
 
-      setOffers((data || []) as DatabaseOffer[]);
+      const offersWithMerchantNames = (data || []).map(offer => ({
+        ...offer,
+        merchant_name: offer.profiles?.name || 'Local Merchant'
+      }));
+      setOffers(offersWithMerchantNames as DatabaseOffer[]);
     } catch (err) {
       console.error('Error fetching offers:', err);
       setError(err instanceof Error ? err.message : 'Failed to fetch offers');
