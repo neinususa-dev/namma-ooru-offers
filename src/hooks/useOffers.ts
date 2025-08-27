@@ -180,37 +180,21 @@ export function useOffers() {
 
       const isPremium = userProfile?.role === 'merchant'; // Only merchants have unlimited redemptions
 
-      // If offerId is a UUID (from saved offers), use it directly. Otherwise, create a new one
-      const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(offerId);
-      let actualOfferId = offerId;
+      // Validate that the offer exists and is active
+      const { data: offerExists, error: validateError } = await supabase
+        .from('offers')
+        .select('id, title, is_active')
+        .eq('id', offerId)
+        .eq('is_active', true)
+        .single();
 
-      if (!isUUID) {
-        // Generate a proper UUID for the mock offer
-        actualOfferId = crypto.randomUUID();
-        
-        // For demo purposes, create a minimal offer record first if it doesn't exist
-        const { data: offerData, error: offerError } = await supabase
-          .from('offers')
-          .insert({
-            id: actualOfferId,
-            merchant_id: user.id, // Using current user as merchant for demo
-            title: `Mock Offer ${offerId}`,
-            description: `This is a demo offer redeemed from ${userProfile?.store_name || userProfile?.name || 'our store'}.`,
-            category: 'general', 
-            location: 'Demo Location',
-            discount_percentage: 20,
-            original_price: 100,
-            discounted_price: 80,
-            expiry_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(), // 30 days from now
-            is_active: true
-          })
-          .select()
-          .single();
-
-        if (offerError && offerError.code !== '23505') { // 23505 is unique violation, which is OK
-          console.error('Error creating offer:', offerError);
-          throw offerError;
-        }
+      if (validateError || !offerExists) {
+        toast({
+          title: "Invalid offer",
+          description: "This offer is no longer available or doesn't exist.",
+          variant: "destructive",
+        });
+        return false;
       }
 
       // Check if already redeemed (only for free users)
@@ -219,7 +203,7 @@ export function useOffers() {
           .from('redemptions')
           .select('id')
           .eq('user_id', user.id)
-          .eq('offer_id', actualOfferId)
+          .eq('offer_id', offerId)
           .maybeSingle();
 
         if (existing) {
@@ -232,18 +216,12 @@ export function useOffers() {
         }
 
         // For free users, also check if they've redeemed a similar offer by title
-        const { data: offerDetails } = await supabase
-          .from('offers')
-          .select('title')
-          .eq('id', actualOfferId)
-          .single();
-
-        if (offerDetails?.title) {
+        if (offerExists?.title) {
           const { data: similarRedemptions } = await supabase
             .from('redemptions')
             .select('id, offers!inner(title)')
             .eq('user_id', user.id)
-            .ilike('offers.title', `%${offerDetails.title.split(' ')[0]}%`)
+            .ilike('offers.title', `%${offerExists.title.split(' ')[0]}%`)
             .limit(1);
 
           if (similarRedemptions && similarRedemptions.length > 0) {
@@ -262,24 +240,22 @@ export function useOffers() {
         .from('redemptions')
         .insert({
           user_id: user.id,
-          offer_id: actualOfferId,
+          offer_id: offerId,
           status: 'pending'
         });
 
       if (error) throw error;
 
-      // If this was redeemed from saved offers, remove it from saved offers
-      if (isUUID) {
-        const { error: removeError } = await supabase
-          .from('saved_offers')
-          .delete()
-          .eq('user_id', user.id)
-          .eq('offer_id', actualOfferId);
+      // Remove from saved offers if it was saved
+      const { error: removeError } = await supabase
+        .from('saved_offers')
+        .delete()
+        .eq('user_id', user.id)
+        .eq('offer_id', offerId);
 
-        if (removeError) {
-          console.error('Error removing from saved offers:', removeError);
-          // Don't throw error here, redemption was successful
-        }
+      if (removeError) {
+        console.error('Error removing from saved offers:', removeError);
+        // Don't throw error here, redemption was successful
       }
 
       toast({
