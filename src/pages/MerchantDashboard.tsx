@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -42,6 +43,7 @@ interface Filters {
 
 const MerchantDashboard = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const { categories, loading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
   const [stats, setStats] = useState<MerchantStats>({
     totalOffers: 0,
@@ -232,15 +234,26 @@ const MerchantDashboard = () => {
 
       // Colors for categories
       const categoryColors: Record<string, string> = {
-        food: '#FF6B6B',
-        fashion: '#4ECDC4', 
+        all: '#808080',
         electronics: '#45B7D1',
+        fashion: '#4ECDC4', 
+        food: '#FF6B6B',
         grocery: '#96CEB4',
         home: '#FFEAA7',
-        beauty: '#DDA0DD',
-        sports: '#FF9FF3',
         travel: '#54A0FF',
+        health: '#FF6B6B',
+        beauty: '#DDA0DD',
+        education: '#9B59B6',
+        sports: '#FF9FF3',
         entertainment: '#5F27CD',
+        automotive: '#E67E22',
+        kids_baby: '#F39C12',
+        books: '#8E44AD',
+        services: '#16A085',
+        pets: '#27AE60',
+        local_deals: '#2980B9',
+        online_deals: '#8E44AD',
+        seasonal: '#E74C3C',
         other: '#00D2D3'
       };
 
@@ -521,16 +534,15 @@ const MerchantDashboard = () => {
                   <SelectTrigger><SelectValue /></SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Categories</SelectItem>
-                    <SelectItem value="food">Food & Dining</SelectItem>
-                    <SelectItem value="fashion">Fashion</SelectItem>
-                    <SelectItem value="electronics">Electronics</SelectItem>
-                    <SelectItem value="grocery">Grocery</SelectItem>
-                    <SelectItem value="home">Home & Garden</SelectItem>
-                    <SelectItem value="beauty">Beauty & Health</SelectItem>
-                    <SelectItem value="sports">Sports & Fitness</SelectItem>
-                    <SelectItem value="travel">Travel</SelectItem>
-                    <SelectItem value="entertainment">Entertainment</SelectItem>
-                    <SelectItem value="other">Other</SelectItem>
+                    {categoriesLoading ? (
+                      <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                    ) : (
+                      categories.map((category) => (
+                        <SelectItem key={category.id} value={category.name}>
+                          {category.name.charAt(0).toUpperCase() + category.name.slice(1).replace('_', ' ')}
+                        </SelectItem>
+                      ))
+                    )}
                   </SelectContent>
                 </Select>
               </div>
