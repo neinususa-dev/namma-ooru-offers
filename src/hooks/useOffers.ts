@@ -114,18 +114,15 @@ export function useOffers() {
     }
 
     try {
-      // Create a consistent offer identifier based on the original offer data
-      const offerIdentifier = `${offerData?.shopName || 'shop'}-${offerData?.offerTitle || offerId}`.toLowerCase().replace(/\s+/g, '-');
-      
-      // Check if this specific offer is already saved by this user
-      const { data: existingOffers } = await supabase
-        .from('offers')
-        .select('id, saved_offers!inner(*)')
-        .eq('saved_offers.user_id', user.id)
-        .ilike('title', `%${offerData?.offerTitle || offerId}%`)
-        .limit(1);
+      // Check if this offer is already saved by this user
+      const { data: existingSave, error: checkError } = await supabase
+        .from('saved_offers')
+        .select('id')
+        .eq('offer_id', offerId)
+        .eq('user_id', user.id)
+        .single();
 
-      if (existingOffers && existingOffers.length > 0) {
+      if (existingSave) {
         toast({
           title: "Already saved",
           description: "This offer is already in your saved offers.",
@@ -133,46 +130,18 @@ export function useOffers() {
         return false;
       }
 
-      // Generate a proper UUID for the new offer
-      const uuidOfferId = crypto.randomUUID();
-
-      // Create offer record using actual offer data
-      const discountValue = offerData?.discount ? 
-        parseInt(offerData.discount.replace(/[^\d]/g, '')) || 20 : 20;
-      
-      const { data: createdOffer, error: offerError } = await supabase
-        .from('offers')
-        .insert({
-          id: uuidOfferId,
-          merchant_id: user.id, // Using current user as merchant for demo
-          title: offerData?.offerTitle || `Offer ${offerId}`,
-          description: offerData?.description || `Special offer from ${profile?.store_name || profile?.name || 'our store'}.`,
-          category: offerData?.category || 'general',
-          location: offerData?.location || 'Local Area',
-          discount_percentage: discountValue,
-          original_price: 100,
-          discounted_price: Math.max(100 - discountValue, 10),
-          expiry_date: offerData?.expiryDate ? 
-            new Date(offerData.expiryDate).toISOString() : 
-            new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-          is_active: true
-        })
-        .select()
-        .single();
-
-      if (offerError) {
-        console.error('Error creating offer:', offerError);
-        throw offerError;
-      }
-
-      const { error } = await supabase
+      // Save the offer reference (not create a new offer)
+      const { error: saveError } = await supabase
         .from('saved_offers')
         .insert({
-          user_id: user.id,
-          offer_id: uuidOfferId
+          offer_id: offerId,
+          user_id: user.id
         });
 
-      if (error) throw error;
+      if (saveError) {
+        console.error('Error saving offer:', saveError);
+        throw saveError;
+      }
 
       toast({
         title: "Offer saved!",
