@@ -28,7 +28,7 @@ const Rewards = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showNavigation={false} />
+      <Header showNavigation={true} />
 
       <div className="container mx-auto px-4 py-8 space-y-12">
 
@@ -203,6 +203,25 @@ const Rewards = () => {
         )}
 
       </div>
+      
+      {/* Footer */}
+      <footer className="bg-card border-t border-primary/10 py-8">
+        <div className="container mx-auto px-4">
+          <div className="text-center space-y-4">
+            <h3 className="text-lg font-semibold">Namma OOru Offers</h3>
+            <p className="text-muted-foreground">Your Local Savings Hub - Connecting Tamil Nadu students with the best deals</p>
+            <div className="flex justify-center gap-6 text-sm text-muted-foreground">
+              <a href="#" className="hover:text-primary transition-colors">About</a>
+              <a href="#" className="hover:text-primary transition-colors">Contact</a>
+              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
+              <a href="#" className="hover:text-primary transition-colors">Terms</a>
+            </div>
+            <p className="text-xs text-muted-foreground">
+              © 2024 Namma OOru Offers. All rights reserved.
+            </p>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 };
