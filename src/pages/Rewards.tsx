@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -20,6 +21,31 @@ import { Header } from "@/components/Header";
 import { useAuth } from "@/hooks/useAuth";
 
 const Rewards = () => {
+  const navigate = useNavigate();
+  const [activeSection, setActiveSection] = useState<string>('rewards');
+
+  const handleSectionChange = (section: string) => {
+    setActiveSection(section);
+    switch (section) {
+      case 'home':
+        navigate('/');
+        break;
+      case 'hot-deals':
+        navigate('/?section=hot-deals');
+        break;
+      case 'local-deals':
+        navigate('/?section=local-deals');
+        break;
+      case 'store-list':
+        navigate('/?section=store-list');
+        break;
+      case 'rewards':
+        // Already on rewards page
+        break;
+      default:
+        navigate('/');
+    }
+  };
   const { user } = useAuth();
   const [currentPoints] = useState(250);
   const [totalEarned] = useState(1840);
@@ -28,7 +54,7 @@ const Rewards = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showNavigation={true} onSectionChange={() => {}} />
+      <Header showNavigation={true} activeSection={activeSection} onSectionChange={handleSectionChange} />
 
       <div className="container mx-auto px-4 py-8 space-y-12">
 
