@@ -1061,7 +1061,7 @@ const Index = () => {
                 <Store className="h-5 w-5 mr-2" />
                 Post Your Offers
               </Button>
-              <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10">
+              <Button variant="outline" size="xl" className="border-white text-primary hover:bg-white/10">
                 Learn More
               </Button>
             </div>
