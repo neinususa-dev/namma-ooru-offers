@@ -114,24 +114,24 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                 >
                   Home
                 </Link>
-                    <button
-                      onClick={() => onSectionChange?.('hot-deals')}
+                    <Link
+                      to="/?section=hot-deals"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                     >
                       Hot Deals
-                    </button>
-                    <button
-                      onClick={() => onSectionChange?.('local-deals')}
+                    </Link>
+                    <Link
+                      to="/?section=local-deals"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                     >
                       Local Deals
-                    </button>
-                    <button
-                      onClick={() => onSectionChange?.('store-list')}
+                    </Link>
+                    <Link
+                      to="/?section=store-list"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                     >
                       Store List
-                    </button>
+                    </Link>
                     <Link 
                       to="/your-offers"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
