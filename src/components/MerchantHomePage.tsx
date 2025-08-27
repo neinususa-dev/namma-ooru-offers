@@ -148,9 +148,11 @@ export const MerchantHomePage: React.FC = () => {
                   shopName={offer.merchant_name || 'Unknown Merchant'}
                   offerTitle={offer.title}
                   description={offer.description}
-                  discount={offer.price ? `₹${offer.price}` : 'Contact for price'}
+                  discount={offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Special Offer'}
+                  originalPrice={offer.original_price ? Number(offer.original_price) : undefined}
+                  discountedPrice={offer.discounted_price ? Number(offer.discounted_price) : undefined}
                   expiryDate={offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString() : 'No expiry'}
-                  location={offer.location || 'Location not specified'}
+                  location={offer.city || offer.district || 'Location not specified'}
                   category={offer.category || 'general'}
                   isHot={offer.listing_type === 'hot_offers'}
                   isTrending={offer.listing_type === 'trending'}
