@@ -65,26 +65,53 @@ export function useOffers() {
     if (!user) return;
 
     try {
+      // First fetch saved offers with just offer data
       const { data, error } = await supabase
         .from('saved_offers')
         .select(`
           *,
-          offers (
-            *,
-            profiles!merchant_id(name, store_name)
-          )
+          offers (*)
         `)
         .eq('user_id', user.id);
 
       if (error) throw error;
-      setSavedOffers(data || []);
+
+      // Then fetch merchant profiles separately for better performance
+      const offerIds = (data || []).map(item => item.offers?.merchant_id).filter(Boolean);
+      let merchantProfiles = {};
+      
+      if (offerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, name, store_name')
+          .in('id', offerIds);
+        
+        merchantProfiles = (profiles || []).reduce((acc, profile) => {
+          acc[profile.id] = profile;
+          return acc;
+        }, {});
+      }
+
+      // Combine the data
+      const enrichedData = (data || []).map(item => ({
+        ...item,
+        offers: item.offers ? {
+          ...item.offers,
+          profiles: merchantProfiles[item.offers.merchant_id] || null
+        } : null
+      }));
+
+      setSavedOffers(enrichedData);
     } catch (error) {
       console.error('Error fetching saved offers:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch saved offers.",
-        variant: "destructive",
-      });
+      // Only show toast if it's not a timeout error to avoid spam
+      if (error?.code !== '57014') {
+        toast({
+          title: "Error",
+          description: "Failed to fetch saved offers.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -92,27 +119,54 @@ export function useOffers() {
     if (!user) return;
 
     try {
+      // First fetch redemptions with just offer data
       const { data, error } = await supabase
         .from('redemptions')
         .select(`
           *,
-          offers (
-            *,
-            profiles!merchant_id(name, store_name)
-          )
+          offers (*)
         `)
         .eq('user_id', user.id)
         .order('redeemed_at', { ascending: false });
 
       if (error) throw error;
-      setRedeemedOffers((data || []) as RedeemedOffer[]);
+
+      // Then fetch merchant profiles separately for better performance
+      const offerIds = (data || []).map(item => item.offers?.merchant_id).filter(Boolean);
+      let merchantProfiles = {};
+      
+      if (offerIds.length > 0) {
+        const { data: profiles } = await supabase
+          .from('profiles')
+          .select('id, name, store_name')
+          .in('id', offerIds);
+        
+        merchantProfiles = (profiles || []).reduce((acc, profile) => {
+          acc[profile.id] = profile;
+          return acc;
+        }, {});
+      }
+
+      // Combine the data
+      const enrichedData = (data || []).map(item => ({
+        ...item,
+        offers: item.offers ? {
+          ...item.offers,
+          profiles: merchantProfiles[item.offers.merchant_id] || null
+        } : null
+      }));
+
+      setRedeemedOffers(enrichedData as RedeemedOffer[]);
     } catch (error) {
       console.error('Error fetching redeemed offers:', error);
-      toast({
-        title: "Error",
-        description: "Failed to fetch redeemed offers.",
-        variant: "destructive",
-      });
+      // Only show toast if it's not a timeout error to avoid spam
+      if (error?.code !== '57014') {
+        toast({
+          title: "Error",
+          description: "Failed to fetch redeemed offers.",
+          variant: "destructive",
+        });
+      }
     } finally {
       setLoading(false);
     }
@@ -134,7 +188,7 @@ export function useOffers() {
         .select('id')
         .eq('offer_id', offerId)
         .eq('user_id', user.id)
-        .single();
+        .maybeSingle();
 
       if (existingSave) {
         toast({
@@ -190,7 +244,7 @@ export function useOffers() {
         .from('profiles')
         .select('role, store_name, name')
         .eq('id', user.id)
-        .single();
+        .maybeSingle();
 
       const isPremium = userProfile?.role === 'merchant'; // Only merchants have unlimited redemptions
 
@@ -200,7 +254,7 @@ export function useOffers() {
         .select('id, title, is_active')
         .eq('id', offerId)
         .eq('is_active', true)
-        .single();
+        .maybeSingle();
 
       if (validateError || !offerExists) {
         toast({
