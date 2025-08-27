@@ -34,7 +34,7 @@ export default function Auth() {
   useEffect(() => {
     if (user && profile && !loading) {
       if (profile.role === 'merchant') {
-        navigate('/merchant-dashboard');
+        navigate('/merchant-post-offer');
       } else {
         navigate('/');
       }
