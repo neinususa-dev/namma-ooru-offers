@@ -9,6 +9,7 @@ import { OfferCard } from '@/components/OfferCard';
 import { useOffers } from '@/hooks/useOffers';
 import { useAuth } from '@/hooks/useAuth';
 import { Link } from 'react-router-dom';
+import { generateDefaultImage } from '@/utils/imageUtils';
 
 export default function YourOffers() {
   const { user, loading: authLoading } = useAuth();
@@ -123,9 +124,10 @@ export default function YourOffers() {
                     expiryDate={savedOffer.offers?.expiry_date ? new Date(savedOffer.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
                     location={savedOffer.offers?.city || savedOffer.offers?.location || 'Local Area'}
                     category={savedOffer.offers?.category || 'general'}
-                    displayMode="saved"
-                    onRemove={() => removeSavedOffer(savedOffer.id)}
-                    image={savedOffer.offers?.image_url}
+                     displayMode="saved"
+                     onRemove={() => removeSavedOffer(savedOffer.id)}
+                     couponCode={savedOffer.id.substring(0, 8).toUpperCase()}
+                     image={savedOffer.offers?.image_url || generateDefaultImage(savedOffer.offers?.profiles?.store_name || savedOffer.offers?.profiles?.name || savedOffer.offers?.store_name || 'Local Merchant')}
                   />
                 ))}
               </div>
@@ -170,7 +172,8 @@ export default function YourOffers() {
                      displayMode={redemption.status === 'approved' ? 'redeemed' : redemption.status === 'pending' ? 'pending' : 'rejected'}
                      couponCode={redemption.id.substring(0, 8).toUpperCase()}
                      redeemedDate={new Date(redemption.redeemed_at).toLocaleDateString()}
-                     image={redemption.offers?.image_url}
+                     redemptionStatus={redemption.status}
+                     image={redemption.offers?.image_url || generateDefaultImage(redemption.offers?.profiles?.store_name || redemption.offers?.profiles?.name || redemption.offers?.store_name || 'Local Merchant')}
                   />
                 ))}
               </div>
