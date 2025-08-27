@@ -14,22 +14,27 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarIcon, MapPin, Tag, DollarSign, Clock } from 'lucide-react';
+import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { DistrictSelect } from '@/components/DistrictSelect';
+import { CitySelect } from '@/components/CitySelect';
 
 const offerSchema = z.object({
   title: z.string().min(1, 'Title is required').max(100, 'Title must be under 100 characters'),
   description: z.string().min(1, 'Description is required').max(500, 'Description must be under 500 characters'),
   category: z.string().min(1, 'Category is required'),
+  district: z.string().min(1, 'District is required'),
+  city: z.string().min(1, 'City/Town is required'),
   location: z.string().min(1, 'Location is required'),
   original_price: z.number().min(0, 'Original price must be positive'),
   discount_percentage: z.number().min(1, 'Discount must be at least 1%').max(100, 'Discount cannot exceed 100%'),
   expiry_date: z.date(),
   redemption_mode: z.enum(['online', 'store', 'both']),
   listing_type: z.enum(['hot_offers', 'trending', 'local_deals']),
+  image_url: z.string().optional(),
 });
 
 type OfferFormData = z.infer<typeof offerSchema>;
@@ -40,6 +45,8 @@ const MerchantPostOffer: React.FC = () => {
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
+  const [uploadedImage, setUploadedImage] = useState<string>('');
+  const [selectedDistrict, setSelectedDistrict] = useState<string>('');
 
   const {
     register,
@@ -63,7 +70,7 @@ const MerchantPostOffer: React.FC = () => {
     // Only check auth after loading is complete and we have both user and profile data
     if (!loading) {
       if (!user) {
-        navigate('/auth');
+        navigate('/signin');
       } else if (user && profile !== null && profile?.role !== 'merchant') {
         navigate('/');
       }
@@ -75,6 +82,25 @@ const MerchantPostOffer: React.FC = () => {
     ? watchedValues.original_price * (1 - (watchedValues.discount_percentage || 0) / 100)
     : 0;
 
+  // Handle image upload
+  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const result = e.target?.result as string;
+        setUploadedImage(result);
+        setValue('image_url', result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage('');
+    setValue('image_url', '');
+  };
+
   const onSubmit = async (data: OfferFormData) => {
     if (!user) return;
 
@@ -84,6 +110,8 @@ const MerchantPostOffer: React.FC = () => {
         title: data.title,
         description: data.description,
         category: data.category,
+        district: data.district,
+        city: data.city,
         location: data.location,
         original_price: data.original_price,
         discount_percentage: data.discount_percentage,
@@ -92,6 +120,7 @@ const MerchantPostOffer: React.FC = () => {
         expiry_date: data.expiry_date.toISOString(),
         redemption_mode: data.redemption_mode,
         listing_type: data.listing_type,
+        image_url: data.image_url,
       };
 
       const { error } = await supabase.from('offers').insert([offerData]);
@@ -107,6 +136,8 @@ const MerchantPostOffer: React.FC = () => {
 
       reset();
       setSelectedDate(undefined);
+      setUploadedImage('');
+      setSelectedDistrict('');
       navigate('/merchant-dashboard');
     } catch (error) {
       console.error('Error posting offer:', error);
@@ -193,6 +224,7 @@ const MerchantPostOffer: React.FC = () => {
                         <SelectItem value="grocery">Grocery</SelectItem>
                         <SelectItem value="home">Home & Garden</SelectItem>
                         <SelectItem value="beauty">Beauty & Health</SelectItem>
+                        <SelectItem value="services">Services</SelectItem>
                         <SelectItem value="sports">Sports & Fitness</SelectItem>
                         <SelectItem value="travel">Travel</SelectItem>
                         <SelectItem value="entertainment">Entertainment</SelectItem>
@@ -205,9 +237,38 @@ const MerchantPostOffer: React.FC = () => {
                   </div>
 
                   <div className="space-y-2">
+                    <Label htmlFor="district">District *</Label>
+                    <DistrictSelect
+                      value={selectedDistrict}
+                      onValueChange={(value) => {
+                        setSelectedDistrict(value);
+                        setValue('district', value);
+                        setValue('city', ''); // Reset city when district changes
+                      }}
+                      placeholder="Select district"
+                    />
+                    {errors.district && (
+                      <p className="text-sm text-destructive">{errors.district.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="city">City/Town *</Label>
+                    <CitySelect
+                      selectedDistrict={selectedDistrict}
+                      value={watchedValues.city}
+                      onValueChange={(value) => setValue('city', value)}
+                      placeholder="Select city/town"
+                    />
+                    {errors.city && (
+                      <p className="text-sm text-destructive">{errors.city.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
                     <Label htmlFor="location" className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
-                      Location *
+                      Specific Location *
                     </Label>
                     <Input
                       id="location"
@@ -218,6 +279,49 @@ const MerchantPostOffer: React.FC = () => {
                     {errors.location && (
                       <p className="text-sm text-destructive">{errors.location.message}</p>
                     )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="image">Offer Image</Label>
+                    <div className="space-y-2">
+                      {uploadedImage ? (
+                        <div className="relative">
+                          <img
+                            src={uploadedImage}
+                            alt="Offer preview"
+                            className="w-full h-32 object-cover rounded-lg"
+                          />
+                          <Button
+                            type="button"
+                            variant="destructive"
+                            size="sm"
+                            className="absolute top-2 right-2"
+                            onClick={removeImage}
+                          >
+                            <X className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ) : (
+                        <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                          <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                          <div className="space-y-2">
+                            <Label htmlFor="image-upload" className="text-sm font-medium cursor-pointer">
+                              Click to upload an image
+                            </Label>
+                            <p className="text-xs text-muted-foreground">
+                              PNG, JPG up to 10MB
+                            </p>
+                          </div>
+                          <Input
+                            id="image-upload"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            className="hidden"
+                          />
+                        </div>
+                      )}
+                    </div>
                   </div>
                 </CardContent>
               </Card>

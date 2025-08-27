@@ -17,12 +17,15 @@ export type Database = {
       offers: {
         Row: {
           category: string | null
+          city: string | null
           created_at: string
           description: string | null
           discount_percentage: number | null
           discounted_price: number | null
+          district: string | null
           expiry_date: string
           id: string
+          image_url: string | null
           is_active: boolean
           listing_type: string | null
           location: string | null
@@ -34,12 +37,15 @@ export type Database = {
         }
         Insert: {
           category?: string | null
+          city?: string | null
           created_at?: string
           description?: string | null
           discount_percentage?: number | null
           discounted_price?: number | null
+          district?: string | null
           expiry_date: string
           id?: string
+          image_url?: string | null
           is_active?: boolean
           listing_type?: string | null
           location?: string | null
@@ -51,12 +57,15 @@ export type Database = {
         }
         Update: {
           category?: string | null
+          city?: string | null
           created_at?: string
           description?: string | null
           discount_percentage?: number | null
           discounted_price?: number | null
+          district?: string | null
           expiry_date?: string
           id?: string
+          image_url?: string | null
           is_active?: boolean
           listing_type?: string | null
           location?: string | null
