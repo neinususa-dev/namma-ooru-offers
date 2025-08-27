@@ -93,6 +93,12 @@ const MerchantEditOffers = () => {
 
   const handleEditOffer = (offer: OfferData) => {
     setSelectedOffer(offer);
+    
+    // If user is not premium and trying to edit a premium listing type, default to local_deals
+    const listingType = !profile?.is_premium && (offer.listing_type === 'hot_offers' || offer.listing_type === 'trending') 
+      ? 'local_deals' 
+      : offer.listing_type;
+    
     setEditForm({
       title: offer.title,
       description: offer.description,
@@ -105,7 +111,7 @@ const MerchantEditOffers = () => {
       discounted_price: offer.discounted_price,
       expiry_date: offer.expiry_date.split('T')[0], // Format for date input
       redemption_mode: offer.redemption_mode,
-      listing_type: offer.listing_type,
+      listing_type: listingType,
       is_active: offer.is_active,
       image_url: offer.image_url
     });
@@ -114,6 +120,12 @@ const MerchantEditOffers = () => {
 
   const handleSaveOffer = async () => {
     if (!selectedOffer || !user) return;
+
+    // Check if user is trying to save a premium listing type without premium access
+    if (!profile?.is_premium && (editForm.listing_type === 'hot_offers' || editForm.listing_type === 'trending')) {
+      toast.error('Premium subscription required for Hot Offers and Trending listings');
+      return;
+    }
 
     try {
       setSaving(true);
@@ -352,9 +364,18 @@ const MerchantEditOffers = () => {
                       <SelectValue placeholder="Select listing type" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="hot_offers">Hot Offers</SelectItem>
-                      <SelectItem value="trending">Trending</SelectItem>
+                      {profile?.is_premium && (
+                        <>
+                          <SelectItem value="hot_offers">Hot Offers (Premium)</SelectItem>
+                          <SelectItem value="trending">Trending (Premium)</SelectItem>
+                        </>
+                      )}
                       <SelectItem value="local_deals">Local Deals</SelectItem>
+                      {!profile?.is_premium && (
+                        <div className="px-2 py-1 text-xs text-muted-foreground">
+                          Upgrade to Premium for Hot Offers & Trending
+                        </div>
+                      )}
                     </SelectContent>
                   </Select>
                 </div>
