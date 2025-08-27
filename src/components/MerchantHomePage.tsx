@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { OfferCard } from '@/components/OfferCard';
+import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Link } from 'react-router-dom';
@@ -84,6 +85,7 @@ export const MerchantHomePage: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header showNavigation={false} />
       {/* Hero Section */}
       <section className="bg-primary-gradient text-primary-foreground py-12">
         <div className="container mx-auto px-4">
@@ -142,7 +144,17 @@ export const MerchantHomePage: React.FC = () => {
               {merchantOffers.slice(0, 8).map(offer => (
                 <OfferCard 
                   key={offer.id} 
-                  {...offer}
+                  id={offer.id}
+                  shopName={offer.merchant_name || 'Unknown Merchant'}
+                  offerTitle={offer.title}
+                  description={offer.description}
+                  discount={offer.price ? `₹${offer.price}` : 'Contact for price'}
+                  expiryDate={offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString() : 'No expiry'}
+                  location={offer.location || 'Location not specified'}
+                  category={offer.category || 'general'}
+                  isHot={offer.listing_type === 'hot_offers'}
+                  isTrending={offer.listing_type === 'trending'}
+                  image={offer.image_url}
                   disableMerchantActions={true}
                 />
               ))}
