@@ -60,22 +60,24 @@ const pricingTiers = [
 
 const paymentMethods = [
   {
+    id: 'cash',
+    name: 'Cash Payment',
+    description: 'Pay directly at our office or via bank transfer',
+    icon: Building2
+  },
+  {
     id: 'card',
-    name: 'Credit/Debit Card',
+    name: 'Credit/Debit Card (Coming Soon)',
     description: 'Visa, Mastercard, RuPay',
-    icon: CreditCard
+    icon: CreditCard,
+    disabled: true
   },
   {
     id: 'upi',
-    name: 'UPI',
+    name: 'UPI (Coming Soon)',
     description: 'Google Pay, PhonePe, Paytm',
-    icon: Smartphone
-  },
-  {
-    id: 'netbanking',
-    name: 'Net Banking',
-    description: 'All major banks supported',
-    icon: Building2
+    icon: Smartphone,
+    disabled: true
   }
 ];
 
@@ -111,39 +113,18 @@ export const Billing: React.FC = () => {
     setIsProcessing(true);
     
     try {
-      // TODO: Replace with actual Razorpay integration
-      toast.info('Razorpay integration ready! Please set up your Razorpay account first.');
+      const selectedTier = pricingTiers.find(t => t.name === selectedPlan);
       
-      // This is where we'll add the Razorpay subscription creation
-      /*
-      const { data, error } = await supabase.functions.invoke('create-razorpay-subscription', {
-        body: { planName: selectedPlan, userId: user.id }
-      });
+      // Show cash payment instructions
+      toast.success(`${selectedPlan} plan selected! Please contact us for cash payment details.`);
       
-      if (error) throw error;
+      // Redirect to success page with payment instructions
+      setTimeout(() => {
+        window.location.href = `/payment-success?plan=${selectedPlan}&amount=${selectedTier?.price}&method=cash`;
+      }, 2000);
       
-      // Open Razorpay checkout
-      const options = {
-        subscription_id: data.subscription_id,
-        handler: function (response) {
-          // Handle successful payment
-          window.location.href = '/payment-success';
-        },
-        prefill: {
-          name: profile?.name || user.email,
-          email: user.email,
-          contact: profile?.phone_number || ''
-        },
-        theme: {
-          color: '#3B82F6'
-        }
-      };
-      
-      const rzp = new window.Razorpay(options);
-      rzp.open();
-      */
     } catch (error) {
-      toast.error('Failed to initiate payment. Please try again.');
+      toast.error('Failed to process request. Please try again.');
       console.error('Payment error:', error);
     } finally {
       setIsProcessing(false);
