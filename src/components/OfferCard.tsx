@@ -129,10 +129,10 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       )}
 
       {/* Offer Image */}
-      {displayMode === 'default' && (
+      {displayMode === 'default' && image && (
         <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
           <img 
-            src={image || defaultOfferImage} 
+            src={image} 
             alt={offerTitle}
             className="w-full h-full object-cover"
           />
