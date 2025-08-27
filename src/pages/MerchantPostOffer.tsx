@@ -60,10 +60,13 @@ const MerchantPostOffer: React.FC = () => {
 
   // Redirect if not authenticated or not a merchant
   React.useEffect(() => {
-    if (!loading && !user) {
-      navigate('/auth');
-    } else if (!loading && user && profile?.role !== 'merchant') {
-      navigate('/');
+    // Only check auth after loading is complete and we have both user and profile data
+    if (!loading) {
+      if (!user) {
+        navigate('/auth');
+      } else if (user && profile !== null && profile?.role !== 'merchant') {
+        navigate('/');
+      }
     }
   }, [user, profile, loading, navigate]);
 
