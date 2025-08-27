@@ -17,7 +17,8 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
     { id: 'home', label: 'Home' },
     { id: 'hot-deals', label: 'Hot Deals' },
     { id: 'local-deals', label: 'Local Deals' },
-    { id: 'store-list', label: 'Store List' }
+    { id: 'store-list', label: 'Store List' },
+    { id: 'rewards', label: 'Rewards', link: '/rewards' }
   ];
 
   return (
@@ -66,19 +67,29 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                 ) : (
                   // Customer/Guest navigation - show all navigation items
                   <>
-                    {navigationItems.map((item) => (
-                      <button
-                        key={item.id}
-                        onClick={() => onSectionChange(item.id)}
-                        className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                          activeSection === item.id 
-                            ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                            : 'text-blue-600'
-                        }`}
-                      >
-                        {item.label}
-                      </button>
-                    ))}
+                     {navigationItems.map((item) => (
+                       item.link ? (
+                         <Link
+                           key={item.id}
+                           to={item.link}
+                           className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
+                         >
+                           {item.label}
+                         </Link>
+                       ) : (
+                         <button
+                           key={item.id}
+                           onClick={() => onSectionChange(item.id)}
+                           className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                             activeSection === item.id 
+                               ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                               : 'text-blue-600'
+                           }`}
+                         >
+                           {item.label}
+                         </button>
+                       )
+                     ))}
                     {user && isCustomer && (
                       <>
                         <Link 
