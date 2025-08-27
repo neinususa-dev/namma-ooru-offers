@@ -7,6 +7,8 @@ export interface DatabaseOffer {
   description: string;
   category: string;
   location: string;
+  district: string;
+  city: string;
   original_price: number;
   discount_percentage: number;
   discounted_price: number;

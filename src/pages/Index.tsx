@@ -468,6 +468,33 @@ const Index = () => {
     };
   };
 
+  // Helper functions to convert IDs to names for filtering
+  const getDistrictNameById = (districtId: string) => {
+    const districts = [
+      { id: 'erode', name: 'Erode' },
+      { id: 'chennai', name: 'Chennai' },
+      { id: 'coimbatore', name: 'Coimbatore' },
+      { id: 'madurai', name: 'Madurai' },
+      { id: 'salem', name: 'Salem' },
+      { id: 'tirupur', name: 'Tirupur' },
+      // Add other districts as needed
+    ];
+    const district = districts.find(d => d.id === districtId);
+    return district ? district.name : districtId;
+  };
+
+  const getCityNameById = (cityId: string) => {
+    const cities = [
+      { id: 'sathyamangalam', name: 'Sathyamangalam' },
+      { id: 'erode-city', name: 'Erode City' },
+      { id: 'gobichettipalayam', name: 'Gobichettipalayam' },
+      { id: 'bhavani', name: 'Bhavani' },
+      // Add other cities as needed
+    ];
+    const city = cities.find(c => c.id === cityId);
+    return city ? city.name : cityId;
+  };
+
   const getOffersToShow = () => {
     let filteredOffers = offers;
 
@@ -481,12 +508,25 @@ const Index = () => {
       filteredOffers = getOffersByCategory(selectedCategory);
     }
 
-    // Location filtering (simplified - you can enhance this based on your location structure)
+    // Location filtering - check district and city fields from database
     if (showFiltered && (selectedDistrict || selectedCity)) {
       filteredOffers = filteredOffers.filter(offer => {
-        const locationMatch = selectedDistrict ? 
-          offer.location.toLowerCase().includes(selectedDistrict.toLowerCase()) : true;
-        return locationMatch;
+        let districtMatch = true;
+        let cityMatch = true;
+
+        // Check district match if selected
+        if (selectedDistrict) {
+          const selectedDistrictName = getDistrictNameById(selectedDistrict);
+          districtMatch = offer.district?.toLowerCase() === selectedDistrictName.toLowerCase();
+        }
+
+        // Check city match if selected  
+        if (selectedCity) {
+          const selectedCityName = getCityNameById(selectedCity);
+          cityMatch = offer.city?.toLowerCase() === selectedCityName.toLowerCase();
+        }
+
+        return districtMatch && cityMatch;
       });
     }
 
