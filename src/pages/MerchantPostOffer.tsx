@@ -14,11 +14,13 @@ import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Store } from 'lucide-react';
+import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Store, Eye } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
 import { cn } from '@/lib/utils';
+import { OfferCard } from '@/components/OfferCard';
+import { resizeImage, generateDefaultImage } from '@/utils/imageUtils';
 
 const offerSchema = z.object({
   store_name: z.string().min(1, 'Store name is required'),
@@ -45,6 +47,7 @@ const MerchantPostOffer: React.FC = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedDate, setSelectedDate] = useState<Date>();
   const [uploadedImage, setUploadedImage] = useState<string>('');
+  const [consentChecked, setConsentChecked] = useState<boolean>(false);
   
 
   const {
@@ -95,23 +98,39 @@ const MerchantPostOffer: React.FC = () => {
     ? watchedValues.original_price * (1 - (watchedValues.discount_percentage || 0) / 100)
     : 0;
 
-  // Handle image upload
-  const handleImageUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle image upload with resizing
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (file) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const result = e.target?.result as string;
-        setUploadedImage(result);
-        setValue('image_url', result);
-      };
-      reader.readAsDataURL(file);
+      try {
+        const resizedImage = await resizeImage(file);
+        setUploadedImage(resizedImage);
+        setValue('image_url', resizedImage);
+      } catch (error) {
+        console.error('Error resizing image:', error);
+        toast({
+          title: 'Error',
+          description: 'Failed to process image. Please try again.',
+          variant: 'destructive',
+        });
+      }
     }
   };
 
   const removeImage = () => {
     setUploadedImage('');
     setValue('image_url', '');
+  };
+
+  // Generate preview image (uploaded image or default image with store name)
+  const getPreviewImage = () => {
+    if (uploadedImage) {
+      return uploadedImage;
+    }
+    if (watchedValues.store_name) {
+      return generateDefaultImage(watchedValues.store_name);
+    }
+    return undefined;
   };
 
   const onSubmit = async (data: OfferFormData) => {
@@ -507,6 +526,58 @@ const MerchantPostOffer: React.FC = () => {
               </Card>
             </div>
 
+            {/* Preview Section */}
+            {watchedValues.store_name && watchedValues.title && watchedValues.description && watchedValues.category && (
+              <Card>
+                <CardHeader>
+                  <CardTitle className="flex items-center gap-2">
+                    <Eye className="h-5 w-5" />
+                    Preview
+                  </CardTitle>
+                  <CardDescription>See how your offer will appear to customers</CardDescription>
+                </CardHeader>
+                <CardContent>
+                  <div className="max-w-sm mx-auto">
+                    <OfferCard
+                      id="preview"
+                      shopName={watchedValues.store_name}
+                      offerTitle={watchedValues.title}
+                      description={watchedValues.description}
+                      discount={watchedValues.discount_percentage ? `${watchedValues.discount_percentage}% OFF` : '0% OFF'}
+                      expiryDate={selectedDate ? format(selectedDate, 'M/d/yyyy') : 'Select date'}
+                      location={watchedValues.city ? `${watchedValues.location || 'Your Location'} - ${watchedValues.city}` : watchedValues.location || 'Your Location'}
+                      category={watchedValues.category || 'Category'}
+                      isHot={watchedValues.listing_type === 'hot_offers'}
+                      isTrending={watchedValues.listing_type === 'trending'}
+                      image={getPreviewImage()}
+                      displayMode="default"
+                    />
+                  </div>
+                </CardContent>
+              </Card>
+            )}
+
+            {/* Consent Section */}
+            <Card>
+              <CardContent className="pt-6">
+                <div className="flex items-start space-x-3">
+                  <Checkbox
+                    id="consent"
+                    checked={consentChecked}
+                    onCheckedChange={(checked) => setConsentChecked(checked === true)}
+                  />
+                  <div className="space-y-1 leading-none">
+                    <Label htmlFor="consent" className="text-sm font-medium cursor-pointer">
+                      I agree to post this offer and confirm all details are accurate
+                    </Label>
+                    <p className="text-xs text-muted-foreground">
+                      By checking this box, you confirm that all offer details are correct and agree to the terms of service.
+                    </p>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+
             <div className="flex gap-4 justify-end">
               <Button
                 type="button"
@@ -515,7 +586,7 @@ const MerchantPostOffer: React.FC = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting}>
+              <Button type="submit" disabled={isSubmitting || !consentChecked}>
                 {isSubmitting ? 'Posting...' : 'Post Offer'}
               </Button>
             </div>
