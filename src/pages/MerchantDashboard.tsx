@@ -124,54 +124,41 @@ const MerchantDashboard = () => {
       // Get offer IDs for this merchant
       const offerIds = offers?.map(offer => offer.id) || [];
       
-      // Fetch saves for merchant offers
+      // Fetch saves for merchant offers - simplified query
       let saves: any[] = [];
       let redemptions: any[] = [];
       
       if (offerIds.length > 0) {
+        console.log('Fetching data for offer IDs:', offerIds);
+        
         const { data: savesData, error: savesError } = await supabase
           .from('saved_offers')
-          .select(`
-            id,
-            saved_at,
-            offer_id,
-            offers (
-              id,
-              title,
-              category,
-              discount_percentage,
-              original_price,
-              discounted_price,
-              merchant_id
-            )
-          `)
+          .select('*')
           .in('offer_id', offerIds);
 
-        if (savesError) throw savesError;
+        if (savesError) {
+          console.error('Saves query error:', savesError);
+          throw savesError;
+        }
+        
         saves = savesData || [];
+        console.log('Saves data:', saves);
 
-        // Fetch redemptions for merchant offers
+        // Fetch redemptions for merchant offers - simplified query
         const { data: redemptionsData, error: redemptionsError } = await supabase
           .from('redemptions')
-          .select(`
-            id,
-            redeemed_at,
-            offer_id,
-            offers (
-              id,
-              title,
-              category,
-              discount_percentage,
-              original_price,
-              discounted_price,
-              redemption_mode,
-              merchant_id
-            )
-          `)
+          .select('*')
           .in('offer_id', offerIds);
 
-        if (redemptionsError) throw redemptionsError;
+        if (redemptionsError) {
+          console.error('Redemptions query error:', redemptionsError);
+          throw redemptionsError;
+        }
+        
         redemptions = redemptionsData || [];
+        console.log('Redemptions data:', redemptions);
+      } else {
+        console.log('No offers found for merchant');
       }
 
       // Process analytics data
@@ -202,12 +189,17 @@ const MerchantDashboard = () => {
         color: categoryColors[category as keyof typeof categoryColors] || categoryColors.other
       }));
 
-      // Redemption modes breakdown
+      // Redemption modes breakdown - need to fetch offer details
       const redemptionModeCount: Record<string, number> = {};
-      redemptions?.forEach(redemption => {
-        const mode = redemption.offers?.redemption_mode || 'both';
-        redemptionModeCount[mode] = (redemptionModeCount[mode] || 0) + 1;
-      });
+      
+      for (const redemption of redemptions) {
+        // Find the corresponding offer
+        const offer = offers?.find(o => o.id === redemption.offer_id);
+        if (offer) {
+          const mode = offer.redemption_mode || 'both';
+          redemptionModeCount[mode] = (redemptionModeCount[mode] || 0) + 1;
+        }
+      }
 
       const redemptionModes = Object.entries(redemptionModeCount).map(([mode, count]) => ({
         name: mode === 'both' ? 'Online & Store' : mode === 'online' ? 'Online Only' : 'Store Only',
@@ -246,7 +238,9 @@ const MerchantDashboard = () => {
         const month = new Date(redemption.redeemed_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         if (monthlyData[month]) {
           monthlyData[month].redemptions++;
-          const revenue = redemption.offers?.discounted_price || 0;
+          // Find corresponding offer for revenue calculation
+          const offer = offers?.find(o => o.id === redemption.offer_id);
+          const revenue = offer?.discounted_price || 0;
           monthlyData[month].revenue += revenue;
         }
       });
@@ -269,15 +263,18 @@ const MerchantDashboard = () => {
       });
 
       saves?.forEach(save => {
-        if (save.offers && offerPerformanceMap[save.offers.id]) {
-          offerPerformanceMap[save.offers.id].saves++;
+        if (save.offer_id && offerPerformanceMap[save.offer_id]) {
+          offerPerformanceMap[save.offer_id].saves++;
         }
       });
 
       redemptions?.forEach(redemption => {
-        if (redemption.offers && offerPerformanceMap[redemption.offers.id]) {
-          offerPerformanceMap[redemption.offers.id].redemptions++;
-          offerPerformanceMap[redemption.offers.id].revenue += redemption.offers.discounted_price || 0;
+        if (redemption.offer_id && offerPerformanceMap[redemption.offer_id]) {
+          offerPerformanceMap[redemption.offer_id].redemptions++;
+          // Find corresponding offer for revenue calculation
+          const offer = offers?.find(o => o.id === redemption.offer_id);
+          const revenue = offer?.discounted_price || 0;
+          offerPerformanceMap[redemption.offer_id].revenue += revenue;
         }
       });
 
@@ -289,8 +286,10 @@ const MerchantDashboard = () => {
       const totalOffers = offers?.length || 0;
       const totalSaves = saves?.length || 0;
       const totalRedemptions = redemptions?.length || 0;
-      const totalRevenue = redemptions?.reduce((sum, redemption) => 
-        sum + (redemption.offers?.discounted_price || 0), 0) || 0;
+      const totalRevenue = redemptions?.reduce((sum, redemption) => {
+        const offer = offers?.find(o => o.id === redemption.offer_id);
+        return sum + (offer?.discounted_price || 0);
+      }, 0) || 0;
 
       setStats({
         totalOffers,
