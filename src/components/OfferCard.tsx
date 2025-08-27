@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift } from 'lucide-react';
+import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -21,10 +21,11 @@ interface OfferCardProps {
   isHot?: boolean;
   isTrending?: boolean;
   image?: string;
-  displayMode?: 'default' | 'saved' | 'redeemed';
+  displayMode?: 'default' | 'saved' | 'redeemed' | 'pending' | 'rejected';
   onRemove?: () => void;
   couponCode?: string;
   redeemedDate?: string;
+  redemptionStatus?: 'pending' | 'approved' | 'rejected';
   disableMerchantActions?: boolean;
 }
 
@@ -46,6 +47,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   onRemove,
   couponCode,
   redeemedDate,
+  redemptionStatus,
   disableMerchantActions = false
 }) => {
   const { user } = useAuth();
@@ -115,6 +117,24 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           >
             <Trash2 className="h-4 w-4" />
           </Button>
+        </div>
+      )}
+
+      {/* Pending/Rejected badge */}
+      {displayMode === 'pending' && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge className="bg-yellow-500 text-yellow-50 font-bold shadow-lg">
+            <Clock className="h-3 w-3 mr-1" />
+            PENDING
+          </Badge>
+        </div>
+      )}
+
+      {displayMode === 'rejected' && (
+        <div className="absolute top-3 right-3 z-10">
+          <Badge className="bg-red-500 text-red-50 font-bold shadow-lg">
+            REJECTED
+          </Badge>
         </div>
       )}
 
@@ -229,6 +249,22 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           >
             Redeem Now
           </Button>
+        )}
+        
+        {displayMode === 'pending' && (
+          <div className="w-full text-center">
+            <p className="text-sm text-yellow-600">
+              Awaiting merchant approval
+            </p>
+          </div>
+        )}
+        
+        {displayMode === 'rejected' && (
+          <div className="w-full text-center">
+            <p className="text-sm text-red-600">
+              Redemption request was rejected
+            </p>
+          </div>
         )}
         
         {displayMode === 'redeemed' && (

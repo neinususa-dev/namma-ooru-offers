@@ -17,7 +17,7 @@ import {
 import { 
   Plus, BarChart3, TrendingUp, Eye, Heart, ShoppingBag, 
   Calendar, Filter, Target, Award, Users, Star, DollarSign,
-  Package, Activity, Clock, Globe, Edit3
+  Package, Activity, Clock, Globe, Edit3, CheckCircle, XCircle
 } from 'lucide-react';
 
 interface MerchantStats {
@@ -31,6 +31,7 @@ interface MerchantStats {
   redemptionModes: Array<{ name: string; value: number; color: string }>;
   customerSaves: Array<{ customer_name: string; customer_email: string; offer_title: string; saved_at: string }>;
   customerRedemptions: Array<{ customer_name: string; customer_email: string; offer_title: string; redeemed_at: string }>;
+  pendingRedemptions: Array<{ id: string; customer_name: string; customer_email: string; offer_title: string; redeemed_at: string; offer_id: string }>;
 }
 
 interface Filters {
@@ -52,7 +53,8 @@ const MerchantDashboard = () => {
     offerPerformance: [],
     redemptionModes: [],
     customerSaves: [],
-    customerRedemptions: []
+    customerRedemptions: [],
+    pendingRedemptions: []
   });
   const [loading, setLoading] = useState(true);
   const [filters, setFilters] = useState<Filters>({
@@ -128,7 +130,8 @@ const MerchantDashboard = () => {
           offerPerformance: [],
           redemptionModes: [],
           customerSaves: [],
-          customerRedemptions: []
+          customerRedemptions: [],
+          pendingRedemptions: []
         });
         return;
       }
@@ -145,6 +148,20 @@ const MerchantDashboard = () => {
         `)
         .in('offer_id', offerIds);
       if (savesError) throw savesError;
+
+      // Fetch pending redemptions for these offers with customer information
+      const { data: pendingRedemptionsData, error: pendingError } = await supabase
+        .from('redemptions')
+        .select(`
+          *,
+          profiles:user_id (
+            name,
+            email
+          )
+        `)
+        .eq('status', 'pending')
+        .in('offer_id', offerIds);
+      if (pendingError) throw pendingError;
 
       const { data: allRedemptions, error: redemptionsError } = await supabase
         .from('redemptions')
@@ -288,13 +305,25 @@ const MerchantDashboard = () => {
         };
       });
 
-      const customerRedemptions = redemptions.map(r => {
+      const customerRedemptions = redemptions.filter(r => r.status === 'approved').map(r => {
         const offer = offers.find(o => o.id === r.offer_id);
         return {
           customer_name: r.profiles?.name || 'Unknown',
           customer_email: r.profiles?.email || 'Unknown',
           offer_title: offer?.title || 'Unknown Offer',
           redeemed_at: new Date(r.redeemed_at).toLocaleDateString()
+        };
+      });
+
+      const pendingRedemptions = (pendingRedemptionsData || []).map(r => {
+        const offer = offers.find(o => o.id === r.offer_id);
+        return {
+          id: r.id,
+          customer_name: r.profiles?.name || 'Unknown',
+          customer_email: r.profiles?.email || 'Unknown',
+          offer_title: offer?.title || 'Unknown Offer',
+          redeemed_at: new Date(r.redeemed_at).toLocaleDateString(),
+          offer_id: r.offer_id
         };
       });
 
@@ -308,7 +337,8 @@ const MerchantDashboard = () => {
         offerPerformance,
         redemptionModes,
         customerSaves,
-        customerRedemptions
+        customerRedemptions,
+        pendingRedemptions
       });
 
     } catch (error) {
@@ -318,7 +348,37 @@ const MerchantDashboard = () => {
     }
   };
 
-  // Show loading while auth is loading or data is loading
+  const approveRedemption = async (redemptionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('redemptions')
+        .update({ status: 'approved' })
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+      
+      // Refresh data
+      fetchMerchantAnalytics();
+    } catch (error) {
+      console.error('Error approving redemption:', error);
+    }
+  };
+
+  const rejectRedemption = async (redemptionId: string) => {
+    try {
+      const { error } = await supabase
+        .from('redemptions')
+        .update({ status: 'rejected' })
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+      
+      // Refresh data
+      fetchMerchantAnalytics();
+    } catch (error) {
+      console.error('Error rejecting redemption:', error);
+    }
+  };
   if (authLoading || loading || !user || !profile) {
     return (
       <div className="min-h-screen bg-background">
@@ -494,6 +554,55 @@ const MerchantDashboard = () => {
             ))}
           </CardContent>
         </Card>
+
+        {/* Pending Redemptions */}
+        {stats.pendingRedemptions.length > 0 && (
+          <Card className="mt-6">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Clock className="h-5 w-5" />
+                Pending Redemptions
+                <Badge variant="secondary">{stats.pendingRedemptions.length}</Badge>
+              </CardTitle>
+              <CardDescription>Customer redemption requests awaiting approval</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3 max-h-96 overflow-y-auto">
+                {stats.pendingRedemptions.map((redemption, idx) => (
+                  <div key={idx} className="p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                    <div className="flex justify-between items-start">
+                      <div className="flex-1">
+                        <p className="font-semibold">{redemption.customer_name}</p>
+                        <p className="text-sm text-muted-foreground">{redemption.customer_email}</p>
+                        <p className="text-sm font-medium text-primary">{redemption.offer_title}</p>
+                        <p className="text-xs text-muted-foreground mt-1">Requested: {redemption.redeemed_at}</p>
+                      </div>
+                      <div className="flex gap-2 ml-4">
+                        <Button 
+                          size="sm" 
+                          onClick={() => approveRedemption(redemption.id)}
+                          className="bg-green-600 hover:bg-green-700 text-white"
+                        >
+                          <CheckCircle className="h-4 w-4 mr-1" />
+                          Approve
+                        </Button>
+                        <Button 
+                          size="sm" 
+                          variant="outline"
+                          onClick={() => rejectRedemption(redemption.id)}
+                          className="border-red-300 text-red-600 hover:bg-red-50"
+                        >
+                          <XCircle className="h-4 w-4 mr-1" />
+                          Reject
+                        </Button>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Customer Activity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">

@@ -153,18 +153,21 @@ export type Database = {
           id: string
           offer_id: string
           redeemed_at: string
+          status: string
           user_id: string
         }
         Insert: {
           id?: string
           offer_id: string
           redeemed_at?: string
+          status?: string
           user_id: string
         }
         Update: {
           id?: string
           offer_id?: string
           redeemed_at?: string
+          status?: string
           user_id?: string
         }
         Relationships: [

@@ -164,14 +164,17 @@ export default function YourOffers() {
                              redemption.offers?.title?.includes('Traditional Wear') ? 'Saravana Stores' :
                              'Local Shop'}
                     offerTitle={redemption.offers?.title || 'Redeemed Offer'}
-                    description={redemption.offers?.description || 'This offer has been redeemed!'}
-                    discount={`${redemption.offers?.discount_percentage || 20}% OFF`}
-                    expiryDate={redemption.offers?.expiry_date ? new Date(redemption.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
-                    location={redemption.offers?.location || 'Local Area'}
-                    category={redemption.offers?.category || 'general'}
-                    displayMode="redeemed"
-                    couponCode={redemption.id.substring(0, 8).toUpperCase()}
-                    redeemedDate={new Date(redemption.redeemed_at).toLocaleDateString()}
+                     description={redemption.status === 'approved' ? 'This coupon has been redeemed!' : 
+                                 redemption.status === 'pending' ? 'Redemption pending merchant approval...' :
+                                 'Redemption request was rejected'}
+                     discount={`${redemption.offers?.discount_percentage || 20}% OFF`}
+                     expiryDate={redemption.offers?.expiry_date ? new Date(redemption.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
+                     location={redemption.offers?.location || 'Local Area'}
+                     category={redemption.offers?.category || 'general'}
+                     displayMode={redemption.status === 'approved' ? 'redeemed' : redemption.status === 'pending' ? 'pending' : 'rejected'}
+                     couponCode={redemption.id.substring(0, 8).toUpperCase()}
+                     redeemedDate={new Date(redemption.redeemed_at).toLocaleDateString()}
+                     redemptionStatus={redemption.status}
                   />
                 ))}
               </div>

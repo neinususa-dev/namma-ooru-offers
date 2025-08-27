@@ -32,6 +32,7 @@ export interface RedeemedOffer {
   offer_id: string;
   user_id: string;
   redeemed_at: string;
+  status: 'pending' | 'approved' | 'rejected';
   offers?: Offer;
 }
 
@@ -90,7 +91,7 @@ export function useOffers() {
         .order('redeemed_at', { ascending: false });
 
       if (error) throw error;
-      setRedeemedOffers(data || []);
+      setRedeemedOffers((data || []) as RedeemedOffer[]);
     } catch (error) {
       console.error('Error fetching redeemed offers:', error);
       toast({
@@ -287,12 +288,13 @@ export function useOffers() {
         }
       }
 
-      // Add to redemptions
+      // Add to redemptions with pending status
       const { error } = await supabase
         .from('redemptions')
         .insert({
           user_id: user.id,
-          offer_id: actualOfferId
+          offer_id: actualOfferId,
+          status: 'pending'
         });
 
       if (error) throw error;
@@ -312,8 +314,8 @@ export function useOffers() {
       }
 
       toast({
-        title: "Offer redeemed!",
-        description: "Congratulations! You can now use this coupon.",
+        title: "Redemption Request Sent!",
+        description: "Your redemption request is pending merchant approval.",
       });
 
       fetchRedeemedOffers();
@@ -360,6 +362,64 @@ export function useOffers() {
     }
   };
 
+  const approveRedemption = async (redemptionId: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('redemptions')
+        .update({ status: 'approved' })
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Redemption Approved",
+        description: "Customer redemption has been approved.",
+      });
+
+      fetchRedeemedOffers();
+      return true;
+    } catch (error) {
+      console.error('Error approving redemption:', error);
+      toast({
+        title: "Error",
+        description: "Failed to approve redemption.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
+  const rejectRedemption = async (redemptionId: string) => {
+    if (!user) return false;
+
+    try {
+      const { error } = await supabase
+        .from('redemptions')
+        .update({ status: 'rejected' })
+        .eq('id', redemptionId);
+
+      if (error) throw error;
+
+      toast({
+        title: "Redemption Rejected",
+        description: "Customer redemption has been rejected.",
+      });
+
+      fetchRedeemedOffers();
+      return true;
+    } catch (error) {
+      console.error('Error rejecting redemption:', error);
+      toast({
+        title: "Error",
+        description: "Failed to reject redemption.",
+        variant: "destructive",
+      });
+      return false;
+    }
+  };
+
   return {
     savedOffers,
     redeemedOffers,
@@ -367,6 +427,8 @@ export function useOffers() {
     saveOffer,
     redeemOffer,
     removeSavedOffer,
+    approveRedemption,
+    rejectRedemption,
     refetch: () => {
       if (user) {
         fetchSavedOffers();
