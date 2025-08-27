@@ -109,27 +109,6 @@ export const MerchantHomePage: React.FC = () => {
       </section>
 
       <div className="container mx-auto px-4 py-8">
-        {/* Quick Actions */}
-        <div className="mb-12">
-          <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link to="/merchant-post-offer">
-              <Button size="lg" variant="hero" className="w-full md:w-auto">
-                Post New Offer
-              </Button>
-            </Link>
-            <Link to="/merchant-dashboard">
-              <Button size="lg" variant="secondary" className="w-full md:w-auto">
-                View Dashboard
-              </Button>
-            </Link>
-            <Link to="/merchant-edit-offers">
-              <Button size="lg" variant="outline" className="w-full md:w-auto">
-                Manage Offers
-              </Button>
-            </Link>
-          </div>
-        </div>
-
         {/* Pricing Tiers */}
         <section className="mb-12">
           <div className="text-center mb-12">
@@ -204,6 +183,27 @@ export const MerchantHomePage: React.FC = () => {
             })}
           </div>
         </section>
+
+        {/* Quick Actions */}
+        <div className="mb-12">
+          <div className="flex flex-col md:flex-row gap-4 justify-center">
+            <Link to="/merchant-post-offer">
+              <Button size="lg" variant="hero" className="w-full md:w-auto">
+                Post New Offer
+              </Button>
+            </Link>
+            <Link to="/merchant-dashboard">
+              <Button size="lg" variant="secondary" className="w-full md:w-auto">
+                View Dashboard
+              </Button>
+            </Link>
+            <Link to="/merchant-edit-offers">
+              <Button size="lg" variant="outline" className="w-full md:w-auto">
+                Manage Offers
+              </Button>
+            </Link>
+          </div>
+        </div>
 
         {/* Your Recent Offers */}
         <section>
