@@ -125,7 +125,7 @@ export default function YourOffers() {
                     category={savedOffer.offers?.category || 'general'}
                     displayMode="saved"
                     onRemove={() => removeSavedOffer(savedOffer.id)}
-                    couponCode={savedOffer.id.substring(0, 8).toUpperCase()}
+                    image={savedOffer.offers?.image_url}
                   />
                 ))}
               </div>
@@ -170,7 +170,7 @@ export default function YourOffers() {
                      displayMode={redemption.status === 'approved' ? 'redeemed' : redemption.status === 'pending' ? 'pending' : 'rejected'}
                      couponCode={redemption.id.substring(0, 8).toUpperCase()}
                      redeemedDate={new Date(redemption.redeemed_at).toLocaleDateString()}
-                     redemptionStatus={redemption.status}
+                     image={redemption.offers?.image_url}
                   />
                 ))}
               </div>

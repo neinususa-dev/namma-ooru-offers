@@ -148,16 +148,17 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         </div>
       )}
 
-      {/* Offer Image */}
-      {displayMode === 'default' && image && (
-        <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
-          <img 
-            src={image} 
-            alt={offerTitle}
-            className="w-full h-full object-cover"
-          />
-        </div>
-      )}
+      {/* Offer Image - Show for all display modes */}
+      <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
+        <img 
+          src={image || defaultOfferImage} 
+          alt={offerTitle}
+          className="w-full h-full object-cover"
+          onError={(e) => {
+            e.currentTarget.src = defaultOfferImage;
+          }}
+        />
+      </div>
       
       <CardHeader className="pb-3">
         <div className="flex items-center justify-between">

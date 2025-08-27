@@ -20,6 +20,7 @@ export interface Offer {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  image_url?: string;
   profiles?: {
     name?: string;
     store_name?: string;
