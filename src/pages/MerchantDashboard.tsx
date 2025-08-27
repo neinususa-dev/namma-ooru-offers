@@ -357,12 +357,17 @@ const MerchantDashboard = () => {
 
       if (error) throw error;
       
-      // Add a small delay to ensure database consistency
+      // Immediately update the local state to remove from pending
+      setStats(prevStats => ({
+        ...prevStats,
+        pendingRedemptions: prevStats.pendingRedemptions.filter(r => r.id !== redemptionId)
+      }));
+      
+      // Then refresh all data after a short delay
       setTimeout(async () => {
         await fetchMerchantAnalytics();
-      }, 500);
+      }, 300);
       
-      // Show success message
       console.log('Redemption approved successfully');
     } catch (error) {
       console.error('Error approving redemption:', error);
@@ -378,12 +383,17 @@ const MerchantDashboard = () => {
 
       if (error) throw error;
       
-      // Add a small delay to ensure database consistency
+      // Immediately update the local state to remove from pending
+      setStats(prevStats => ({
+        ...prevStats,
+        pendingRedemptions: prevStats.pendingRedemptions.filter(r => r.id !== redemptionId)
+      }));
+      
+      // Then refresh all data after a short delay
       setTimeout(async () => {
         await fetchMerchantAnalytics();
-      }, 500);
+      }, 300);
       
-      // Show success message
       console.log('Redemption rejected successfully');
     } catch (error) {
       console.error('Error rejecting redemption:', error);
