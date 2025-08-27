@@ -747,11 +747,14 @@ const Index = () => {
             {/* Local Deals Section */}
             <section className="py-12 bg-background">
               <div className="container mx-auto px-4">
-                <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-                  <div>
-                    <h3 className="text-3xl font-bold text-foreground mb-2">Local Deals</h3>
-                    <p className="text-muted-foreground">Discover all available offers from local shops</p>
-                  </div>
+                 <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+                   <div>
+                     <div className="flex items-center gap-3 mb-2">
+                       <MapPin className="h-6 w-6 text-primary" />
+                       <h3 className="text-3xl font-bold text-foreground">Local Deals</h3>
+                     </div>
+                     <p className="text-muted-foreground">Discover all available offers from local shops</p>
+                   </div>
                   
                   {/* Search Offers - moved to right side */}
                   <div className="lg:w-96">
