@@ -83,6 +83,7 @@ const MerchantDashboard = () => {
 
     try {
       setLoading(true);
+      console.log('Fetching analytics for merchant:', user.id, profile?.name);
 
       const now = new Date();
 
@@ -109,11 +110,14 @@ const MerchantDashboard = () => {
 
       const { data: allOffers, error: offersError } = await baseOffersQuery;
       if (offersError) throw offersError;
+      console.log('Found offers for merchant:', allOffers?.length, allOffers);
 
       const offerIds = allOffers?.map(o => o.id) || [];
+      console.log('Offer IDs:', offerIds);
 
       if (!offerIds.length) {
         // If no offers found, set empty stats and return
+        console.log('No offers found for merchant, returning empty stats');
         setStats({
           totalOffers: 0,
           totalSaves: 0,
@@ -133,12 +137,14 @@ const MerchantDashboard = () => {
         .select('*')
         .in('offer_id', offerIds);
       if (savesError) throw savesError;
+      console.log('Found saves:', allSaves?.length, allSaves);
 
       const { data: allRedemptions, error: redemptionsError } = await supabase
         .from('redemptions')
         .select('*')
         .in('offer_id', offerIds);
       if (redemptionsError) throw redemptionsError;
+      console.log('Found redemptions:', allRedemptions?.length, allRedemptions);
 
       // Filter offers by date if applicable (for offer counts)
       const offers = dateFilter 
@@ -258,6 +264,13 @@ const MerchantDashboard = () => {
         const offer = offers.find(o => o.id === r.offer_id);
         return sum + (offer?.discounted_price || 0);
       }, 0);
+
+      console.log('Final calculated stats:', {
+        totalOffers,
+        totalSaves,
+        totalRedemptions,
+        totalRevenue
+      });
 
       setStats({
         totalOffers,
