@@ -147,6 +147,16 @@ const MerchantDashboard = () => {
 
       // Fetch ALL saves and redemptions for these offers with customer information
       console.log('Fetching saved offers for offer IDs:', offerIds);
+      
+      // First, let's check all saved offers without RLS to debug
+      const { data: debugSaves, error: debugError } = await supabase
+        .from('saved_offers')
+        .select('*')
+        .in('offer_id', offerIds);
+      
+      console.log('DEBUG: Raw saved offers data:', debugSaves);
+      console.log('DEBUG: Raw saved offers error:', debugError);
+      
       const { data: allSaves, error: savesError } = await supabase
         .from('saved_offers')
         .select(`
@@ -157,9 +167,21 @@ const MerchantDashboard = () => {
           )
         `)
         .in('offer_id', offerIds);
-      if (savesError) throw savesError;
+      if (savesError) {
+        console.error('Error fetching saved offers:', savesError);
+        throw savesError;
+      }
       
-      console.log('Fetched saved offers:', allSaves?.length || 0, allSaves);
+      console.log('Fetched saved offers with profiles:', allSaves?.length || 0);
+      console.log('Detailed saved offers data:', allSaves);
+      
+      // Let's also check if there are any saved offers that the current user can't see
+      const { data: allPossibleSaves, error: allSavesError } = await supabase
+        .from('saved_offers')
+        .select('user_id, offer_id, saved_at')
+        .in('offer_id', offerIds);
+      
+      console.log('All possible saves (user IDs only):', allPossibleSaves);
 
       // Fetch pending redemptions for these offers with customer information
       console.log('Fetching pending redemptions for offer IDs:', offerIds);
