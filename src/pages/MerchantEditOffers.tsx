@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
+import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -41,6 +42,7 @@ interface OfferData {
 
 const MerchantEditOffers = () => {
   const { user, profile, loading: authLoading } = useAuth();
+  const { categories, loading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
   const [offers, setOffers] = useState<OfferData[]>([]);
   const [selectedOffer, setSelectedOffer] = useState<OfferData | null>(null);
@@ -343,16 +345,15 @@ const MerchantEditOffers = () => {
                       <SelectValue placeholder="Select category" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="food">Food & Dining</SelectItem>
-                      <SelectItem value="fashion">Fashion</SelectItem>
-                      <SelectItem value="electronics">Electronics</SelectItem>
-                      <SelectItem value="grocery">Grocery</SelectItem>
-                      <SelectItem value="home">Home & Garden</SelectItem>
-                      <SelectItem value="beauty">Beauty & Health</SelectItem>
-                      <SelectItem value="sports">Sports & Fitness</SelectItem>
-                      <SelectItem value="travel">Travel</SelectItem>
-                      <SelectItem value="entertainment">Entertainment</SelectItem>
-                      <SelectItem value="other">Other</SelectItem>
+                      {categoriesLoading ? (
+                        <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                      ) : (
+                        categories.map((category) => (
+                          <SelectItem key={category.id} value={category.name}>
+                            {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+                          </SelectItem>
+                        ))
+                      )}
                     </SelectContent>
                   </Select>
                 </div>

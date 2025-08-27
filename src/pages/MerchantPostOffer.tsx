@@ -3,6 +3,7 @@ import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
+import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
 import { useNavigate } from 'react-router-dom';
 import { Header } from '@/components/Header';
@@ -42,6 +43,7 @@ type OfferFormData = z.infer<typeof offerSchema>;
 
 const MerchantPostOffer: React.FC = () => {
   const { user, profile, loading } = useAuth();
+  const { categories, loading: categoriesLoading } = useCategories();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -259,30 +261,28 @@ const MerchantPostOffer: React.FC = () => {
                     )}
                   </div>
 
-                  <div className="space-y-2">
-                    <Label htmlFor="category">Category *</Label>
-                    <Select onValueChange={(value) => setValue('category', value)}>
-                      <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
-                        <SelectValue placeholder="Select a category" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        <SelectItem value="electronics">Electronics</SelectItem>
-                        <SelectItem value="fashion">Fashion</SelectItem>
-                        <SelectItem value="food">Food & Dining</SelectItem>
-                        <SelectItem value="grocery">Grocery</SelectItem>
-                        <SelectItem value="home">Home & Garden</SelectItem>
-                        <SelectItem value="beauty">Beauty & Health</SelectItem>
-                        <SelectItem value="services">Services</SelectItem>
-                        <SelectItem value="sports">Sports & Fitness</SelectItem>
-                        <SelectItem value="travel">Travel</SelectItem>
-                        <SelectItem value="entertainment">Entertainment</SelectItem>
-                        <SelectItem value="other">Other</SelectItem>
-                      </SelectContent>
-                    </Select>
-                    {errors.category && (
-                      <p className="text-sm text-destructive">{errors.category.message}</p>
-                    )}
-                  </div>
+                   <div className="space-y-2">
+                     <Label htmlFor="category">Category *</Label>
+                     <Select onValueChange={(value) => setValue('category', value)}>
+                       <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
+                         <SelectValue placeholder="Select a category" />
+                       </SelectTrigger>
+                       <SelectContent>
+                         {categoriesLoading ? (
+                           <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                         ) : (
+                           categories.map((category) => (
+                             <SelectItem key={category.id} value={category.name}>
+                               {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+                             </SelectItem>
+                           ))
+                         )}
+                       </SelectContent>
+                     </Select>
+                     {errors.category && (
+                       <p className="text-sm text-destructive">{errors.category.message}</p>
+                     )}
+                   </div>
 
                   <div className="space-y-2">
                     <Label htmlFor="district">District *</Label>

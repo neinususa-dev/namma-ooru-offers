@@ -8,18 +8,9 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/components/ui/select';
+import { useCategories } from '@/hooks/useCategories';
 
-const categories = [
-  { id: 'all', name: 'All Categories' },
-  { id: 'food', name: 'Food & Dining' },
-  { id: 'fashion', name: 'Fashion & Clothing' },
-  { id: 'electronics', name: 'Electronics' },
-  { id: 'services', name: 'Services' },
-  { id: 'groceries', name: 'Groceries' },
-  { id: 'health', name: 'Health & Beauty' },
-  { id: 'travel', name: 'Travel & Transport' },
-  { id: 'education', name: 'Education' },
-];
+const capitalizeFirst = (str: string) => str.charAt(0).toUpperCase() + str.slice(1);
 
 interface OfferFiltersProps {
   selectedCategory: string;
@@ -32,6 +23,8 @@ export const OfferFilters: React.FC<OfferFiltersProps> = ({
   onCategoryChange,
   onClearFilters
 }) => {
+  const { categories, loading } = useCategories();
+
   return (
     <Select value={selectedCategory} onValueChange={onCategoryChange}>
       <SelectTrigger className="w-full bg-card shadow-md hover:shadow-lg transition-smooth border-primary/20 focus:border-primary">
@@ -41,15 +34,25 @@ export const OfferFilters: React.FC<OfferFiltersProps> = ({
         </div>
       </SelectTrigger>
       <SelectContent className="max-h-80 bg-card border-primary/20 shadow-xl">
-        {categories.map((category) => (
-          <SelectItem 
-            key={category.id} 
-            value={category.id}
-            className="hover:bg-primary/10 focus:bg-primary/10 cursor-pointer"
-          >
-            {category.name}
-          </SelectItem>
-        ))}
+        <SelectItem 
+          value="all"
+          className="hover:bg-primary/10 focus:bg-primary/10 cursor-pointer"
+        >
+          All Categories
+        </SelectItem>
+        {loading ? (
+          <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+        ) : (
+          categories.map((category) => (
+            <SelectItem 
+              key={category.id} 
+              value={category.name}
+              className="hover:bg-primary/10 focus:bg-primary/10 cursor-pointer"
+            >
+              {capitalizeFirst(category.name)}
+            </SelectItem>
+          ))
+        )}
       </SelectContent>
     </Select>
   );
