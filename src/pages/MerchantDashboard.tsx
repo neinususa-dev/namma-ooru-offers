@@ -89,6 +89,7 @@ const MerchantDashboard = () => {
 
     try {
       setLoading(true);
+      console.log('Starting fetchMerchantAnalytics for user:', user.id);
 
       const now = new Date();
 
@@ -102,7 +103,10 @@ const MerchantDashboard = () => {
         dateFilter = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString();
       }
 
+      console.log('Applied filters:', filters);
+
       // First, get ALL offers for this merchant (without date filter)
+      console.log('Fetching offers for merchant:', user.id);
       let baseOffersQuery = supabase.from('offers').select('*').eq('merchant_id', user.id);
       
       // Apply category and status filters to offers
@@ -114,7 +118,12 @@ const MerchantDashboard = () => {
       }
 
       const { data: allOffers, error: offersError } = await baseOffersQuery;
-      if (offersError) throw offersError;
+      if (offersError) {
+        console.error('Error fetching offers:', offersError);
+        throw offersError;
+      }
+      
+      console.log('Fetched offers:', allOffers?.length || 0);
 
       const offerIds = allOffers?.map(o => o.id) || [];
 
@@ -137,6 +146,7 @@ const MerchantDashboard = () => {
       }
 
       // Fetch ALL saves and redemptions for these offers with customer information
+      console.log('Fetching saved offers for offer IDs:', offerIds);
       const { data: allSaves, error: savesError } = await supabase
         .from('saved_offers')
         .select(`
@@ -148,6 +158,8 @@ const MerchantDashboard = () => {
         `)
         .in('offer_id', offerIds);
       if (savesError) throw savesError;
+      
+      console.log('Fetched saved offers:', allSaves?.length || 0, allSaves);
 
       // Fetch pending redemptions for these offers with customer information
       console.log('Fetching pending redemptions for offer IDs:', offerIds);
