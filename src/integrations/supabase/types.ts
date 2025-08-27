@@ -87,30 +87,45 @@ export type Database = {
       }
       profiles: {
         Row: {
+          city: string | null
           created_at: string
+          district: string | null
           email: string
           id: string
           is_premium: boolean | null
           name: string
+          phone_number: string | null
           role: Database["public"]["Enums"]["user_role"]
+          store_location: string | null
+          store_name: string | null
           updated_at: string
         }
         Insert: {
+          city?: string | null
           created_at?: string
+          district?: string | null
           email: string
           id: string
           is_premium?: boolean | null
           name: string
+          phone_number?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          store_location?: string | null
+          store_name?: string | null
           updated_at?: string
         }
         Update: {
+          city?: string | null
           created_at?: string
+          district?: string | null
           email?: string
           id?: string
           is_premium?: boolean | null
           name?: string
+          phone_number?: string | null
           role?: Database["public"]["Enums"]["user_role"]
+          store_location?: string | null
+          store_name?: string | null
           updated_at?: string
         }
         Relationships: []

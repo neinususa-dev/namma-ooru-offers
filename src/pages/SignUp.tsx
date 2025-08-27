@@ -45,11 +45,20 @@ export default function SignUp() {
     e.preventDefault();
     setIsLoading(true);
 
+    const additionalData = signUpForm.role === 'merchant' ? {
+      phone_number: signUpForm.phoneNumber,
+      store_name: signUpForm.storeName,
+      store_location: signUpForm.storeLocation,
+      district: signUpForm.district,
+      city: signUpForm.city
+    } : undefined;
+
     const { error } = await signUp(
       signUpForm.email,
       signUpForm.password,
       signUpForm.name,
-      signUpForm.role
+      signUpForm.role,
+      additionalData
     );
 
     if (error) {

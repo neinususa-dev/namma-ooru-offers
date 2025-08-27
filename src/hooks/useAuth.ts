@@ -91,7 +91,19 @@ export function useAuth() {
     }
   };
 
-  const signUp = async (email: string, password: string, name: string, role: 'customer' | 'merchant') => {
+  const signUp = async (
+    email: string, 
+    password: string, 
+    name: string, 
+    role: 'customer' | 'merchant',
+    additionalData?: {
+      phone_number?: string;
+      store_name?: string;
+      store_location?: string;
+      district?: string;
+      city?: string;
+    }
+  ) => {
     try {
       const redirectUrl = `${window.location.origin}/`;
       
@@ -102,7 +114,8 @@ export function useAuth() {
           emailRedirectTo: redirectUrl,
           data: {
             name,
-            role
+            role,
+            ...additionalData
           }
         }
       });
