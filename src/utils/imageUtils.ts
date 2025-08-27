@@ -43,10 +43,10 @@ export const generateDefaultImage = (storeName: string, width: number = 300, hei
   canvas.height = height;
   
   if (ctx) {
-    // Create gradient background
+    // Create gradient background with proper colors
     const gradient = ctx.createLinearGradient(0, 0, width, height);
-    gradient.addColorStop(0, 'hsl(var(--primary))');
-    gradient.addColorStop(1, 'hsl(var(--primary-foreground))');
+    gradient.addColorStop(0, '#6366f1'); // Primary color
+    gradient.addColorStop(1, '#4f46e5'); // Darker primary
     
     ctx.fillStyle = gradient;
     ctx.fillRect(0, 0, width, height);
