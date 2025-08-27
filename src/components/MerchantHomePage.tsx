@@ -130,49 +130,8 @@ export const MerchantHomePage: React.FC = () => {
           </div>
         </div>
 
-        {/* Your Recent Offers */}
-        <section className="mb-12">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-3xl font-bold text-foreground">Your Recent Offers</h2>
-            <Link to="/merchant-edit-offers">
-              <Button variant="ghost">View All</Button>
-            </Link>
-          </div>
-          
-          {merchantOffers.length > 0 ? (
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {merchantOffers.slice(0, 8).map(offer => (
-                <OfferCard 
-                  key={offer.id} 
-                  id={offer.id}
-                  shopName={offer.merchant_name || 'Unknown Merchant'}
-                  offerTitle={offer.title}
-                  description={offer.description}
-                  discount={offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Special Offer'}
-                  originalPrice={offer.original_price ? Number(offer.original_price) : undefined}
-                  discountedPrice={offer.discounted_price ? Number(offer.discounted_price) : undefined}
-                  expiryDate={offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString() : 'No expiry'}
-                  location={offer.city || offer.district || 'Location not specified'}
-                  category={offer.category || 'general'}
-                  isHot={offer.listing_type === 'hot_offers'}
-                  isTrending={offer.listing_type === 'trending'}
-                  image={offer.image_url}
-                  disableMerchantActions={true}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-muted/30 rounded-lg">
-              <p className="text-muted-foreground mb-4">You haven't posted any offers yet.</p>
-              <Link to="/merchant-post-offer">
-                <Button variant="hero">Post Your First Offer</Button>
-              </Link>
-            </div>
-          )}
-        </section>
-
         {/* Pricing Tiers */}
-        <section>
+        <section className="mb-12">
           <div className="text-center mb-12">
             <h2 className="text-3xl md:text-4xl font-bold text-foreground mb-4">
               Choose Your Plan
@@ -244,6 +203,47 @@ export const MerchantHomePage: React.FC = () => {
               );
             })}
           </div>
+        </section>
+
+        {/* Your Recent Offers */}
+        <section>
+          <div className="flex items-center justify-between mb-6">
+            <h2 className="text-3xl font-bold text-foreground">Your Recent Offers</h2>
+            <Link to="/merchant-edit-offers">
+              <Button variant="ghost">View All</Button>
+            </Link>
+          </div>
+          
+          {merchantOffers.length > 0 ? (
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+              {merchantOffers.slice(0, 8).map(offer => (
+                <OfferCard 
+                  key={offer.id} 
+                  id={offer.id}
+                  shopName={offer.merchant_name || 'Unknown Merchant'}
+                  offerTitle={offer.title}
+                  description={offer.description}
+                  discount={offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Special Offer'}
+                  originalPrice={offer.original_price ? Number(offer.original_price) : undefined}
+                  discountedPrice={offer.discounted_price ? Number(offer.discounted_price) : undefined}
+                  expiryDate={offer.expiry_date ? new Date(offer.expiry_date).toLocaleDateString() : 'No expiry'}
+                  location={offer.city || offer.district || 'Location not specified'}
+                  category={offer.category || 'general'}
+                  isHot={offer.listing_type === 'hot_offers'}
+                  isTrending={offer.listing_type === 'trending'}
+                  image={offer.image_url}
+                  disableMerchantActions={true}
+                />
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-muted/30 rounded-lg">
+              <p className="text-muted-foreground mb-4">You haven't posted any offers yet.</p>
+              <Link to="/merchant-post-offer">
+                <Button variant="hero">Post Your First Offer</Button>
+              </Link>
+            </div>
+          )}
         </section>
       </div>
     </div>
