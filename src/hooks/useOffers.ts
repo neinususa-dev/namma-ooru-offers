@@ -36,7 +36,7 @@ export interface RedeemedOffer {
 }
 
 export function useOffers() {
-  const { user } = useAuth();
+  const { user, profile } = useAuth();
   const [savedOffers, setSavedOffers] = useState<SavedOffer[]>([]);
   const [redeemedOffers, setRedeemedOffers] = useState<RedeemedOffer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -145,7 +145,7 @@ export function useOffers() {
           id: uuidOfferId,
           merchant_id: user.id, // Using current user as merchant for demo
           title: offerData?.offerTitle || `Offer ${offerId}`,
-          description: offerData?.description || 'Special offer from marketplace.',
+          description: offerData?.description || `Special offer from ${profile?.store_name || profile?.name || 'our store'}.`,
           category: offerData?.category || 'general',
           location: offerData?.location || 'Local Area',
           discount_percentage: discountValue,
@@ -202,13 +202,13 @@ export function useOffers() {
 
     try {
       // Get user profile to check if they're premium
-      const { data: profile } = await supabase
+      const { data: userProfile } = await supabase
         .from('profiles')
-        .select('role')
+        .select('role, store_name, name')
         .eq('id', user.id)
         .single();
 
-      const isPremium = profile?.role === 'merchant'; // Only merchants have unlimited redemptions
+      const isPremium = userProfile?.role === 'merchant'; // Only merchants have unlimited redemptions
 
       // If offerId is a UUID (from saved offers), use it directly. Otherwise, create a new one
       const isUUID = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(offerId);
@@ -225,7 +225,7 @@ export function useOffers() {
             id: actualOfferId,
             merchant_id: user.id, // Using current user as merchant for demo
             title: `Mock Offer ${offerId}`,
-            description: 'This is a demo offer redeemed from the marketplace.',
+            description: `This is a demo offer redeemed from ${userProfile?.store_name || userProfile?.name || 'our store'}.`,
             category: 'general', 
             location: 'Demo Location',
             discount_percentage: 20,
