@@ -46,7 +46,7 @@ export const StoresList: React.FC<StoresListProps> = ({
     originalPrice: offer.original_price,
     discountedPrice: offer.discounted_price,
     expiryDate: new Date(offer.expiry_date).toLocaleDateString(),
-    location: offer.location || '',
+    location: offer.city || '',
     category: offer.category || '',
     isHot: offer.listing_type === 'hot_offers',
     isTrending: offer.listing_type === 'trending',
