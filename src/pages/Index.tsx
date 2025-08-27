@@ -12,6 +12,7 @@ import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Link } from 'react-router-dom';
+import { generateDefaultImage } from '@/utils/imageUtils';
 import heroImage from '@/assets/hero-marketplace.jpg';
 import shopOffersImage from '@/assets/shop-offers.jpg';
 import foodOfferImage from '@/assets/food-offer.jpg';
@@ -461,7 +462,7 @@ const Index = () => {
       category: dbOffer.category,
       isHot: dbOffer.listing_type === 'hot_offers',
       isTrending: dbOffer.listing_type === 'trending',
-      image: dbOffer.image_url || undefined
+      image: dbOffer.image_url || generateDefaultImage(dbOffer.merchant_name || 'Local Merchant')
     };
   };
 
