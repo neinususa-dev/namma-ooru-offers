@@ -90,6 +90,10 @@ const getEmailContent = (type: string, data: any) => {
   }
 };
 
+const isValidEmail = (email: string): boolean => {
+  return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+};
+
 serve(async (req) => {
   if (req.method === "OPTIONS") {
     return new Response(null, { headers: corsHeaders });
@@ -104,33 +108,85 @@ serve(async (req) => {
     const { type, redemptionId, customerEmail, merchantEmail, customerName, merchantName, offerTitle, storeName }: EmailRequest = await req.json();
 
     console.log(`Sending ${type} emails for redemption ${redemptionId}`);
+    console.log(`Customer email: ${customerEmail}, Merchant email: ${merchantEmail}`);
+
+    // Validate email addresses
+    if (!customerEmail || !isValidEmail(customerEmail)) {
+      console.error(`Invalid customer email: ${customerEmail}`);
+      return new Response(
+        JSON.stringify({ error: "Invalid customer email address" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        }
+      );
+    }
+
+    if (!merchantEmail || !isValidEmail(merchantEmail)) {
+      console.error(`Invalid merchant email: ${merchantEmail}`);
+      return new Response(
+        JSON.stringify({ error: "Invalid merchant email address" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 400,
+        }
+      );
+    }
 
     const emailContent = getEmailContent(type, { customerName, merchantName, offerTitle, storeName });
 
+    let customerEmailResponse;
+    let merchantEmailResponse;
+
+    // Note: In Resend testing mode, emails can only be sent to verified addresses
+    // For production use, verify your domain at https://resend.com/domains
+    const verifiedEmail = "nammaooruoffers.official@gmail.com"; // Your verified Resend email
+    
     // Send email to customer
-    const customerEmailResponse = await resend.emails.send({
-      from: "OfferHub <onboarding@resend.dev>",
-      to: [customerEmail],
-      subject: emailContent.customerSubject,
-      html: emailContent.customerHtml,
-    });
+    try {
+      customerEmailResponse = await resend.emails.send({
+        from: "OfferHub <onboarding@resend.dev>",
+        to: [verifiedEmail], // Use verified email for testing
+        subject: `[FOR ${customerEmail}] ${emailContent.customerSubject}`,
+        html: `
+          <p><strong>This email was intended for: ${customerEmail}</strong></p>
+          <p><strong>Customer Name: ${customerName}</strong></p>
+          <hr>
+          ${emailContent.customerHtml}
+        `,
+      });
+      console.log("Customer email sent:", customerEmailResponse);
+    } catch (emailError) {
+      console.error("Failed to send customer email:", emailError);
+      customerEmailResponse = { error: emailError };
+    }
 
     // Send email to merchant
-    const merchantEmailResponse = await resend.emails.send({
-      from: "OfferHub <onboarding@resend.dev>",
-      to: [merchantEmail],
-      subject: emailContent.merchantSubject,
-      html: emailContent.merchantHtml,
-    });
-
-    console.log("Customer email sent:", customerEmailResponse);
-    console.log("Merchant email sent:", merchantEmailResponse);
+    try {
+      merchantEmailResponse = await resend.emails.send({
+        from: "OfferHub <onboarding@resend.dev>",
+        to: [verifiedEmail], // Use verified email for testing
+        subject: `[FOR ${merchantEmail}] ${emailContent.merchantSubject}`,
+        html: `
+          <p><strong>This email was intended for: ${merchantEmail}</strong></p>
+          <p><strong>Merchant Name: ${merchantName}</strong></p>
+          <hr>
+          ${emailContent.merchantHtml}
+        `,
+      });
+      console.log("Merchant email sent:", merchantEmailResponse);
+    } catch (emailError) {
+      console.error("Failed to send merchant email:", emailError);
+      merchantEmailResponse = { error: emailError };
+    }
 
     return new Response(
       JSON.stringify({ 
         success: true, 
-        customerEmailId: customerEmailResponse.data?.id,
-        merchantEmailId: merchantEmailResponse.data?.id
+        customerEmailId: customerEmailResponse?.data?.id,
+        merchantEmailId: merchantEmailResponse?.data?.id,
+        customerEmailStatus: customerEmailResponse?.error ? 'failed' : 'sent',
+        merchantEmailStatus: merchantEmailResponse?.error ? 'failed' : 'sent'
       }),
       {
         headers: { ...corsHeaders, "Content-Type": "application/json" },
