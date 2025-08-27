@@ -54,8 +54,9 @@ export const PaymentSuccess: React.FC = () => {
                       <div>
                         <p className="font-medium">Visit Our Office</p>
                         <p className="text-sm text-muted-foreground">
-                          123 Business Center, Main Road<br />
-                          Your City, State - 123456<br />
+                          Neinus Private Ltd, Opposite To BIT College<br />
+                          Sathy Athani Road Bus Stop, Sathyamangalam - 638503<br />
+                          Erode Dt, TamilNadu<br />
                           <strong>Hours:</strong> Mon-Fri, 9:00 AM - 6:00 PM
                         </p>
                       </div>
@@ -79,9 +80,9 @@ export const PaymentSuccess: React.FC = () => {
                       <div>
                         <p className="font-medium">Contact for Payment</p>
                         <p className="text-sm text-muted-foreground">
-                          <strong>Phone:</strong> +91 9876543210<br />
-                          <strong>WhatsApp:</strong> +91 9876543210<br />
-                          <strong>Email:</strong> billing@yourcompany.com
+                          <strong>Phone:</strong> +91 7200864623, +91 9965618507<br />
+                          <strong>WhatsApp:</strong> +91 7200864223<br />
+                          <strong>Email:</strong> contactus@neinus.com
                         </p>
                       </div>
                     </div>
