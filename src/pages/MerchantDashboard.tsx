@@ -59,18 +59,25 @@ const MerchantDashboard = () => {
 
   // Redirect if not authenticated or not a merchant
   useEffect(() => {
-    if (!authLoading && !user) {
-      navigate('/auth');
-    } else if (!authLoading && user && profile?.role !== 'merchant') {
-      navigate('/');
+    if (!authLoading) {
+      if (!user) {
+        navigate('/auth');
+        return;
+      }
+      
+      // Only redirect if we have both user and profile loaded
+      if (profile && profile.role !== 'merchant') {
+        navigate('/');
+        return;
+      }
     }
   }, [user, profile, authLoading, navigate]);
 
   useEffect(() => {
-    if (user && profile?.role === 'merchant') {
+    if (user && profile?.role === 'merchant' && !authLoading) {
       fetchMerchantAnalytics();
     }
-  }, [user, profile, filters]);
+  }, [user, profile, filters, authLoading]);
 
   const fetchMerchantAnalytics = async () => {
     if (!user) return;

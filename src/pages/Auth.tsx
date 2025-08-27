@@ -14,7 +14,7 @@ import { Header } from '@/components/Header';
 import { useEffect } from 'react';
 
 export default function Auth() {
-  const { user, signUp, signIn, loading } = useAuth();
+  const { user, profile, signUp, signIn, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
   
@@ -30,32 +30,16 @@ export default function Auth() {
     role: 'customer' as 'customer' | 'merchant'
   });
 
-  // Redirect if already authenticated
+  // Redirect authenticated users
   useEffect(() => {
-    if (!loading && user) {
-      // Check user's profile to determine redirect
-      const fetchProfileAndRedirect = async () => {
-        try {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('role')
-            .eq('id', user.id)
-            .single();
-          
-          if (profile?.role === 'merchant') {
-            navigate('/merchant-dashboard');
-          } else {
-            navigate('/customer-analytics');
-          }
-        } catch (error) {
-          console.error('Error fetching profile:', error);
-          navigate('/');
-        }
-      };
-      
-      fetchProfileAndRedirect();
+    if (user && profile && !loading) {
+      if (profile.role === 'merchant') {
+        navigate('/merchant-dashboard');
+      } else {
+        navigate('/');
+      }
     }
-  }, [user, loading, navigate]);
+  }, [user, profile, loading, navigate]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();

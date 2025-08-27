@@ -19,18 +19,26 @@ export function useAuth() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    let mounted = true;
+
     // Set up auth state listener
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
+        if (!mounted) return;
+        
         console.log('Auth state changed:', event, session?.user?.id);
         setSession(session);
         setUser(session?.user ?? null);
         
         if (session?.user) {
-          // Fetch user profile with setTimeout to prevent deadlock
-          setTimeout(() => {
-            fetchUserProfile(session.user.id);
-          }, 0);
+          // Only fetch profile if we don't already have it
+          if (!profile || profile.id !== session.user.id) {
+            setTimeout(() => {
+              if (mounted) {
+                fetchUserProfile(session.user.id);
+              }
+            }, 0);
+          }
         } else {
           setProfile(null);
         }
@@ -38,8 +46,10 @@ export function useAuth() {
       }
     );
 
-    // Check for existing session
+    // Check for existing session only once
     supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!mounted) return;
+      
       setSession(session);
       setUser(session?.user ?? null);
       if (session?.user) {
@@ -49,8 +59,11 @@ export function useAuth() {
       }
     });
 
-    return () => subscription.unsubscribe();
-  }, []);
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
+  }, []); // Remove profile dependency to prevent infinite loops
 
   const fetchUserProfile = async (userId: string) => {
     try {
@@ -65,7 +78,14 @@ export function useAuth() {
         return;
       }
 
-      setProfile(data);
+      // Only update if profile actually changed
+      setProfile(prevProfile => {
+        if (!data) return null;
+        if (prevProfile?.id === data.id && prevProfile?.updated_at === data.updated_at) {
+          return prevProfile; // No change, don't trigger re-render
+        }
+        return data;
+      });
     } catch (error) {
       console.error('Error fetching profile:', error);
     }
@@ -100,11 +120,7 @@ export function useAuth() {
         password
       });
 
-      if (data.user && !error) {
-        // Force page reload for clean state
-        window.location.href = '/';
-      }
-
+      // Let the auth state listener handle the redirect
       return { data, error };
     } catch (error) {
       return { data: null, error };
