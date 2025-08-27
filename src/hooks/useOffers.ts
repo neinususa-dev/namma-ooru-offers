@@ -251,7 +251,12 @@ export function useOffers() {
       // Validate that the offer exists and is active
       const { data: offerExists, error: validateError } = await supabase
         .from('offers')
-        .select('id, title, is_active')
+        .select(`
+          id, 
+          title, 
+          is_active,
+          profiles!merchant_id(name, store_name, email)
+        `)
         .eq('id', offerId)
         .eq('is_active', true)
         .maybeSingle();
@@ -303,16 +308,37 @@ export function useOffers() {
         }
       }
 
-      // Add to redemptions with pending status
-      const { error } = await supabase
+      // Insert the redemption record
+      const { data: redemptionData, error: insertError } = await supabase
         .from('redemptions')
         .insert({
-          user_id: user.id,
           offer_id: offerId,
+          user_id: user.id,
           status: 'pending'
-        });
+        })
+        .select()
+        .single();
 
-      if (error) throw error;
+      if (insertError) throw insertError;
+
+      // Send redemption notification emails
+      try {
+        await supabase.functions.invoke('send-redemption-email', {
+          body: {
+            type: 'redemption_requested',
+            redemptionId: redemptionData.id,
+            customerEmail: user.email,
+            merchantEmail: offerExists.profiles?.email || '',
+            customerName: userProfile?.name || 'Customer',
+            merchantName: offerExists.profiles?.name || 'Merchant',
+            offerTitle: offerExists.title,
+            storeName: offerExists.profiles?.store_name || 'Store'
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send redemption emails:', emailError);
+        // Don't fail the redemption if email fails
+      }
 
       // Remove from saved offers if it was saved
       const { error: removeError } = await supabase
@@ -375,10 +401,25 @@ export function useOffers() {
     }
   };
 
-  const approveRedemption = async (redemptionId: string) => {
-    if (!user) return false;
-
+  const approveRedemption = async (redemptionId: string): Promise<boolean> => {
     try {
+      // First get redemption details with user and offer info
+      const { data: redemptionData, error: fetchError } = await supabase
+        .from('redemptions')
+        .select(`
+          *,
+          offers (
+            title,
+            profiles!merchant_id(name, store_name, email)
+          ),
+          profiles!user_id(name, email)
+        `)
+        .eq('id', redemptionId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Update redemption status
       const { error } = await supabase
         .from('redemptions')
         .update({ status: 'approved' })
@@ -386,9 +427,28 @@ export function useOffers() {
 
       if (error) throw error;
 
+      // Send approval notification emails
+      try {
+        await supabase.functions.invoke('send-redemption-email', {
+          body: {
+            type: 'redemption_approved',
+            redemptionId: redemptionId,
+            customerEmail: redemptionData.profiles?.email || '',
+            merchantEmail: redemptionData.offers?.profiles?.email || '',
+            customerName: redemptionData.profiles?.name || 'Customer',
+            merchantName: redemptionData.offers?.profiles?.name || 'Merchant',
+            offerTitle: redemptionData.offers?.title || 'Offer',
+            storeName: redemptionData.offers?.profiles?.store_name || 'Store'
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send approval emails:', emailError);
+        // Don't fail the approval if email fails
+      }
+
       toast({
-        title: "Redemption Approved",
-        description: "Customer redemption has been approved.",
+        title: "Success",
+        description: "Redemption approved successfully.",
       });
 
       fetchRedeemedOffers();
@@ -404,10 +464,25 @@ export function useOffers() {
     }
   };
 
-  const rejectRedemption = async (redemptionId: string) => {
-    if (!user) return false;
-
+  const rejectRedemption = async (redemptionId: string): Promise<boolean> => {
     try {
+      // First get redemption details with user and offer info
+      const { data: redemptionData, error: fetchError } = await supabase
+        .from('redemptions')
+        .select(`
+          *,
+          offers (
+            title,
+            profiles!merchant_id(name, store_name, email)
+          ),
+          profiles!user_id(name, email)
+        `)
+        .eq('id', redemptionId)
+        .single();
+
+      if (fetchError) throw fetchError;
+
+      // Update redemption status
       const { error } = await supabase
         .from('redemptions')
         .update({ status: 'rejected' })
@@ -415,9 +490,28 @@ export function useOffers() {
 
       if (error) throw error;
 
+      // Send rejection notification emails
+      try {
+        await supabase.functions.invoke('send-redemption-email', {
+          body: {
+            type: 'redemption_rejected',
+            redemptionId: redemptionId,
+            customerEmail: redemptionData.profiles?.email || '',
+            merchantEmail: redemptionData.offers?.profiles?.email || '',
+            customerName: redemptionData.profiles?.name || 'Customer',
+            merchantName: redemptionData.offers?.profiles?.name || 'Merchant',
+            offerTitle: redemptionData.offers?.title || 'Offer',
+            storeName: redemptionData.offers?.profiles?.store_name || 'Store'
+          }
+        });
+      } catch (emailError) {
+        console.error('Failed to send rejection emails:', emailError);
+        // Don't fail the rejection if email fails
+      }
+
       toast({
-        title: "Redemption Rejected",
-        description: "Customer redemption has been rejected.",
+        title: "Success",
+        description: "Redemption rejected successfully.",
       });
 
       fetchRedeemedOffers();
