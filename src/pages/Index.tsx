@@ -448,18 +448,22 @@ const Index = () => {
   const [searchQuery, setSearchQuery] = useState<string>('');
   const [showFiltered, setShowFiltered] = useState<boolean>(false);
 
-  const convertToOfferCardProps = (dbOffer: any) => ({
-    id: dbOffer.id,
-    shopName: dbOffer.merchant_name || 'Local Merchant',
-    offerTitle: dbOffer.title,
-    description: dbOffer.description,
-    discount: `${dbOffer.discount_percentage}% OFF`,
-    expiryDate: new Date(dbOffer.expiry_date).toLocaleDateString(),
-    location: dbOffer.location,
-    category: dbOffer.category,
-    isHot: dbOffer.listing_type === 'hot_offers',
-    isTrending: dbOffer.listing_type === 'trending'
-  });
+  const convertToOfferCardProps = (dbOffer: any) => {
+    console.log('Converting offer:', dbOffer.title, 'merchant_name:', dbOffer.merchant_name);
+    return {
+      id: dbOffer.id,
+      shopName: dbOffer.merchant_name || 'Local Merchant',
+      offerTitle: dbOffer.title,
+      description: dbOffer.description,
+      discount: `${dbOffer.discount_percentage}% OFF`,
+      expiryDate: new Date(dbOffer.expiry_date).toLocaleDateString(),
+      location: dbOffer.location,
+      category: dbOffer.category,
+      isHot: dbOffer.listing_type === 'hot_offers',
+      isTrending: dbOffer.listing_type === 'trending',
+      image: dbOffer.image_url || undefined
+    };
+  };
 
   const getOffersToShow = () => {
     let filteredOffers = offers;

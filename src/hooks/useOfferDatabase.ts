@@ -33,7 +33,7 @@ export function useOfferDatabase() {
         .from('offers')
         .select(`
           *,
-          profiles!offers_merchant_id_fkey(name, store_name)
+          profiles(name, store_name)
         `)
         .eq('is_active', true)
         .gte('expiry_date', new Date().toISOString())
@@ -43,10 +43,14 @@ export function useOfferDatabase() {
         throw fetchError;
       }
 
-      const offersWithMerchantNames = (data || []).map(offer => ({
-        ...offer,
-        merchant_name: offer.profiles?.store_name || offer.profiles?.name || 'Local Merchant'
-      }));
+      const offersWithMerchantNames = (data || []).map(offer => {
+        const merchantName = offer.profiles?.store_name || offer.profiles?.name || 'Local Merchant';
+        console.log('Processing offer:', offer.title, 'profiles:', offer.profiles, 'merchant_name:', merchantName);
+        return {
+          ...offer,
+          merchant_name: merchantName
+        };
+      });
       setOffers(offersWithMerchantNames as DatabaseOffer[]);
     } catch (err) {
       console.error('Error fetching offers:', err);
