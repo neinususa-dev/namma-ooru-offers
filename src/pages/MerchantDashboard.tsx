@@ -17,7 +17,7 @@ import {
 import { 
   Plus, BarChart3, TrendingUp, Eye, Heart, ShoppingBag, 
   Calendar, Filter, Target, Award, Users, Star, DollarSign,
-  Package, Activity, Clock, Globe
+  Package, Activity, Clock, Globe, Edit3
 } from 'lucide-react';
 
 interface MerchantStats {
@@ -304,10 +304,16 @@ const MerchantDashboard = () => {
             <h1 className="text-3xl font-bold text-foreground mb-2">Merchant Dashboard</h1>
             <p className="text-muted-foreground">Welcome back, {profile?.name}! Track your offers and business performance.</p>
           </div>
-          <Button onClick={() => navigate('/merchant-post-offer')} className="flex items-center gap-2">
-            <Plus className="h-4 w-4" />
-            Post New Offer
-          </Button>
+          <div className="flex gap-3">
+            <Button onClick={() => navigate('/merchant-edit-offers')} variant="outline" className="flex items-center gap-2">
+              <Edit3 className="h-4 w-4" />
+              Edit Offers
+            </Button>
+            <Button onClick={() => navigate('/merchant-post-offer')} className="flex items-center gap-2">
+              <Plus className="h-4 w-4" />
+              Post New Offer
+            </Button>
+          </div>
         </div>
 
         {/* Filters */}
