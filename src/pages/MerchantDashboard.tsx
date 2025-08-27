@@ -150,6 +150,7 @@ const MerchantDashboard = () => {
       if (savesError) throw savesError;
 
       // Fetch pending redemptions for these offers with customer information
+      console.log('Fetching pending redemptions for offer IDs:', offerIds);
       const { data: pendingRedemptionsData, error: pendingError } = await supabase
         .from('redemptions')
         .select(`
@@ -161,7 +162,12 @@ const MerchantDashboard = () => {
         `)
         .eq('status', 'pending')
         .in('offer_id', offerIds);
-      if (pendingError) throw pendingError;
+      
+      console.log('Pending redemptions fetched:', pendingRedemptionsData);
+      if (pendingError) {
+        console.error('Error fetching pending redemptions:', pendingError);
+        throw pendingError;
+      }
 
       const { data: allRedemptions, error: redemptionsError } = await supabase
         .from('redemptions')
@@ -350,12 +356,19 @@ const MerchantDashboard = () => {
 
   const approveRedemption = async (redemptionId: string) => {
     try {
+      console.log('Starting approval process for:', redemptionId);
+      
       const { error } = await supabase
         .from('redemptions')
         .update({ status: 'approved' })
         .eq('id', redemptionId);
 
-      if (error) throw error;
+      if (error) {
+        console.error('Database update failed:', error);
+        throw error;
+      }
+      
+      console.log('Database update successful, refreshing data...');
       
       // Immediately refresh all data
       await fetchMerchantAnalytics();
