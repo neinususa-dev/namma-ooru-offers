@@ -33,7 +33,7 @@ export function useOfferDatabase() {
         .from('offers')
         .select(`
           *,
-          profiles!offers_merchant_id_fkey(name)
+          profiles!offers_merchant_id_fkey(name, store_name)
         `)
         .eq('is_active', true)
         .gte('expiry_date', new Date().toISOString())
@@ -45,7 +45,7 @@ export function useOfferDatabase() {
 
       const offersWithMerchantNames = (data || []).map(offer => ({
         ...offer,
-        merchant_name: offer.profiles?.name || 'Local Merchant'
+        merchant_name: offer.profiles?.store_name || offer.profiles?.name || 'Local Merchant'
       }));
       setOffers(offersWithMerchantNames as DatabaseOffer[]);
     } catch (err) {

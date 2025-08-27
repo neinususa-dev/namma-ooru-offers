@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
@@ -43,6 +43,12 @@ export const OfferCard: React.FC<OfferCardProps> = ({
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
+  const [showFullDescription, setShowFullDescription] = useState(false);
+  
+  const isDescriptionLong = description && description.length > 100;
+  const displayDescription = showFullDescription || !isDescriptionLong 
+    ? description 
+    : description?.substring(0, 100) + '...';
 
   const handleGetCoupon = async () => {
     // Always save the offer first, regardless of login status
@@ -143,14 +149,25 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       </CardHeader>
 
       <CardContent className="py-3">
-        <p className="text-sm text-muted-foreground mb-3 line-clamp-2">
-          {description}
-        </p>
+        <div className="mb-3">
+          <p className="text-sm text-muted-foreground">
+            {displayDescription}
+          </p>
+          {isDescriptionLong && (
+            <button
+              onClick={() => setShowFullDescription(!showFullDescription)}
+              className="text-xs text-primary hover:text-primary/80 mt-1 font-medium"
+            >
+              {showFullDescription ? 'Read less' : 'Read more'}
+            </button>
+          )}
+        </div>
         
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            {location}
+            {/* Display city from location or just location if no comma */}
+            {location?.includes(',') ? location.split(',').pop()?.trim() : location}
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />
