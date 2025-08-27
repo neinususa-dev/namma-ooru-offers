@@ -8,6 +8,11 @@ export interface Profile {
   email: string;
   role: 'customer' | 'merchant';
   is_premium: boolean;
+  phone_number?: string;
+  store_name?: string;
+  store_location?: string;
+  district?: string;
+  city?: string;
   created_at: string;
   updated_at: string;
 }

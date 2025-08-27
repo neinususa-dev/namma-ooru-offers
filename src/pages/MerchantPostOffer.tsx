@@ -65,7 +65,7 @@ const MerchantPostOffer: React.FC = () => {
 
   const watchedValues = watch();
 
-  // Redirect if not authenticated or not a merchant
+  // Redirect if not authenticated or not a merchant and prepopulate merchant data
   React.useEffect(() => {
     // Only check auth after loading is complete and we have both user and profile data
     if (!loading) {
@@ -73,9 +73,21 @@ const MerchantPostOffer: React.FC = () => {
         navigate('/signin');
       } else if (user && profile !== null && profile?.role !== 'merchant') {
         navigate('/');
+      } else if (user && profile && profile.role === 'merchant') {
+        // Prepopulate merchant profile data
+        if (profile.district) {
+          setSelectedDistrict(profile.district);
+          setValue('district', profile.district);
+        }
+        if (profile.city) {
+          setValue('city', profile.city);
+        }
+        if (profile.store_location) {
+          setValue('location', profile.store_location);
+        }
       }
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, loading, navigate, setValue]);
 
   // Calculate discounted price
   const discountedPrice = watchedValues.original_price 
