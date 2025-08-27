@@ -32,6 +32,7 @@ export type Database = {
           merchant_id: string
           original_price: number | null
           redemption_mode: string | null
+          store_name: string | null
           title: string
           updated_at: string
         }
@@ -52,6 +53,7 @@ export type Database = {
           merchant_id: string
           original_price?: number | null
           redemption_mode?: string | null
+          store_name?: string | null
           title: string
           updated_at?: string
         }
@@ -72,6 +74,7 @@ export type Database = {
           merchant_id?: string
           original_price?: number | null
           redemption_mode?: string | null
+          store_name?: string | null
           title?: string
           updated_at?: string
         }

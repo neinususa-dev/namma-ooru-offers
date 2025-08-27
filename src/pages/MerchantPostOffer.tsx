@@ -120,6 +120,7 @@ const MerchantPostOffer: React.FC = () => {
     setIsSubmitting(true);
     try {
       const offerData = {
+        store_name: data.store_name,
         title: data.title,
         description: data.description,
         category: data.category,
