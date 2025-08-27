@@ -27,7 +27,8 @@ export default function SignUp() {
     storeLocation: '',
     district: '',
     city: '',
-    phoneNumber: ''
+    phoneNumber: '',
+    referralCode: ''
   });
 
   // Redirect authenticated users
@@ -47,6 +48,7 @@ export default function SignUp() {
 
     const additionalData = {
       phone_number: signUpForm.phoneNumber,
+      referral_code: signUpForm.referralCode || undefined,
       ...(signUpForm.role === 'merchant' ? {
         store_name: signUpForm.storeName,
         store_location: signUpForm.storeLocation,
@@ -156,6 +158,24 @@ export default function SignUp() {
                     required
                   />
                 </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="referral-code">Referral Code (Optional)</Label>
+                <div className="relative">
+                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="referral-code"
+                    type="text"
+                    placeholder="Enter referral code from a friend"
+                    className="pl-10"
+                    value={signUpForm.referralCode}
+                    onChange={(e) => setSignUpForm({ ...signUpForm, referralCode: e.target.value.toUpperCase() })}
+                  />
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Have a referral code? Enter it to earn bonus points for both you and your friend!
+                </p>
               </div>
 
               {signUpForm.role === 'merchant' && (

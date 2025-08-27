@@ -1,28 +1,35 @@
-import { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Progress } from "@/components/ui/progress";
-import { 
-  Gift, 
-  Users, 
-  QrCode, 
-  Star, 
-  Trophy, 
-  Camera,
-  Share2,
-  Coins,
-  Target,
-  Crown,
-  Zap
-} from "lucide-react";
-import { Header } from "@/components/Header";
-import { useAuth } from "@/hooks/useAuth";
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Users, Gift, Share2, Copy, Trophy, TrendingUp, Zap, QrCode, Star, Award, Crown, Heart, Coins, Target, Camera } from 'lucide-react';
+import { Header } from '@/components/Header';
+import { useAuth } from '@/hooks/useAuth';
+import { useRewards } from '@/hooks/useRewards';
+import { QRScanner } from '@/components/QRScanner';
+import { RewardOffers } from '@/components/RewardOffers';
+import { ActivityHistory } from '@/components/ActivityHistory';
+import { Leaderboard } from '@/components/Leaderboard';
+import { toast } from 'sonner';
 
 const Rewards = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('rewards');
+  const { user } = useAuth();
+  const { 
+    userReward, 
+    activities, 
+    rewardOffers, 
+    referrals,
+    loading, 
+    error,
+    redeemRewardOffer,
+    copyReferralCode,
+    refetch
+  } = useRewards();
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
@@ -46,11 +53,45 @@ const Rewards = () => {
         navigate('/');
     }
   };
-  const { user } = useAuth();
-  const [currentPoints] = useState(250);
-  const [totalEarned] = useState(1840);
-  const [level] = useState("Campus Champ");
-  const [nextLevelPoints] = useState(500);
+
+  const handleCopyReferralCode = async () => {
+    const success = await copyReferralCode();
+    if (success) {
+      toast.success('Referral code copied to clipboard!');
+    } else {
+      toast.error('Failed to copy referral code');
+    }
+  };
+
+  const getLevelProgress = () => {
+    if (!userReward) return 0;
+    const { total_earned_points } = userReward;
+    
+    if (total_earned_points >= 1000) return 100;
+    if (total_earned_points >= 500) return ((total_earned_points - 500) / 500) * 100;
+    if (total_earned_points >= 200) return ((total_earned_points - 200) / 300) * 100;
+    return (total_earned_points / 200) * 100;
+  };
+
+  const getNextLevelPoints = () => {
+    if (!userReward) return 0;
+    const { total_earned_points } = userReward;
+    
+    if (total_earned_points >= 1000) return 0;
+    if (total_earned_points >= 500) return 1000 - total_earned_points;
+    if (total_earned_points >= 200) return 500 - total_earned_points;
+    return 200 - total_earned_points;
+  };
+
+  const getNextLevel = () => {
+    if (!userReward) return 'Silver';
+    const { total_earned_points } = userReward;
+    
+    if (total_earned_points >= 1000) return 'Platinum';
+    if (total_earned_points >= 500) return 'Platinum';
+    if (total_earned_points >= 200) return 'Gold';
+    return 'Silver';
+  };
 
   return (
     <div className="min-h-screen bg-white">
@@ -63,171 +104,317 @@ const Rewards = () => {
           <Gift className="h-16 w-16 mx-auto animate-bounce mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-2">Earn Rewards with Namma Ooru Offers!</h1>
           <p className="text-white/90 mb-4 text-lg max-w-xl mx-auto">
-            Register now and instantly get ₹50 points. Refer friends, scan QR codes in stores, and unlock more exciting rewards across Tamil Nadu!
+            Register now and instantly get 50 points. Refer friends, scan QR codes in stores, and unlock more exciting rewards across Tamil Nadu!
           </p>
-          <div className="flex justify-center gap-4">
-           <Button className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl shadow-lg 
-                     hover:text-white hover:bg-blue-600 transition-colors duration-300">
-    Sign Up Now
-  </Button>
-            <Button className="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors">
-            Login
-          </Button>
-          </div>
+          {!user ? (
+            <div className="flex justify-center gap-4">
+              <Button 
+                onClick={() => navigate('/sign-up')}
+                className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl shadow-lg 
+                          hover:text-white hover:bg-blue-600 transition-colors duration-300"
+              >
+                Sign Up Now
+              </Button>
+              <Button 
+                onClick={() => navigate('/sign-in')}
+                className="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors"
+              >
+                Login
+              </Button>
+            </div>
+          ) : (
+            <div className="text-center">
+              <Badge className="bg-white/20 text-white text-lg px-4 py-2">
+                Welcome back, {user.user_metadata?.name || 'User'}!
+              </Badge>
+            </div>
+          )}
         </Card>
 
-     {/* How to Earn Points - 3 Column Layout */}
-<div className="grid md:grid-cols-3 gap-6">
-
-  {/* Column 1: Refer Friends */}
-  <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6 text-center">
-    <CardHeader className="flex justify-center mb-4">
-      <Users className="h-16 w-16 mx-auto" />
-    </CardHeader>
-    <CardTitle className="text-xl font-bold mb-2">Refer Friends & Earn Big!</CardTitle>
-    <CardContent>
-      <p className="text-white/90 mb-2 text-lg">
-        Share Namma Ooru Offers with your friends, classmates, and roommates.
-      </p>
-      <p className="text-white/90 mb-2 font-semibold text-lg">
-        Earn ₹50 points for each successful referral!
-      </p>
-      <p className="text-white/80 text-base">
-        The more friends you invite, the more points you collect. Stack up your rewards and unlock exclusive badges.
-      </p>
-    </CardContent>
-  </Card>
-
-  {/* Column 2: Scan QR Codes */}
-  <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 text-center">
-    <CardHeader className="flex justify-center mb-4">
-      <QrCode className="h-16 w-16 mx-auto" />
-    </CardHeader>
-    <CardTitle className="text-xl font-bold mb-2">Scan QR Codes in Stores</CardTitle>
-    <CardContent>
-      <p className="text-white/90 mb-2 text-lg">
-        Visit participating stores and scan QR codes at checkout to earn points instantly.
-      </p>
-      <p className="text-white/90 mb-2 font-semibold text-lg">
-        Earn 5-50 points per visit!
-      </p>
-      <p className="text-white/80 text-base">
-        First-time visits double your points. Explore stores near your location and maximize your rewards.
-      </p>
-    </CardContent>
-  </Card>
-
-  {/* Column 3: Active Offers */}
-  <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-blue-400 to-purple-500 text-white p-6 text-center">
-    <CardHeader className="flex justify-center mb-4">
-      <Target className="h-16 w-16 mx-auto" />
-    </CardHeader>
-    <CardTitle className="text-xl font-bold mb-2">Active Offers</CardTitle>
-    <CardContent>
-      <p className="text-white/90 mb-2 text-lg">
-        Browse the latest deals near your location through Namma Ooru Offers.
-      </p>
-      <p className="text-white/90 mb-2 font-semibold text-lg">
-        Redeem points while shopping and earn extra rewards.
-      </p>
-      <p className="text-white/80 text-base">
-        Combine referrals, QR scans, and active deals to maximize your points daily. Don’t miss limited-time offers!
-      </p>
-    </CardContent>
-  </Card>
-
-</div>
-
-
-{/* Achievement Badges Section */}
-<div className="space-y-4">
-  <h2 className="text-2xl font-bold text-center mb-4">Your Achievement Badges</h2>
-  <div className="grid grid-cols-6 gap-4 justify-center text-center">
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Star className="h-8 w-8 mb-2 text-yellow-400" />
-      <span className="text-sm font-medium">Newbie</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Trophy className="h-8 w-8 mb-2 text-green-500" />
-      <span className="text-sm font-medium">Campus Champ</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Camera className="h-8 w-8 mb-2 text-blue-500" />
-      <span className="text-sm font-medium">Store Explorer</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Users className="h-8 w-8 mb-2 text-pink-500" />
-      <span className="text-sm font-medium">Referral King</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Coins className="h-8 w-8 mb-2 text-orange-400" />
-      <span className="text-sm font-medium">Point Master</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <QrCode className="h-8 w-8 mb-2 text-purple-500" />
-      <span className="text-sm font-medium">QR Scanner Pro</span>
-    </Card>
-  </div>
-</div>
-
-        {/* Rewards Dashboard & Referral - visible after login */}
-        {user && (
-          <div className="space-y-6">
-
-            {/* Dashboard */}
-            <div className="grid md:grid-cols-3 gap-6">
-
+        {/* User Dashboard - visible after login */}
+        {user && userReward && (
+          <div className="space-y-8">
+            {/* Points & Level Overview */}
+            <div className="grid md:grid-cols-4 gap-6">
               <Card className="rounded-2xl shadow-md bg-gradient-to-r from-green-400 to-green-600 text-white p-6 text-center">
                 <CardTitle className="text-sm font-medium mb-2">Current Points</CardTitle>
                 <Coins className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-3xl font-bold">{currentPoints}</div>
+                <div className="text-3xl font-bold">{userReward.current_points}</div>
                 <p className="text-white/80 text-sm">Ready to redeem!</p>
               </Card>
 
               <Card className="rounded-2xl shadow-md bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 text-center">
                 <CardTitle className="text-sm font-medium mb-2">Total Earned</CardTitle>
                 <Trophy className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-3xl font-bold">{totalEarned}</div>
+                <div className="text-3xl font-bold">{userReward.total_earned_points}</div>
                 <p className="text-white/80 text-sm">Since joining</p>
               </Card>
 
-              <Card className="rounded-2xl shadow-md bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 text-center">
-                <CardTitle className="text-sm font-medium mb-2">Active Offers</CardTitle>
-                <Target className="h-6 w-6 mx-auto mb-2" />
-                <div className="text-3xl font-bold">12</div>
-                <p className="text-white/80 text-sm">Near your college</p>
+              <Card className="rounded-2xl shadow-md bg-gradient-to-r from-purple-400 to-purple-600 text-white p-6 text-center">
+                <CardTitle className="text-sm font-medium mb-2">Level</CardTitle>
+                <Crown className="h-6 w-6 mx-auto mb-2" />
+                <div className="text-2xl font-bold">{userReward.level_name}</div>
+                <p className="text-white/80 text-sm">Your status</p>
               </Card>
 
+              <Card className="rounded-2xl shadow-md bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 text-center">
+                <CardTitle className="text-sm font-medium mb-2">Referrals</CardTitle>
+                <Users className="h-6 w-6 mx-auto mb-2" />
+                <div className="text-3xl font-bold">{referrals.filter(r => r.referrer_id === user.id).length}</div>
+                <p className="text-white/80 text-sm">Friends invited</p>
+              </Card>
             </div>
 
-            {/* Referral & Social Sharing */}
-            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6">
-              <CardTitle className="text-2xl font-bold flex items-center mb-4">
-                <Users className="h-6 w-6 mr-2" />
-                Share & Earn Points
-              </CardTitle>
-              <p className="text-white/90 mb-2">
-                Your unique referral code: <span className="font-mono bg-white/20 px-2 py-1 rounded">USER12345</span>
-              </p>
-              <p className="text-white/90 mb-4">
-                Share on social media to earn extra points every time your friends register!
-              </p>
-              <div className="flex flex-wrap gap-3">
-                <Button className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2 flex items-center">
-                  <Share2 className="h-4 w-4 mr-2" /> WhatsApp
-                </Button>
-                <Button className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2">
-                  Instagram Story
-                </Button>
-                <Button className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2">
-                  Telegram
-                </Button>
+            {/* Level Progress */}
+            <Card className="p-6">
+              <div className="flex items-center justify-between mb-4">
+                <div>
+                  <h3 className="text-lg font-bold">{userReward.level_name} Level</h3>
+                  <p className="text-sm text-muted-foreground">
+                    {getNextLevelPoints() > 0 
+                      ? `${getNextLevelPoints()} points to ${getNextLevel()}`
+                      : 'Maximum level reached!'
+                    }
+                  </p>
+                </div>
+                <Badge variant="outline" className="px-3 py-1">
+                  {userReward.total_earned_points} / {
+                    userReward.total_earned_points >= 1000 ? '1000+' : 
+                    userReward.total_earned_points >= 500 ? '1000' :
+                    userReward.total_earned_points >= 200 ? '500' : '200'
+                  }
+                </Badge>
               </div>
+              <Progress value={getLevelProgress()} className="h-3" />
             </Card>
 
+            {/* Tabs for different sections */}
+            <Tabs defaultValue="dashboard" className="space-y-6">
+              <TabsList className="grid w-full grid-cols-5">
+                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
+                <TabsTrigger value="earn">Earn Points</TabsTrigger>
+                <TabsTrigger value="redeem">Redeem</TabsTrigger>
+                <TabsTrigger value="activity">Activity</TabsTrigger>
+                <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+              </TabsList>
+
+              <TabsContent value="dashboard" className="space-y-6">
+                {/* Referral & Social Sharing */}
+                <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6">
+                  <CardTitle className="text-2xl font-bold flex items-center mb-4">
+                    <Users className="h-6 w-6 mr-2" />
+                    Share & Earn Points
+                  </CardTitle>
+                  <p className="text-white/90 mb-2">
+                    Your unique referral code: 
+                    <span className="font-mono bg-white/20 px-2 py-1 rounded ml-2">
+                      {userReward.referral_code}
+                    </span>
+                    <Button
+                      onClick={handleCopyReferralCode}
+                      variant="ghost"
+                      size="sm"
+                      className="ml-2 text-white hover:bg-white/20"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </Button>
+                  </p>
+                  <p className="text-white/90 mb-4">
+                    Share with friends and earn 25 points for each successful referral!
+                  </p>
+                  <div className="flex flex-wrap gap-3">
+                    <Button 
+                      onClick={() => {
+                        const text = `Join Namma Ooru Offers and get exclusive deals! Use my referral code: ${userReward.referral_code}`;
+                        const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                        window.open(url, '_blank');
+                      }}
+                      className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2 flex items-center"
+                    >
+                      <Share2 className="h-4 w-4 mr-2" /> WhatsApp
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        const text = `Join Namma Ooru Offers with code: ${userReward.referral_code}`;
+                        const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(text)}`;
+                        window.open(url, '_blank');
+                      }}
+                      className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2"
+                    >
+                      Telegram
+                    </Button>
+                  </div>
+                </Card>
+
+                <ActivityHistory activities={activities} loading={loading} />
+              </TabsContent>
+
+              <TabsContent value="earn" className="space-y-6">
+                <div className="grid md:grid-cols-2 gap-6">
+                  <QRScanner onPointsAwarded={refetch} />
+                  
+                  {/* How to Earn Points */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle>Ways to Earn Points</CardTitle>
+                      <CardDescription>Multiple ways to boost your rewards</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <div className="p-2 bg-green-100 rounded-full">
+                          <Users className="w-5 h-5 text-green-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Refer Friends</p>
+                          <p className="text-sm text-muted-foreground">Earn 25 points per referral</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <div className="p-2 bg-orange-100 rounded-full">
+                          <QrCode className="w-5 h-5 text-orange-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">QR Code Scans</p>
+                          <p className="text-sm text-muted-foreground">Earn 10 points per store visit</p>
+                        </div>
+                      </div>
+                      
+                      <div className="flex items-center gap-3 p-3 border rounded-lg">
+                        <div className="p-2 bg-blue-100 rounded-full">
+                          <Gift className="w-5 h-5 text-blue-600" />
+                        </div>
+                        <div>
+                          <p className="font-medium">Welcome Bonus</p>
+                          <p className="text-sm text-muted-foreground">50 points for signing up</p>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </TabsContent>
+
+              <TabsContent value="redeem">
+                <RewardOffers 
+                  offers={rewardOffers} 
+                  userReward={userReward} 
+                  onRedeem={redeemRewardOffer} 
+                />
+              </TabsContent>
+
+              <TabsContent value="activity">
+                <ActivityHistory activities={activities} loading={loading} />
+              </TabsContent>
+
+              <TabsContent value="leaderboard">
+                <Leaderboard />
+              </TabsContent>
+            </Tabs>
           </div>
         )}
 
+        {/* How to Earn Points - 3 Column Layout (for non-logged in users) */}
+        {!user && (
+          <>
+            <div className="grid md:grid-cols-3 gap-6">
+              {/* Column 1: Refer Friends */}
+              <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6 text-center">
+                <CardHeader className="flex justify-center mb-4">
+                  <Users className="h-16 w-16 mx-auto" />
+                </CardHeader>
+                <CardTitle className="text-xl font-bold mb-2">Refer Friends & Earn Big!</CardTitle>
+                <CardContent>
+                  <p className="text-white/90 mb-2 text-lg">
+                    Share Namma Ooru Offers with your friends, classmates, and roommates.
+                  </p>
+                  <p className="text-white/90 mb-2 font-semibold text-lg">
+                    Earn 25 points for each successful referral!
+                  </p>
+                  <p className="text-white/80 text-base">
+                    The more friends you invite, the more points you collect. Stack up your rewards and unlock exclusive badges.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Column 2: Scan QR Codes */}
+              <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 text-center">
+                <CardHeader className="flex justify-center mb-4">
+                  <QrCode className="h-16 w-16 mx-auto" />
+                </CardHeader>
+                <CardTitle className="text-xl font-bold mb-2">Scan QR Codes in Stores</CardTitle>
+                <CardContent>
+                  <p className="text-white/90 mb-2 text-lg">
+                    Visit participating stores and scan QR codes at checkout to earn points instantly.
+                  </p>
+                  <p className="text-white/90 mb-2 font-semibold text-lg">
+                    Earn 10 points per visit!
+                  </p>
+                  <p className="text-white/80 text-base">
+                    Explore stores near your location and maximize your rewards with every visit.
+                  </p>
+                </CardContent>
+              </Card>
+
+              {/* Column 3: Active Offers */}
+              <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-blue-400 to-purple-500 text-white p-6 text-center">
+                <CardHeader className="flex justify-center mb-4">
+                  <Target className="h-16 w-16 mx-auto" />
+                </CardHeader>
+                <CardTitle className="text-xl font-bold mb-2">Redeem Rewards</CardTitle>
+                <CardContent>
+                  <p className="text-white/90 mb-2 text-lg">
+                    Use your points to redeem exciting rewards and exclusive offers.
+                  </p>
+                  <p className="text-white/90 mb-2 font-semibold text-lg">
+                    Free vouchers, discounts & more!
+                  </p>
+                  <p className="text-white/80 text-base">
+                    From coffee vouchers to shopping discounts, turn your points into real value.
+                  </p>
+                </CardContent>
+              </Card>
+            </div>
+
+            {/* Achievement Badges Section */}
+            <div className="space-y-4">
+              <h2 className="text-2xl font-bold text-center mb-4">Achievement Badges</h2>
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 justify-center text-center">
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <Star className="h-8 w-8 mb-2 text-amber-400" />
+                  <span className="text-sm font-medium">Bronze</span>
+                </Card>
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <Trophy className="h-8 w-8 mb-2 text-gray-400" />
+                  <span className="text-sm font-medium">Silver</span>
+                </Card>
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <Award className="h-8 w-8 mb-2 text-yellow-500" />
+                  <span className="text-sm font-medium">Gold</span>
+                </Card>
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <Crown className="h-8 w-8 mb-2 text-purple-500" />
+                  <span className="text-sm font-medium">Platinum</span>
+                </Card>
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <Users className="h-8 w-8 mb-2 text-pink-500" />
+                  <span className="text-sm font-medium">Referral King</span>
+                </Card>
+                <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
+                  <QrCode className="h-8 w-8 mb-2 text-blue-500" />
+                  <span className="text-sm font-medium">QR Master</span>
+                </Card>
+              </div>
+            </div>
+          </>
+        )}
+
+        {error && (
+          <Card className="border-red-200 bg-red-50">
+            <CardContent className="p-4">
+              <p className="text-red-600 text-center">{error}</p>
+            </CardContent>
+          </Card>
+        )}
       </div>
       
       {/* Footer */}
