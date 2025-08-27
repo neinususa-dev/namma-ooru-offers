@@ -538,8 +538,18 @@ const Index = () => {
   };
 
   const filteredOffers = getOffersToShow();
-  const hotOffers = getOffersByType('hot_offers').map(convertToOfferCardProps);
-  const trendingOffers = getOffersByType('trending').map(convertToOfferCardProps);
+  
+  // Get hot offers, fallback to first 6 offers if no specific hot offers exist
+  const hotOffersFromDb = getOffersByType('hot_offers');
+  const hotOffers = hotOffersFromDb.length > 0 
+    ? hotOffersFromDb.map(convertToOfferCardProps)
+    : offers.slice(0, 6).map(convertToOfferCardProps);
+  
+  // Get trending offers, fallback to next 6 offers if no specific trending offers exist
+  const trendingOffersFromDb = getOffersByType('trending');
+  const trendingOffers = trendingOffersFromDb.length > 0 
+    ? trendingOffersFromDb.map(convertToOfferCardProps)
+    : offers.slice(6, 12).map(convertToOfferCardProps);
 
   const handleClearFilters = () => {
     setSelectedCategory('all');
@@ -673,20 +683,66 @@ const Index = () => {
             </section>
 
             {/* Hot Offers Section */}
-            <PaginatedOffersSection
-              title="Today's Hot Offers"
-              icon={<Flame className="h-6 w-6 text-hot-offer animate-pulse" />}
-              offers={hotOffers}
-              sectionClass="py-12 bg-background"
-            />
+            {loading ? (
+              <section className="py-12 bg-background">
+                <div className="container mx-auto px-4">
+                  <div className="mb-8 flex items-center gap-3">
+                    <Flame className="h-6 w-6 text-hot-offer animate-pulse" />
+                    <h3 className="text-3xl font-bold text-foreground">Today's Hot Offers</h3>
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="bg-card p-4 rounded-lg border animate-pulse">
+                        <div className="h-40 bg-muted rounded mb-4"></div>
+                        <div className="space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4"></div>
+                          <div className="h-4 bg-muted rounded w-1/2"></div>
+                          <div className="h-8 bg-muted rounded mt-4"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <PaginatedOffersSection
+                title="Today's Hot Offers"
+                icon={<Flame className="h-6 w-6 text-hot-offer animate-pulse" />}
+                offers={hotOffers}
+                sectionClass="py-12 bg-background"
+              />
+            )}
 
             {/* Trending Offers Section */}
-            <PaginatedOffersSection
-              title="Top Trending Coupons"
-              icon={<TrendingUp className="h-6 w-6 text-trending animate-bounce" />}
-              offers={trendingOffers}
-              sectionClass="py-12 bg-muted/30"
-            />
+            {loading ? (
+              <section className="py-12 bg-muted/30">
+                <div className="container mx-auto px-4">
+                  <div className="mb-8 flex items-center gap-3">
+                    <TrendingUp className="h-6 w-6 text-trending animate-bounce" />
+                    <h3 className="text-3xl font-bold text-foreground">Top Trending Coupons</h3>
+                  </div>
+                  <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                    {Array.from({ length: 6 }).map((_, i) => (
+                      <div key={i} className="bg-card p-4 rounded-lg border animate-pulse">
+                        <div className="h-40 bg-muted rounded mb-4"></div>
+                        <div className="space-y-2">
+                          <div className="h-4 bg-muted rounded w-3/4"></div>
+                          <div className="h-4 bg-muted rounded w-1/2"></div>
+                          <div className="h-8 bg-muted rounded mt-4"></div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </section>
+            ) : (
+              <PaginatedOffersSection
+                title="Top Trending Coupons"
+                icon={<TrendingUp className="h-6 w-6 text-trending animate-bounce" />}
+                offers={trendingOffers}
+                sectionClass="py-12 bg-muted/30"
+              />
+            )}
 
             {/* Local Deals Section */}
             <section className="py-12 bg-background">
