@@ -61,6 +61,7 @@ export type Database = {
           location: string | null
           merchant_id: string
           original_price: number | null
+          points_required: number | null
           redemption_mode: string | null
           store_name: string | null
           title: string
@@ -82,6 +83,7 @@ export type Database = {
           location?: string | null
           merchant_id: string
           original_price?: number | null
+          points_required?: number | null
           redemption_mode?: string | null
           store_name?: string | null
           title: string
@@ -103,6 +105,7 @@ export type Database = {
           location?: string | null
           merchant_id?: string
           original_price?: number | null
+          points_required?: number | null
           redemption_mode?: string | null
           store_name?: string | null
           title?: string
@@ -217,6 +220,176 @@ export type Database = {
           },
         ]
       }
+      referrals: {
+        Row: {
+          created_at: string
+          id: string
+          points_awarded: number
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referral_code: string
+          referred_id: string
+          referrer_id: string
+          status?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_awarded?: number
+          referral_code?: string
+          referred_id?: string
+          referrer_id?: string
+          status?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "referrals_referred_id_fkey"
+            columns: ["referred_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "referrals_referrer_id_fkey"
+            columns: ["referrer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_activities: {
+        Row: {
+          activity_type: string
+          created_at: string
+          description: string
+          id: string
+          points: number
+          reference_id: string | null
+          reference_type: string | null
+          user_id: string
+        }
+        Insert: {
+          activity_type: string
+          created_at?: string
+          description: string
+          id?: string
+          points: number
+          reference_id?: string | null
+          reference_type?: string | null
+          user_id: string
+        }
+        Update: {
+          activity_type?: string
+          created_at?: string
+          description?: string
+          id?: string
+          points?: number
+          reference_id?: string | null
+          reference_type?: string | null
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_activities_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reward_offers: {
+        Row: {
+          created_at: string
+          current_redemptions: number
+          description: string
+          expiry_date: string | null
+          id: string
+          image_url: string | null
+          is_active: boolean
+          max_redemptions: number | null
+          points_required: number
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          current_redemptions?: number
+          description: string
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          max_redemptions?: number | null
+          points_required: number
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          current_redemptions?: number
+          description?: string
+          expiry_date?: string | null
+          id?: string
+          image_url?: string | null
+          is_active?: boolean
+          max_redemptions?: number | null
+          points_required?: number
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      reward_redemptions: {
+        Row: {
+          created_at: string
+          id: string
+          points_used: number
+          reward_offer_id: string
+          status: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          points_used: number
+          reward_offer_id: string
+          status?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          points_used?: number
+          reward_offer_id?: string
+          status?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reward_redemptions_reward_offer_id_fkey"
+            columns: ["reward_offer_id"]
+            isOneToOne: false
+            referencedRelation: "reward_offers"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "reward_redemptions_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       saved_offers: {
         Row: {
           id: string
@@ -298,12 +471,70 @@ export type Database = {
         }
         Relationships: []
       }
+      user_rewards: {
+        Row: {
+          created_at: string
+          current_points: number
+          id: string
+          level_name: string
+          referral_code: string
+          total_earned_points: number
+          total_redeemed_points: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          current_points?: number
+          id?: string
+          level_name?: string
+          referral_code: string
+          total_earned_points?: number
+          total_redeemed_points?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          current_points?: number
+          id?: string
+          level_name?: string
+          referral_code?: string
+          total_earned_points?: number
+          total_redeemed_points?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "user_rewards_user_id_fkey"
+            columns: ["user_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      award_points: {
+        Args: {
+          activity_description: string
+          activity_type: string
+          points_amount: number
+          reference_id?: string
+          reference_type?: string
+          target_user_id: string
+        }
+        Returns: undefined
+      }
+      generate_referral_code: {
+        Args: { user_name: string }
+        Returns: string
+      }
     }
     Enums: {
       user_role: "customer" | "merchant"
