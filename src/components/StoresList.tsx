@@ -88,11 +88,11 @@ export const StoresList: React.FC<StoresListProps> = ({
                   )}
                 </div>
                 <div className="flex flex-col items-end gap-2">
-                  <Badge variant="default">Active</Badge>
-                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                  <div className="flex items-center gap-1 text-sm text-secondary animate-pulse">
                     <ShoppingBag className="h-4 w-4" />
                     <span>{getOfferCount(store.name)} offers</span>
                   </div>
+                  <Badge variant="default">Active</Badge>
                 </div>
               </div>
             </CardHeader>
