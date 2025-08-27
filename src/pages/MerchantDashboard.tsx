@@ -124,17 +124,24 @@ const MerchantDashboard = () => {
       // Get offer IDs for this merchant
       const offerIds = offers?.map(offer => offer.id) || [];
       
-      // Fetch saves for merchant offers - simplified query
+      // Fetch saves for merchant offers
       let saves: any[] = [];
       let redemptions: any[] = [];
       
       if (offerIds.length > 0) {
         console.log('Fetching data for offer IDs:', offerIds);
         
-        const { data: savesData, error: savesError } = await supabase
+        // Build saves query with date filter
+        let savesQuery = supabase
           .from('saved_offers')
           .select('*')
           .in('offer_id', offerIds);
+
+        if (dateFilter) {
+          savesQuery = savesQuery.gte('saved_at', dateFilter);
+        }
+
+        const { data: savesData, error: savesError } = await savesQuery;
 
         if (savesError) {
           console.error('Saves query error:', savesError);
@@ -144,11 +151,17 @@ const MerchantDashboard = () => {
         saves = savesData || [];
         console.log('Saves data:', saves);
 
-        // Fetch redemptions for merchant offers - simplified query
-        const { data: redemptionsData, error: redemptionsError } = await supabase
+        // Build redemptions query with date filter
+        let redemptionsQuery = supabase
           .from('redemptions')
           .select('*')
           .in('offer_id', offerIds);
+
+        if (dateFilter) {
+          redemptionsQuery = redemptionsQuery.gte('redeemed_at', dateFilter);
+        }
+
+        const { data: redemptionsData, error: redemptionsError } = await redemptionsQuery;
 
         if (redemptionsError) {
           console.error('Redemptions query error:', redemptionsError);
