@@ -23,10 +23,10 @@ export function AuthButton() {
     return (
       <div className="flex items-center space-x-2">
         <Button variant="outline" size="sm" asChild>
-          <Link to="/auth">Sign In</Link>
+          <Link to="/signin">Log In</Link>
         </Button>
         <Button size="sm" className="bg-primary-gradient hover:opacity-90" asChild>
-          <Link to="/auth">Join Now</Link>
+          <Link to="/signup">Join Now</Link>
         </Button>
       </div>
     );
