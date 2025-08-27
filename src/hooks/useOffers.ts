@@ -10,6 +10,9 @@ export interface Offer {
   description: string;
   category: string;
   location: string;
+  city?: string;
+  district?: string;
+  store_name?: string;
   discount_percentage: number;
   original_price: number;
   discounted_price: number;
@@ -17,6 +20,10 @@ export interface Offer {
   is_active: boolean;
   created_at: string;
   updated_at: string;
+  profiles?: {
+    name?: string;
+    store_name?: string;
+  };
 }
 
 export interface SavedOffer {
@@ -61,7 +68,10 @@ export function useOffers() {
         .from('saved_offers')
         .select(`
           *,
-          offers (*)
+          offers (
+            *,
+            profiles!merchant_id(name, store_name)
+          )
         `)
         .eq('user_id', user.id);
 
@@ -85,7 +95,10 @@ export function useOffers() {
         .from('redemptions')
         .select(`
           *,
-          offers (*)
+          offers (
+            *,
+            profiles!merchant_id(name, store_name)
+          )
         `)
         .eq('user_id', user.id)
         .order('redeemed_at', { ascending: false });

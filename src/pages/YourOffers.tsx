@@ -111,19 +111,17 @@ export default function YourOffers() {
                   <OfferCard
                     key={savedOffer.id}
                     id={savedOffer.offer_id}
-                    shopName={savedOffer.offers?.title?.includes('Designer Saree') ? 'Pothys' : 
-                             savedOffer.offers?.title?.includes('Idli') ? 'Murugan Idli Shop' :
-                             savedOffer.offers?.title?.includes('Family Feast') ? 'Annapoorna Restaurant' :
-                             savedOffer.offers?.title?.includes('Biryani') ? 'Hotel Buhari' :
-                             savedOffer.offers?.title?.includes('Thali') ? 'A2B Restaurant' :
-                             savedOffer.offers?.title?.includes('Sweet Box') ? 'Adyar Ananda Bhavan' :
-                             savedOffer.offers?.title?.includes('Traditional Wear') ? 'Saravana Stores' :
-                             'Local Shop'}
+                    shopName={savedOffer.offers?.profiles?.store_name || 
+                             savedOffer.offers?.profiles?.name || 
+                             savedOffer.offers?.store_name || 
+                             'Local Merchant'}
                     offerTitle={savedOffer.offers?.title || 'Special Offer'}
                     description={savedOffer.offers?.description || 'Great discount available!'}
                     discount={`${savedOffer.offers?.discount_percentage || 20}% OFF`}
+                    originalPrice={savedOffer.offers?.original_price}
+                    discountedPrice={savedOffer.offers?.discounted_price}
                     expiryDate={savedOffer.offers?.expiry_date ? new Date(savedOffer.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
-                    location={savedOffer.offers?.location || 'Local Area'}
+                    location={savedOffer.offers?.city || savedOffer.offers?.location || 'Local Area'}
                     category={savedOffer.offers?.category || 'general'}
                     displayMode="saved"
                     onRemove={() => removeSavedOffer(savedOffer.id)}
@@ -155,21 +153,19 @@ export default function YourOffers() {
                   <OfferCard
                     key={redemption.id}
                     id={redemption.offer_id}
-                    shopName={redemption.offers?.title?.includes('Designer Saree') ? 'Pothys' : 
-                             redemption.offers?.title?.includes('Idli') ? 'Murugan Idli Shop' :
-                             redemption.offers?.title?.includes('Family Feast') ? 'Annapoorna Restaurant' :
-                             redemption.offers?.title?.includes('Biryani') ? 'Hotel Buhari' :
-                             redemption.offers?.title?.includes('Thali') ? 'A2B Restaurant' :
-                             redemption.offers?.title?.includes('Sweet Box') ? 'Adyar Ananda Bhavan' :
-                             redemption.offers?.title?.includes('Traditional Wear') ? 'Saravana Stores' :
-                             'Local Shop'}
+                    shopName={redemption.offers?.profiles?.store_name || 
+                             redemption.offers?.profiles?.name || 
+                             redemption.offers?.store_name || 
+                             'Local Merchant'}
                     offerTitle={redemption.offers?.title || 'Redeemed Offer'}
                      description={redemption.status === 'approved' ? 'This coupon has been redeemed!' : 
                                  redemption.status === 'pending' ? 'Redemption pending merchant approval...' :
                                  'Redemption request was rejected'}
                      discount={`${redemption.offers?.discount_percentage || 20}% OFF`}
+                     originalPrice={redemption.offers?.original_price}
+                     discountedPrice={redemption.offers?.discounted_price}
                      expiryDate={redemption.offers?.expiry_date ? new Date(redemption.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
-                     location={redemption.offers?.location || 'Local Area'}
+                     location={redemption.offers?.city || redemption.offers?.location || 'Local Area'}
                      category={redemption.offers?.category || 'general'}
                      displayMode={redemption.status === 'approved' ? 'redeemed' : redemption.status === 'pending' ? 'pending' : 'rejected'}
                      couponCode={redemption.id.substring(0, 8).toUpperCase()}
