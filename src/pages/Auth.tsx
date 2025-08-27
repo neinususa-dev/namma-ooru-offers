@@ -45,7 +45,7 @@ export default function Auth() {
           if (profile?.role === 'merchant') {
             navigate('/merchant-dashboard');
           } else {
-            navigate('/');
+            navigate('/customer-analytics');
           }
         } catch (error) {
           console.error('Error fetching profile:', error);
