@@ -53,7 +53,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
                     >
                       <BarChart3 className="h-4 w-4" />
-                      Dashboard
+                      Analytics
                     </Link>
                     <Link 
                       to="/merchant-post-offer"
@@ -136,7 +136,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
                     >
                       <BarChart3 className="h-4 w-4" />
-                      Dashboard
+                      Analytics
                     </Link>
                     <Link 
                       to="/merchant-post-offer"
