@@ -126,10 +126,10 @@ export const StoresList: React.FC<StoresListProps> = ({
               <p className="text-muted-foreground mt-1">{selectedStore.description}</p>
             )}
             <div className="flex items-center gap-2 mt-2 text-sm text-muted-foreground">
-              {selectedStore.location && (
+              {selectedStore.city && (
                 <div className="flex items-center gap-1">
                   <MapPin className="h-4 w-4" />
-                  <span>{selectedStore.location}</span>
+                  <span>{selectedStore.city}</span>
                 </div>
               )}
               <Badge variant="secondary" className="animate-pulse">
