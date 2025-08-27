@@ -89,6 +89,13 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                           Your Offers
                         </Link>
                         <Link 
+                          to="/rewards"
+                          className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                        >
+                          <Heart className="h-4 w-4" />
+                          Rewards
+                        </Link>
+                        <Link 
                           to="/customer-analytics"
                           className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
                         >
@@ -132,12 +139,19 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                     >
                       Store List
                     </Link>
-                    <Link 
+                     <Link 
                       to="/your-offers"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
                     >
                       <Gift className="h-4 w-4" />
                       Your Offers
+                    </Link>
+                    <Link 
+                      to="/rewards"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <Heart className="h-4 w-4" />
+                      Rewards
                     </Link>
                     <Link 
                       to="/customer-analytics"
