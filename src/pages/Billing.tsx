@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { toast } from 'sonner';
+import { supabase } from '@/integrations/supabase/client';
 
 const pricingTiers = [
   {
@@ -86,7 +87,7 @@ export const Billing: React.FC = () => {
   const [selectedPlan, setSelectedPlan] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
 
-  const currentTier = profile?.is_premium ? 'Gold' : 'Silver';
+  const currentTier = profile?.current_plan || 'Silver';
 
   const handlePlanSelection = (planName: string, razorpayPlanId: string | null) => {
     if (!user) {
@@ -115,8 +116,29 @@ export const Billing: React.FC = () => {
     try {
       const selectedTier = pricingTiers.find(t => t.name === selectedPlan);
       
+      if (!selectedTier) {
+        toast.error('Selected plan not found');
+        return;
+      }
+
+      // Save plan details to user profile
+      const { error: updateError } = await supabase
+        .from('profiles')
+        .update({
+          current_plan: selectedPlan,
+          plan_amount: parseFloat(selectedTier.price.replace('₹', '').replace(',', '')),
+          plan_selected_at: new Date().toISOString(),
+          payment_method: 'cash',
+          plan_status: 'pending'
+        })
+        .eq('id', user.id);
+
+      if (updateError) {
+        throw updateError;
+      }
+      
       // Show cash payment instructions
-      toast.success(`${selectedPlan} plan selected! Please contact us for cash payment details.`);
+      toast.success(`${selectedPlan} plan selected! Plan details saved to your profile.`);
       
       // Redirect to success page with payment instructions
       setTimeout(() => {

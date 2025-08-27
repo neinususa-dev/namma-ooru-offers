@@ -13,6 +13,11 @@ export interface Profile {
   store_location?: string;
   district?: string;
   city?: string;
+  current_plan?: string;
+  plan_amount?: number;
+  plan_selected_at?: string;
+  payment_method?: string;
+  plan_status?: string;
   created_at: string;
   updated_at: string;
 }

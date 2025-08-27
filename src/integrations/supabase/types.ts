@@ -92,12 +92,17 @@ export type Database = {
         Row: {
           city: string | null
           created_at: string
+          current_plan: string | null
           district: string | null
           email: string
           id: string
           is_premium: boolean | null
           name: string
+          payment_method: string | null
           phone_number: string | null
+          plan_amount: number | null
+          plan_selected_at: string | null
+          plan_status: string | null
           role: Database["public"]["Enums"]["user_role"]
           store_location: string | null
           store_name: string | null
@@ -106,12 +111,17 @@ export type Database = {
         Insert: {
           city?: string | null
           created_at?: string
+          current_plan?: string | null
           district?: string | null
           email: string
           id: string
           is_premium?: boolean | null
           name: string
+          payment_method?: string | null
           phone_number?: string | null
+          plan_amount?: number | null
+          plan_selected_at?: string | null
+          plan_status?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           store_location?: string | null
           store_name?: string | null
@@ -120,12 +130,17 @@ export type Database = {
         Update: {
           city?: string | null
           created_at?: string
+          current_plan?: string | null
           district?: string | null
           email?: string
           id?: string
           is_premium?: boolean | null
           name?: string
+          payment_method?: string | null
           phone_number?: string | null
+          plan_amount?: number | null
+          plan_selected_at?: string | null
+          plan_status?: string | null
           role?: Database["public"]["Enums"]["user_role"]
           store_location?: string | null
           store_name?: string | null
