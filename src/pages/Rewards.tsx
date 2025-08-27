@@ -205,43 +205,58 @@ const Rewards = () => {
                     <Users className="h-6 w-6 mr-2" />
                     Share & Earn Points
                   </CardTitle>
-                  <p className="text-white/90 mb-2">
-                    Your unique referral code: 
-                    <span className="font-mono bg-white/20 px-2 py-1 rounded ml-2">
-                      {userReward.referral_code}
-                    </span>
-                    <Button
-                      onClick={handleCopyReferralCode}
-                      variant="ghost"
-                      size="sm"
-                      className="ml-2 text-white hover:bg-white/20"
-                    >
-                      <Copy className="h-4 w-4" />
-                    </Button>
+                  <div className="bg-white/10 rounded-xl p-4 mb-4">
+                    <p className="text-white/90 mb-2 text-lg font-semibold">
+                      Your Unique Referral Code:
+                    </p>
+                    <div className="flex items-center justify-between bg-white/20 rounded-lg p-3">
+                      <span className="font-mono text-2xl font-bold text-white">
+                        {userReward.referral_code}
+                      </span>
+                      <Button
+                        onClick={handleCopyReferralCode}
+                        variant="ghost"
+                        size="sm"
+                        className="text-white hover:bg-white/20 px-3 py-2"
+                      >
+                        <Copy className="h-4 w-4 mr-2" />
+                        Copy
+                      </Button>
+                    </div>
+                  </div>
+                  <p className="text-white/90 mb-6 text-lg">
+                    Share with friends and earn <span className="font-bold">25 points</span> for each successful referral!
                   </p>
-                  <p className="text-white/90 mb-4">
-                    Share with friends and earn 25 points for each successful referral!
-                  </p>
-                  <div className="flex flex-wrap gap-3">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Button 
                       onClick={() => {
-                        const text = `Join Namma Ooru Offers and get exclusive deals! Use my referral code: ${userReward.referral_code}`;
+                        const text = `🎉 Join Namma Ooru Offers and get exclusive deals across Tamil Nadu! Use my referral code: ${userReward.referral_code} to get started! 🏪✨`;
                         const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
                         window.open(url, '_blank');
                       }}
-                      className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2 flex items-center"
+                      className="bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
                     >
                       <Share2 className="h-4 w-4 mr-2" /> WhatsApp
                     </Button>
                     <Button 
                       onClick={() => {
-                        const text = `Join Namma Ooru Offers with code: ${userReward.referral_code}`;
+                        const text = `🎉 Join Namma Ooru Offers with my referral code: ${userReward.referral_code} and get exclusive local deals! 🏪`;
                         const url = `https://t.me/share/url?url=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(text)}`;
                         window.open(url, '_blank');
                       }}
-                      className="bg-white/30 border-white/40 text-white font-bold rounded-xl hover:bg-white/50 transition-colors px-4 py-2"
+                      className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
                     >
-                      Telegram
+                      <Share2 className="h-4 w-4 mr-2" /> Telegram
+                    </Button>
+                    <Button 
+                      onClick={() => {
+                        const text = `🎉 Just discovered amazing local deals on Namma Ooru Offers! Join with my code: ${userReward.referral_code} 🏪 #NammaOoruOffers #LocalDeals #TamilNadu`;
+                        const url = `https://www.instagram.com/create/story/?media=${encodeURIComponent(window.location.origin)}&text=${encodeURIComponent(text)}`;
+                        window.open(url, '_blank');
+                      }}
+                      className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
+                    >
+                      <Share2 className="h-4 w-4 mr-2" /> Instagram
                     </Button>
                   </div>
                 </Card>
