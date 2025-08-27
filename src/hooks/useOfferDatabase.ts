@@ -44,8 +44,8 @@ export function useOfferDatabase() {
       }
 
       const offersWithMerchantNames = (data || []).map(offer => {
-        const merchantName = offer.profiles?.store_name || offer.profiles?.name || 'Local Merchant';
-        console.log('Processing offer:', offer.title, 'profiles:', offer.profiles, 'merchant_name:', merchantName);
+        const merchantName = offer.profiles?.store_name || offer.profiles?.name || offer.store_name || 'Local Merchant';
+        console.log('Processing offer:', offer.title, 'profiles:', offer.profiles, 'store_name from offers:', offer.store_name, 'final merchant_name:', merchantName);
         return {
           ...offer,
           merchant_name: merchantName
