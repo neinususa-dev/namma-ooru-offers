@@ -358,22 +358,50 @@ const MerchantDashboard = () => {
     try {
       console.log('Starting approval process for:', redemptionId);
       
-      const { error } = await supabase
+      // First check if the redemption exists and get current status
+      const { data: currentRedemption, error: fetchError } = await supabase
         .from('redemptions')
-        .update({ status: 'approved' })
-        .eq('id', redemptionId);
-
-      if (error) {
-        console.error('Database update failed:', error);
-        throw error;
+        .select('*')
+        .eq('id', redemptionId)
+        .maybeSingle();
+      
+      if (fetchError) {
+        console.error('Error fetching redemption:', fetchError);
+        throw fetchError;
       }
       
-      console.log('Database update successful, refreshing data...');
+      if (!currentRedemption) {
+        console.error('Redemption not found:', redemptionId);
+        return;
+      }
       
-      // Immediately refresh all data
-      await fetchMerchantAnalytics();
+      console.log('Current redemption status:', currentRedemption.status);
       
-      console.log('Redemption approved and data refreshed');
+      // Update the status to approved
+      const { data: updatedData, error: updateError } = await supabase
+        .from('redemptions')
+        .update({ status: 'approved' })
+        .eq('id', redemptionId)
+        .select('*')
+        .maybeSingle();
+
+      if (updateError) {
+        console.error('Database update failed:', updateError);
+        throw updateError;
+      }
+      
+      console.log('Updated redemption data:', updatedData);
+      
+      if (updatedData && updatedData.status === 'approved') {
+        console.log('Status successfully updated to approved');
+        
+        // Refresh the data
+        await fetchMerchantAnalytics();
+        console.log('Data refreshed successfully');
+      } else {
+        console.error('Status update may have failed, updated data:', updatedData);
+      }
+      
     } catch (error) {
       console.error('Error approving redemption:', error);
     }
