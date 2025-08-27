@@ -57,20 +57,26 @@ const MerchantDashboard = () => {
     status: 'all'
   });
 
-  // Redirect if not authenticated or not a merchant
+  // Redirect if not authenticated or not a merchant - with stability check
   useEffect(() => {
-    if (!authLoading && !user) {
+    if (authLoading) return; // Don't redirect while auth is loading
+    
+    if (!user) {
       navigate('/auth');
-    } else if (!authLoading && user && profile?.role !== 'merchant') {
-      navigate('/');
+      return;
     }
-  }, [user, profile, authLoading, navigate]);
+    
+    if (profile && profile.role !== 'merchant') {
+      navigate('/');
+      return;
+    }
+  }, [user, profile?.role, authLoading, navigate]);
 
   useEffect(() => {
-    if (user && profile?.role === 'merchant') {
+    if (user && profile?.role === 'merchant' && !authLoading) {
       fetchMerchantAnalytics();
     }
-  }, [user, profile, filters]);
+  }, [user, profile?.role, authLoading, filters]);
 
   const fetchMerchantAnalytics = async () => {
     if (!user) return;
@@ -103,20 +109,33 @@ const MerchantDashboard = () => {
       const { data: offers, error: offersError } = await offersQuery;
       if (offersError) throw offersError;
 
-      const offerIds = offers.map(o => o.id);
+      const offerIds = offers?.map(o => o.id) || [];
 
-      // Fetch saves for these offers
-      const { data: saves, error: savesError } = await supabase
-        .from('saved_offers')
-        .select('*')
-        .in('offer_id', offerIds);
+      if (!offerIds.length) {
+        // If no offers found, set empty stats and return
+        setStats({
+          totalOffers: 0,
+          totalSaves: 0,
+          totalRedemptions: 0,
+          totalRevenue: 0,
+          categoriesData: [],
+          monthlyActivity: [],
+          offerPerformance: [],
+          redemptionModes: []
+        });
+        return;
+      }
+
+      // Fetch saves for these offers with date filter if applicable
+      let savesQuery = supabase.from('saved_offers').select('*').in('offer_id', offerIds);
+      if (dateFilter) savesQuery = savesQuery.gte('saved_at', dateFilter);
+      const { data: saves, error: savesError } = await savesQuery;
       if (savesError) throw savesError;
 
-      // Fetch redemptions for these offers
-      const { data: redemptions, error: redemptionsError } = await supabase
-        .from('redemptions')
-        .select('*')
-        .in('offer_id', offerIds);
+      // Fetch redemptions for these offers with date filter if applicable
+      let redemptionsQuery = supabase.from('redemptions').select('*').in('offer_id', offerIds);
+      if (dateFilter) redemptionsQuery = redemptionsQuery.gte('redeemed_at', dateFilter);
+      const { data: redemptions, error: redemptionsError } = await redemptionsQuery;
       if (redemptionsError) throw redemptionsError;
 
       // Colors for categories
@@ -241,7 +260,8 @@ const MerchantDashboard = () => {
     }
   };
 
-  if (authLoading || loading) {
+  // Show loading while auth is loading or data is loading
+  if (authLoading || loading || !user || !profile) {
     return (
       <div className="min-h-screen bg-background">
         <Header showNavigation={false} />
@@ -250,6 +270,11 @@ const MerchantDashboard = () => {
         </div>
       </div>
     );
+  }
+
+  // Don't render if user is not a merchant
+  if (profile.role !== 'merchant') {
+    return null;
   }
 
   return (
