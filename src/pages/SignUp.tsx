@@ -45,13 +45,15 @@ export default function SignUp() {
     e.preventDefault();
     setIsLoading(true);
 
-    const additionalData = signUpForm.role === 'merchant' ? {
+    const additionalData = {
       phone_number: signUpForm.phoneNumber,
-      store_name: signUpForm.storeName,
-      store_location: signUpForm.storeLocation,
-      district: signUpForm.district,
-      city: signUpForm.city
-    } : undefined;
+      ...(signUpForm.role === 'merchant' ? {
+        store_name: signUpForm.storeName,
+        store_location: signUpForm.storeLocation,
+        district: signUpForm.district,
+        city: signUpForm.city
+      } : {})
+    };
 
     const { error } = await signUp(
       signUpForm.email,
@@ -140,24 +142,24 @@ export default function SignUp() {
                 </div>
               </div>
 
+              <div className="space-y-2">
+                <Label htmlFor="phone-number">Phone Number</Label>
+                <div className="relative">
+                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <Input
+                    id="phone-number"
+                    type="tel"
+                    placeholder="Enter your phone number"
+                    className="pl-10"
+                    value={signUpForm.phoneNumber}
+                    onChange={(e) => setSignUpForm({ ...signUpForm, phoneNumber: e.target.value })}
+                    required
+                  />
+                </div>
+              </div>
+
               {signUpForm.role === 'merchant' && (
                 <>
-                  <div className="space-y-2">
-                    <Label htmlFor="phone-number">Phone Number</Label>
-                    <div className="relative">
-                      <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                      <Input
-                        id="phone-number"
-                        type="tel"
-                        placeholder="Enter your phone number"
-                        className="pl-10"
-                        value={signUpForm.phoneNumber}
-                        onChange={(e) => setSignUpForm({ ...signUpForm, phoneNumber: e.target.value })}
-                        required
-                      />
-                    </div>
-                  </div>
-
                   <div className="space-y-2">
                     <Label htmlFor="store-name">Store Name</Label>
                     <div className="relative">
