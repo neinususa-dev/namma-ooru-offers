@@ -28,7 +28,7 @@ const Rewards = () => {
 
   return (
     <div className="min-h-screen bg-white">
-      <Header showNavigation={true} />
+      <Header showNavigation={true} onSectionChange={() => {}} />
 
       <div className="container mx-auto px-4 py-8 space-y-12">
 
@@ -207,18 +207,25 @@ const Rewards = () => {
       {/* Footer */}
       <footer className="bg-card border-t border-primary/10 py-8">
         <div className="container mx-auto px-4">
-          <div className="text-center space-y-4">
-            <h3 className="text-lg font-semibold">Namma OOru Offers</h3>
-            <p className="text-muted-foreground">Your Local Savings Hub - Connecting Tamil Nadu students with the best deals</p>
-            <div className="flex justify-center gap-6 text-sm text-muted-foreground">
-              <a href="#" className="hover:text-primary transition-colors">About</a>
-              <a href="#" className="hover:text-primary transition-colors">Contact</a>
-              <a href="#" className="hover:text-primary transition-colors">Privacy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms</a>
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <div className="flex items-center gap-2 mb-4 md:mb-0">
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma OOru Offers Logo" 
+                className="w-8 h-8 rounded"
+              />
+              <div>
+                <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
+                  Namma OOru Offers
+                </div>
+                <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
+              </div>
             </div>
-            <p className="text-xs text-muted-foreground">
-              © 2024 Namma OOru Offers. All rights reserved.
-            </p>
+            
+            <div className="text-sm text-muted-foreground text-center md:text-right">
+              <p>© 2024 Namma OOru Offers. Supporting local businesses across Tamil Nadu.</p>
+              <p className="mt-1">Made with ❤️ for Tamil Nadu</p>
+            </div>
           </div>
         </div>
       </footer>
