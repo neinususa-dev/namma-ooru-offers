@@ -463,6 +463,8 @@ const Index = () => {
       discountedPrice: dbOffer.discounted_price,
       expiryDate: new Date(dbOffer.expiry_date).toLocaleDateString(),
       location: dbOffer.city || dbOffer.location, // Show city instead of specific location
+      district: dbOffer.district || '',
+      city: dbOffer.city || '',
       category: dbOffer.category,
       isHot: dbOffer.listing_type === 'hot_offers',
       isTrending: dbOffer.listing_type === 'trending',
@@ -536,8 +538,8 @@ const Index = () => {
   };
 
   const filteredOffers = getOffersToShow();
-  const hotOffers = mockOffers.filter(offer => offer.isHot);
-  const trendingOffers = mockOffers.filter(offer => offer.isTrending);
+  const hotOffers = getOffersByType('hot_offers').map(convertToOfferCardProps);
+  const trendingOffers = getOffersByType('trending').map(convertToOfferCardProps);
 
   const handleClearFilters = () => {
     setSelectedCategory('all');
