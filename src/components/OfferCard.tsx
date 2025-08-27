@@ -24,6 +24,7 @@ interface OfferCardProps {
   onRemove?: () => void;
   couponCode?: string;
   redeemedDate?: string;
+  disableMerchantActions?: boolean;
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({
@@ -43,7 +44,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   displayMode = 'default',
   onRemove,
   couponCode,
-  redeemedDate
+  redeemedDate,
+  disableMerchantActions = false
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
@@ -55,6 +57,9 @@ export const OfferCard: React.FC<OfferCardProps> = ({
     : description?.substring(0, 100) + '...';
 
   const handleGetCoupon = async () => {
+    // Don't allow merchants to save offers
+    if (disableMerchantActions) return;
+    
     // Always save the offer first, regardless of login status
     const offerData = {
       id,
@@ -209,8 +214,9 @@ export const OfferCard: React.FC<OfferCardProps> = ({
             className="w-full" 
             variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
             onClick={handleGetCoupon}
+            disabled={disableMerchantActions}
           >
-            Get Coupon
+            {disableMerchantActions ? "View Only" : "Get Coupon"}
           </Button>
         )}
         

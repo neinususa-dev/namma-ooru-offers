@@ -774,7 +774,7 @@ const Index = () => {
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                   {filteredOffers.slice(0, 12).map(offer => (
-                    <OfferCard key={offer.id} {...offer} />
+                    <OfferCard key={offer.id} {...offer} disableMerchantActions={isMerchant} />
                   ))}
                 </div>
 
@@ -936,7 +936,7 @@ const Index = () => {
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredOffers.map(offer => (
-                  <OfferCard key={offer.id} {...offer} />
+                  <OfferCard key={offer.id} {...offer} disableMerchantActions={isMerchant} />
                 ))}
               </div>
 
