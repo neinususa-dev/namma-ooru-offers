@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -32,7 +33,27 @@ export default function Auth() {
   // Redirect if already authenticated
   useEffect(() => {
     if (!loading && user) {
-      navigate('/');
+      // Check user's profile to determine redirect
+      const fetchProfileAndRedirect = async () => {
+        try {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('role')
+            .eq('id', user.id)
+            .single();
+          
+          if (profile?.role === 'merchant') {
+            navigate('/merchant-dashboard');
+          } else {
+            navigate('/');
+          }
+        } catch (error) {
+          console.error('Error fetching profile:', error);
+          navigate('/');
+        }
+      };
+      
+      fetchProfileAndRedirect();
     }
   }, [user, loading, navigate]);
 
