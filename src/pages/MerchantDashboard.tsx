@@ -145,11 +145,14 @@ const MerchantDashboard = () => {
         color: categoryColors[name] || categoryColors.other
       }));
 
-      // Redemption modes
+      // Redemption modes - get from offers that have redemptions
       const redemptionModeCount: Record<string, number> = {};
       redemptions.forEach(r => {
-        const mode = r.redemption_mode || 'both';
-        redemptionModeCount[mode] = (redemptionModeCount[mode] || 0) + 1;
+        const offer = offers.find(o => o.id === r.offer_id);
+        if (offer) {
+          const mode = offer.redemption_mode || 'both';
+          redemptionModeCount[mode] = (redemptionModeCount[mode] || 0) + 1;
+        }
       });
       const redemptionModes = Object.entries(redemptionModeCount).map(([mode, value]) => ({
         name: mode === 'both' ? 'Online & Store' : mode === 'online' ? 'Online Only' : 'Store Only',
@@ -180,7 +183,10 @@ const MerchantDashboard = () => {
         const month = new Date(r.redeemed_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
         if (monthlyData[month]) {
           monthlyData[month].redemptions++;
-          monthlyData[month].revenue += r.discounted_price || 0;
+          const offer = offers.find(o => o.id === r.offer_id);
+          if (offer) {
+            monthlyData[month].revenue += offer.discounted_price || 0;
+          }
         }
       });
 
@@ -197,7 +203,10 @@ const MerchantDashboard = () => {
       redemptions.forEach(r => {
         if (offerPerformanceMap[r.offer_id]) {
           offerPerformanceMap[r.offer_id].redemptions++;
-          offerPerformanceMap[r.offer_id].revenue += r.discounted_price || 0;
+          const offer = offers.find(o => o.id === r.offer_id);
+          if (offer) {
+            offerPerformanceMap[r.offer_id].revenue += offer.discounted_price || 0;
+          }
         }
       });
 
@@ -209,7 +218,10 @@ const MerchantDashboard = () => {
       const totalOffers = offers.length;
       const totalSaves = saves.length;
       const totalRedemptions = redemptions.length;
-      const totalRevenue = redemptions.reduce((sum, r) => sum + (r.discounted_price || 0), 0);
+      const totalRevenue = redemptions.reduce((sum, r) => {
+        const offer = offers.find(o => o.id === r.offer_id);
+        return sum + (offer?.discounted_price || 0);
+      }, 0);
 
       setStats({
         totalOffers,
