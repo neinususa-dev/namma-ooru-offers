@@ -70,8 +70,8 @@ export function AuthButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
-          <Link to={profile.role === 'merchant' ? "/merchant/post-offer" : "/your-offers"} className="flex items-center">
-            <Gift className="mr-2 h-4 w-4" />
+          <Link to={profile.role === 'merchant' ? "/merchant-post-offer" : "/your-offers"} className="flex items-center">
+            <Gift className="h-4 w-4" />
             <span>{profile.role === 'merchant' ? 'Post Offer' : 'Your Offers'}</span>
           </Link>
         </DropdownMenuItem>
