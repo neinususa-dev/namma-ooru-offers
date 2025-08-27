@@ -166,23 +166,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         <div className="flex items-center justify-between text-xs text-muted-foreground mb-3">
           <div className="flex items-center gap-1">
             <MapPin className="h-3 w-3" />
-            {/* Extract city name from location string */}
-            {(() => {
-              if (!location) return 'Location not specified';
-              
-              // Handle different formats: "City - PostalCode - City" or "City, State" or just "City"
-              if (location.includes(' - ')) {
-                // For format like "Sathyamangalam - 638503 - Sathyamangalam"
-                const parts = location.split(' - ');
-                return parts[0]; // Return first part (city name)
-              } else if (location.includes(',')) {
-                // For format like "City, State"
-                return location.split(',').pop()?.trim();
-              } else {
-                // Just return the location as is
-                return location;
-              }
-            })()}
+            {location || 'Location not specified'}
           </div>
           <div className="flex items-center gap-1">
             <Calendar className="h-3 w-3" />

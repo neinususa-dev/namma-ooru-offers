@@ -545,7 +545,7 @@ const MerchantPostOffer: React.FC = () => {
                       description={watchedValues.description}
                       discount={watchedValues.discount_percentage ? `${watchedValues.discount_percentage}% OFF` : '0% OFF'}
                       expiryDate={selectedDate ? format(selectedDate, 'M/d/yyyy') : 'Select date'}
-                      location={watchedValues.city ? `${watchedValues.location || 'Your Location'} - ${watchedValues.city}` : watchedValues.location || 'Your Location'}
+                      location={watchedValues.city || 'Your City'}
                       category={watchedValues.category || 'Category'}
                       isHot={watchedValues.listing_type === 'hot_offers'}
                       isTrending={watchedValues.listing_type === 'trending'}
