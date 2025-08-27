@@ -357,8 +357,13 @@ const MerchantDashboard = () => {
 
       if (error) throw error;
       
-      // Refresh data
-      fetchMerchantAnalytics();
+      // Add a small delay to ensure database consistency
+      setTimeout(async () => {
+        await fetchMerchantAnalytics();
+      }, 500);
+      
+      // Show success message
+      console.log('Redemption approved successfully');
     } catch (error) {
       console.error('Error approving redemption:', error);
     }
@@ -373,8 +378,13 @@ const MerchantDashboard = () => {
 
       if (error) throw error;
       
-      // Refresh data
-      fetchMerchantAnalytics();
+      // Add a small delay to ensure database consistency
+      setTimeout(async () => {
+        await fetchMerchantAnalytics();
+      }, 500);
+      
+      // Show success message
+      console.log('Redemption rejected successfully');
     } catch (error) {
       console.error('Error rejecting redemption:', error);
     }
