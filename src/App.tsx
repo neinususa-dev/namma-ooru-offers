@@ -11,6 +11,7 @@ import CustomerAnalytics from "./pages/CustomerAnalytics";
 import MerchantDashboard from "./pages/MerchantDashboard";
 import MerchantPostOffer from "./pages/MerchantPostOffer";
 import MerchantEditOffers from "./pages/MerchantEditOffers";
+import Rewards from "./pages/Rewards";
 import { Billing } from "./pages/Billing";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { PaymentCanceled } from "./pages/PaymentCanceled";
@@ -33,6 +34,7 @@ const App = () => (
           <Route path="/merchant-dashboard" element={<MerchantDashboard />} />
           <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
           <Route path="/merchant-edit-offers" element={<MerchantEditOffers />} />
+          <Route path="/rewards" element={<Rewards />} />
           <Route path="/billing" element={<Billing />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
