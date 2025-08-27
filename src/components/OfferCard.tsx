@@ -12,6 +12,8 @@ interface OfferCardProps {
   offerTitle: string;
   description: string;
   discount: string;
+  originalPrice?: number;
+  discountedPrice?: number;
   expiryDate: string;
   location: string;
   category: string;
@@ -30,6 +32,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   offerTitle,
   description,
   discount,
+  originalPrice,
+  discountedPrice,
   expiryDate,
   location,
   category,
@@ -58,6 +62,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       offerTitle,
       description,
       discount,
+      originalPrice,
+      discountedPrice,
       expiryDate,
       location,
       category,
@@ -132,8 +138,20 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           <Badge variant="outline" className="text-xs font-medium bg-primary/5 text-primary border-primary/20">
             {category}
           </Badge>
-          <div className="text-2xl font-bold text-primary bg-primary-gradient bg-clip-text text-transparent">
-            {discount}
+          <div className="text-right">
+            <div className="text-2xl font-bold text-primary bg-primary-gradient bg-clip-text text-transparent">
+              {discount}
+            </div>
+            {originalPrice && discountedPrice && (
+              <div className="flex flex-col items-end gap-1 mt-1">
+                <span className="text-sm text-muted-foreground line-through">
+                  ₹{originalPrice.toLocaleString()}
+                </span>
+                <span className="text-lg font-semibold text-foreground">
+                  ₹{discountedPrice.toLocaleString()}
+                </span>
+              </div>
+            )}
           </div>
         </div>
         

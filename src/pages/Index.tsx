@@ -457,6 +457,8 @@ const Index = () => {
       offerTitle: dbOffer.title,
       description: dbOffer.description,
       discount: `${dbOffer.discount_percentage}% OFF`,
+      originalPrice: dbOffer.original_price,
+      discountedPrice: dbOffer.discounted_price,
       expiryDate: new Date(dbOffer.expiry_date).toLocaleDateString(),
       location: dbOffer.city || dbOffer.location, // Show city instead of specific location
       category: dbOffer.category,
