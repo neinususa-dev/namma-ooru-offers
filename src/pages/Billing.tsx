@@ -44,9 +44,9 @@ const pricingTiers = [
     name: 'Platinum',
     price: '₹1500',
     period: '/mo',
-    maxOffers: 30,
+    maxOffers: 40,
     features: [
-      'Up to 30 offers per month',
+      'Up to 40 offers per month',
       'Premium placement',
       'Advanced analytics',
       'Priority support',
