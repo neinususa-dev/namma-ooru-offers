@@ -96,20 +96,21 @@ const MerchantDashboard = () => {
         dateFilter = new Date(now.getTime() - 90 * 24 * 60 * 60 * 1000).toISOString();
       }
 
-      // Fetch offers for this merchant
-      let offersQuery = supabase.from('offers').select('*').eq('merchant_id', user.id);
-      if (dateFilter) offersQuery = offersQuery.gte('created_at', dateFilter);
-      if (filters.category !== 'all') offersQuery = offersQuery.eq('category', filters.category);
+      // First, get ALL offers for this merchant (without date filter)
+      let baseOffersQuery = supabase.from('offers').select('*').eq('merchant_id', user.id);
+      
+      // Apply category and status filters to offers
+      if (filters.category !== 'all') baseOffersQuery = baseOffersQuery.eq('category', filters.category);
       if (filters.status !== 'all') {
-        if (filters.status === 'active') offersQuery = offersQuery.eq('is_active', true).gte('expiry_date', now.toISOString());
-        else if (filters.status === 'expired') offersQuery = offersQuery.lt('expiry_date', now.toISOString());
-        else if (filters.status === 'inactive') offersQuery = offersQuery.eq('is_active', false);
+        if (filters.status === 'active') baseOffersQuery = baseOffersQuery.eq('is_active', true).gte('expiry_date', now.toISOString());
+        else if (filters.status === 'expired') baseOffersQuery = baseOffersQuery.lt('expiry_date', now.toISOString());
+        else if (filters.status === 'inactive') baseOffersQuery = baseOffersQuery.eq('is_active', false);
       }
 
-      const { data: offers, error: offersError } = await offersQuery;
+      const { data: allOffers, error: offersError } = await baseOffersQuery;
       if (offersError) throw offersError;
 
-      const offerIds = offers?.map(o => o.id) || [];
+      const offerIds = allOffers?.map(o => o.id) || [];
 
       if (!offerIds.length) {
         // If no offers found, set empty stats and return
@@ -126,17 +127,33 @@ const MerchantDashboard = () => {
         return;
       }
 
-      // Fetch saves for these offers with date filter if applicable
-      let savesQuery = supabase.from('saved_offers').select('*').in('offer_id', offerIds);
-      if (dateFilter) savesQuery = savesQuery.gte('saved_at', dateFilter);
-      const { data: saves, error: savesError } = await savesQuery;
+      // Fetch ALL saves and redemptions for these offers (without date filter first)
+      const { data: allSaves, error: savesError } = await supabase
+        .from('saved_offers')
+        .select('*')
+        .in('offer_id', offerIds);
       if (savesError) throw savesError;
 
-      // Fetch redemptions for these offers with date filter if applicable
-      let redemptionsQuery = supabase.from('redemptions').select('*').in('offer_id', offerIds);
-      if (dateFilter) redemptionsQuery = redemptionsQuery.gte('redeemed_at', dateFilter);
-      const { data: redemptions, error: redemptionsError } = await redemptionsQuery;
+      const { data: allRedemptions, error: redemptionsError } = await supabase
+        .from('redemptions')
+        .select('*')
+        .in('offer_id', offerIds);
       if (redemptionsError) throw redemptionsError;
+
+      // Filter offers by date if applicable (for offer counts)
+      const offers = dateFilter 
+        ? allOffers.filter(o => new Date(o.created_at) >= new Date(dateFilter))
+        : allOffers;
+
+      // Filter saves by date if applicable
+      const saves = dateFilter 
+        ? allSaves.filter(s => new Date(s.saved_at) >= new Date(dateFilter))
+        : allSaves;
+
+      // Filter redemptions by date if applicable
+      const redemptions = dateFilter 
+        ? allRedemptions.filter(r => new Date(r.redeemed_at) >= new Date(dateFilter))
+        : allRedemptions;
 
       // Colors for categories
       const categoryColors: Record<string, string> = {
