@@ -2,8 +2,9 @@ import React from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Mail, Globe, ExternalLink } from 'lucide-react';
+import { MapPin, Phone, Mail, Globe, ExternalLink, ShoppingBag } from 'lucide-react';
 import { useStores } from '@/hooks/useStores';
+import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 
 interface StoresListProps {
@@ -18,8 +19,16 @@ export const StoresList: React.FC<StoresListProps> = ({
   onStoreClick
 }) => {
   const { stores, loading, error } = useStores();
+  const { offers, loading: offersLoading } = useOfferDatabase();
 
-  if (loading) {
+  // Function to count offers per store
+  const getOfferCount = (storeName: string) => {
+    return offers.filter(offer => 
+      offer.merchant_name === storeName
+    ).length;
+  };
+
+  if (loading || offersLoading) {
     return (
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {Array.from({ length: maxItems || 6 }).map((_, i) => (
@@ -78,7 +87,13 @@ export const StoresList: React.FC<StoresListProps> = ({
                     </CardDescription>
                   )}
                 </div>
-                <Badge variant="default">Active</Badge>
+                <div className="flex flex-col items-end gap-2">
+                  <Badge variant="default">Active</Badge>
+                  <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <ShoppingBag className="h-4 w-4" />
+                    <span>{getOfferCount(store.name)} offers</span>
+                  </div>
+                </div>
               </div>
             </CardHeader>
             <CardContent className="space-y-3">
