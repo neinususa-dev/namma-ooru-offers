@@ -7,7 +7,7 @@ import { CitySelect } from '@/components/CitySelect';
 import { OfferCard } from '@/components/OfferCard';
 import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
-import { StoreList } from '@/components/StoreList';
+import { StoresList } from '@/components/StoresList';
 import { Header } from '@/components/Header';
 import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
@@ -872,7 +872,7 @@ const Index = () => {
                   <h3 className="text-3xl font-bold text-foreground mb-2">Store Directory</h3>
                   <p className="text-muted-foreground">Browse all stores offering amazing deals and coupons</p>
                 </div>
-                <StoreList offers={mockOffers.slice(0, 9)} showTitle={false} />
+                <StoresList maxItems={9} showViewAll={false} />
                 <div className="text-center mt-8">
                   <Button 
                     variant="outline" 
@@ -1017,7 +1017,7 @@ const Index = () => {
         );
 
       case 'store-list':
-        return <StoreList offers={mockOffers} />;
+        return <StoresList />;
 
       default:
         return null;
