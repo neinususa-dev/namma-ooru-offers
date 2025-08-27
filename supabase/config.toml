@@ -1,1 +1,4 @@
 project_id = "suyaaextkifjxjuvqbqz"
+
+[functions.send-redemption-email]
+verify_jwt = false
