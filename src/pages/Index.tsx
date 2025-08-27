@@ -9,6 +9,7 @@ import { OfferFilters } from '@/components/OfferFilters';
 import { PaginatedOffersSection } from '@/components/PaginatedOffersSection';
 import { StoreList } from '@/components/StoreList';
 import { Header } from '@/components/Header';
+import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Link, useNavigate } from 'react-router-dom';
@@ -961,6 +962,11 @@ const Index = () => {
         return null;
     }
   };
+
+  // If user is authenticated and is a merchant, show merchant home page
+  if (user && isMerchant) {
+    return <MerchantHomePage />;
+  }
 
   return (
     <div className="min-h-screen bg-sunset-gradient">
