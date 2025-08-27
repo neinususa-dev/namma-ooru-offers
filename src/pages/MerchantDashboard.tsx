@@ -121,46 +121,58 @@ const MerchantDashboard = () => {
       const { data: offers, error: offersError } = await offersQuery;
       if (offersError) throw offersError;
 
+      // Get offer IDs for this merchant
+      const offerIds = offers?.map(offer => offer.id) || [];
+      
       // Fetch saves for merchant offers
-      const { data: saves, error: savesError } = await supabase
-        .from('saved_offers')
-        .select(`
-          id,
-          saved_at,
-          offers (
+      let saves: any[] = [];
+      let redemptions: any[] = [];
+      
+      if (offerIds.length > 0) {
+        const { data: savesData, error: savesError } = await supabase
+          .from('saved_offers')
+          .select(`
             id,
-            title,
-            category,
-            discount_percentage,
-            original_price,
-            discounted_price,
-            merchant_id
-          )
-        `)
-        .eq('offers.merchant_id', user.id);
+            saved_at,
+            offer_id,
+            offers (
+              id,
+              title,
+              category,
+              discount_percentage,
+              original_price,
+              discounted_price,
+              merchant_id
+            )
+          `)
+          .in('offer_id', offerIds);
 
-      if (savesError) throw savesError;
+        if (savesError) throw savesError;
+        saves = savesData || [];
 
-      // Fetch redemptions for merchant offers
-      const { data: redemptions, error: redemptionsError } = await supabase
-        .from('redemptions')
-        .select(`
-          id,
-          redeemed_at,
-          offers (
+        // Fetch redemptions for merchant offers
+        const { data: redemptionsData, error: redemptionsError } = await supabase
+          .from('redemptions')
+          .select(`
             id,
-            title,
-            category,
-            discount_percentage,
-            original_price,
-            discounted_price,
-            redemption_mode,
-            merchant_id
-          )
-        `)
-        .eq('offers.merchant_id', user.id);
+            redeemed_at,
+            offer_id,
+            offers (
+              id,
+              title,
+              category,
+              discount_percentage,
+              original_price,
+              discounted_price,
+              redemption_mode,
+              merchant_id
+            )
+          `)
+          .in('offer_id', offerIds);
 
-      if (redemptionsError) throw redemptionsError;
+        if (redemptionsError) throw redemptionsError;
+        redemptions = redemptionsData || [];
+      }
 
       // Process analytics data
       const categoryColors = {
