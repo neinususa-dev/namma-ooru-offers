@@ -35,7 +35,7 @@ export function useOfferDatabase() {
         .from('offers')
         .select(`
           *,
-          profiles(name, store_name)
+          profiles!merchant_id(name, store_name)
         `)
         .eq('is_active', true)
         .gte('expiry_date', new Date().toISOString())
