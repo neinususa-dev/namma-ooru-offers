@@ -5,6 +5,7 @@ import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useOffers } from '@/hooks/useOffers';
+import defaultOfferImage from '@/assets/default-offer-image.jpg';
 
 interface OfferCardProps {
   id: string;
@@ -128,10 +129,10 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       )}
 
       {/* Offer Image */}
-      {image && displayMode === 'default' && (
+      {displayMode === 'default' && (
         <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
           <img 
-            src={image} 
+            src={image || defaultOfferImage} 
             alt={offerTitle}
             className="w-full h-full object-cover"
           />

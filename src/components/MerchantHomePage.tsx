@@ -112,17 +112,17 @@ export const MerchantHomePage: React.FC = () => {
         {/* Quick Actions */}
         <div className="mb-12">
           <div className="flex flex-col md:flex-row gap-4 justify-center">
-            <Link to="/merchant/post-offer">
+            <Link to="/merchant-post-offer">
               <Button size="lg" variant="hero" className="w-full md:w-auto">
                 Post New Offer
               </Button>
             </Link>
-            <Link to="/merchant/dashboard">
+            <Link to="/merchant-dashboard">
               <Button size="lg" variant="secondary" className="w-full md:w-auto">
                 View Dashboard
               </Button>
             </Link>
-            <Link to="/your-offers">
+            <Link to="/merchant-edit-offers">
               <Button size="lg" variant="outline" className="w-full md:w-auto">
                 Manage Offers
               </Button>
@@ -134,7 +134,7 @@ export const MerchantHomePage: React.FC = () => {
         <section className="mb-12">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-3xl font-bold text-foreground">Your Recent Offers</h2>
-            <Link to="/your-offers">
+            <Link to="/merchant-edit-offers">
               <Button variant="ghost">View All</Button>
             </Link>
           </div>
@@ -164,7 +164,7 @@ export const MerchantHomePage: React.FC = () => {
           ) : (
             <div className="text-center py-12 bg-muted/30 rounded-lg">
               <p className="text-muted-foreground mb-4">You haven't posted any offers yet.</p>
-              <Link to="/merchant/post-offer">
+              <Link to="/merchant-post-offer">
                 <Button variant="hero">Post Your First Offer</Button>
               </Link>
             </div>
