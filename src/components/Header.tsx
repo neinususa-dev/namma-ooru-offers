@@ -60,7 +60,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
                     >
                       <Plus className="h-4 w-4" />
-                      Post Offer test
+                      Post Offer
                     </Link>
                   </>
                 ) : (
@@ -105,14 +105,15 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
             {/* Authenticated user navigation for other pages */}
             {!showNavigation && user && (
               <nav className="hidden md:flex items-center gap-6">
-                <Link 
+               
+                {isCustomer && (
+                  <>
+                     <Link 
                   to="/"
                   className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                 >
                   Home
                 </Link>
-                {isCustomer && (
-                  <>
                     <Link 
                       to="/your-offers"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
