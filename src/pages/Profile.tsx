@@ -3,9 +3,9 @@ import { useAuth } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
+import { Header } from '@/components/Header';
 import { DistrictSelect } from '@/components/DistrictSelect';
 import { CitySelect } from '@/components/CitySelect';
 import { useForm } from 'react-hook-form';
@@ -97,12 +97,15 @@ export default function Profile() {
 
   if (!user || !profile) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center">
-        <Card className="w-96">
-          <CardContent className="pt-6">
-            <p className="text-center text-muted-foreground">Please sign in to view your profile.</p>
-          </CardContent>
-        </Card>
+      <div className="min-h-screen bg-background">
+        <Header showNavigation={false} />
+        <div className="container mx-auto px-4 py-8">
+          <Card className="w-96 mx-auto">
+            <CardContent className="pt-6">
+              <p className="text-center text-muted-foreground">Please sign in to view your profile.</p>
+            </CardContent>
+          </Card>
+        </div>
       </div>
     );
   }
@@ -111,12 +114,14 @@ export default function Profile() {
 
   return (
     <div className="min-h-screen bg-background">
+      <Header showNavigation={false} />
+      
       <div className="container mx-auto px-4 py-8 max-w-2xl">
         {/* Header */}
         <div className="flex items-center gap-4 mb-8">
           <Button variant="ghost" size="sm" asChild>
             <Link to="/">
-              <ArrowLeft className="h-4 w-4" />
+              <ArrowLeft className="h-4 w-4 mr-2" />
               Back to Home
             </Link>
           </Button>
