@@ -261,30 +261,31 @@ const Index = () => {
                        </div>
                      </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                      <Button 
-                        variant="default" 
-                        size="xl" 
-                        className="flex-1"
-                        onClick={() => {
-                          const localDealsSection = document.getElementById('local-deals-section');
-                          if (localDealsSection) {
-                            localDealsSection.scrollIntoView({ behavior: 'smooth' });
-                          }
-                        }}
-                      >
-                        <Search className="h-5 w-5 mr-2" />
-                        Explore Offers
-                      </Button>
-                      <Button 
-                        variant="secondary" 
-                        size="xl" 
-                        className="flex-1"
-                        onClick={() => navigate('/signup')}
-                      >
-                        <Users className="h-5 w-5 mr-2" />
-                        Become a Merchant
-                      </Button>
+                    <div className="flex flex-col sm:flex-row gap-4 justify-center items-center mb-6">
+                      <Link to="/signup">
+                        <Button size="lg" className="flex items-center gap-2">
+                          <Users className="h-5 w-5" />
+                          Join as Customer
+                        </Button>
+                      </Link>
+                      <Link to="/signup">
+                        <Button variant="secondary" size="lg" className="flex items-center gap-2">
+                          <TrendingUp className="h-5 w-5" />
+                          Become a Merchant
+                        </Button>
+                      </Link>
+                    </div>
+                    
+                    <div className="text-center space-y-4">
+                      <div className="flex items-center justify-center gap-2 text-lg font-semibold text-primary">
+                        <MapPin className="h-5 w-5" />
+                        <span>Proudly local. Proudly smart.</span>
+                      </div>
+                      <p className="text-xl font-bold">
+                        <span className="bg-blue-orange-gradient bg-clip-text text-transparent">
+                          Welcome to Namma Ooru Offers – where every deal feels personal!
+                        </span>
+                      </p>
                     </div>
                   </div>
 
