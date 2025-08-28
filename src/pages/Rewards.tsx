@@ -167,25 +167,103 @@ const Rewards = () => {
 
             {/* Level Progress */}
             <Card className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div>
-                  <h3 className="text-lg font-bold">{userReward.level_name} Level</h3>
-                  <p className="text-sm text-muted-foreground">
-                    {getNextLevelPoints() > 0 
-                      ? `${getNextLevelPoints()} points to ${getNextLevel()}`
-                      : 'Maximum level reached!'
-                    }
-                  </p>
-                </div>
-                <Badge variant="outline" className="px-3 py-1">
-                  {userReward.total_earned_points} / {
-                    userReward.total_earned_points >= 1000 ? '1000+' : 
-                    userReward.total_earned_points >= 500 ? '1000' :
-                    userReward.total_earned_points >= 200 ? '500' : '200'
+              <div className="mb-6">
+                <h3 className="text-xl font-bold text-center mb-2">Your Level Progress</h3>
+                <p className="text-sm text-muted-foreground text-center">
+                  {getNextLevelPoints() > 0 
+                    ? `${getNextLevelPoints()} points to reach ${getNextLevel()}`
+                    : 'Congratulations! Maximum level reached!'
                   }
-                </Badge>
+                </p>
               </div>
-              <Progress value={getLevelProgress()} className="h-3" />
+              
+              {/* Level Icons Row */}
+              <div className="flex items-center justify-between mb-6">
+                {/* Bronze Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  userReward.total_earned_points >= 0 ? 'bg-amber-100 scale-110' : 'bg-gray-100'
+                }`}>
+                  <Star className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    userReward.total_earned_points >= 0 ? 'text-amber-600 animate-pulse' : 'text-gray-400'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    userReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
+                  }`}>Bronze</span>
+                  <span className="text-xs text-muted-foreground">0 pts</span>
+                </div>
+
+                {/* Connection Line 1 */}
+                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
+                  userReward.total_earned_points >= 200 ? 'bg-gradient-to-r from-amber-400 to-gray-400' : 'bg-gray-200'
+                }`}></div>
+
+                {/* Silver Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  userReward.total_earned_points >= 200 ? 'bg-gray-100 scale-110' : 'bg-gray-50'
+                }`}>
+                  <Trophy className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    userReward.total_earned_points >= 200 ? 'text-gray-500 animate-pulse' : 'text-gray-300'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    userReward.total_earned_points >= 200 ? 'text-gray-700' : 'text-gray-400'
+                  }`}>Silver</span>
+                  <span className="text-xs text-muted-foreground">200 pts</span>
+                </div>
+
+                {/* Connection Line 2 */}
+                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
+                  userReward.total_earned_points >= 500 ? 'bg-gradient-to-r from-gray-400 to-yellow-400' : 'bg-gray-200'
+                }`}></div>
+
+                {/* Gold Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  userReward.total_earned_points >= 500 ? 'bg-yellow-100 scale-110' : 'bg-gray-50'
+                }`}>
+                  <Award className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    userReward.total_earned_points >= 500 ? 'text-yellow-600 animate-pulse' : 'text-gray-300'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    userReward.total_earned_points >= 500 ? 'text-yellow-700' : 'text-gray-400'
+                  }`}>Gold</span>
+                  <span className="text-xs text-muted-foreground">500 pts</span>
+                </div>
+
+                {/* Connection Line 3 */}
+                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
+                  userReward.total_earned_points >= 1000 ? 'bg-gradient-to-r from-yellow-400 to-purple-400' : 'bg-gray-200'
+                }`}></div>
+
+                {/* Platinum Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  userReward.total_earned_points >= 1000 ? 'bg-purple-100 scale-110' : 'bg-gray-50'
+                }`}>
+                  <Crown className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    userReward.total_earned_points >= 1000 ? 'text-purple-600 animate-pulse' : 'text-gray-300'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    userReward.total_earned_points >= 1000 ? 'text-purple-700' : 'text-gray-400'
+                  }`}>Platinum</span>
+                  <span className="text-xs text-muted-foreground">1000 pts</span>
+                </div>
+              </div>
+
+              {/* Current Progress Bar */}
+              <div className="space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span className="font-medium">Current: {userReward.total_earned_points} points</span>
+                  <span className="text-muted-foreground">
+                    {userReward.level_name} Level
+                  </span>
+                </div>
+                <div className="relative">
+                  <Progress value={getLevelProgress()} className="h-4" />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-xs font-bold text-white drop-shadow-lg">
+                      {Math.round(getLevelProgress())}%
+                    </span>
+                  </div>
+                </div>
+              </div>
             </Card>
 
             {/* Tabs for different sections */}
