@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -16,6 +16,7 @@ export default function SignUp() {
   const { user, profile, signUp, loading } = useAuth();
   const { toast } = useToast();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   
   const [isLoading, setIsLoading] = useState(false);
   const [signUpForm, setSignUpForm] = useState({
@@ -30,6 +31,14 @@ export default function SignUp() {
     phoneNumber: '',
     referralCode: ''
   });
+
+  // Handle URL referral code parameter
+  useEffect(() => {
+    const refCode = searchParams.get('ref');
+    if (refCode && !signUpForm.referralCode) {
+      setSignUpForm(prev => ({ ...prev, referralCode: refCode.toUpperCase() }));
+    }
+  }, [searchParams]);
 
   // Redirect authenticated users
   useEffect(() => {
