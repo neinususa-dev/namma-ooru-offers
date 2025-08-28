@@ -1,5 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useForm } from 'react-hook-form';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { z } from 'zod';
 import { useAuth } from "@/hooks/useAuth";
+import { useCategories } from '@/hooks/useCategories';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -8,17 +12,22 @@ import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Checkbox } from '@/components/ui/checkbox';
+import { Calendar } from '@/components/ui/calendar';
+import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { useOfferDatabase } from "@/hooks/useOfferDatabase";
 import { useAdminOffers } from "@/hooks/useAdminOffers";
 import { useStores } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle } from "lucide-react";
+import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle, CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Eye } from "lucide-react";
 import { OfferCard } from "@/components/OfferCard";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { SuperAdminLayout } from "@/components/SuperAdminLayout";
 import { format } from "date-fns";
+import { cn } from '@/lib/utils';
+import { resizeImage, generateDefaultImage } from '@/utils/imageUtils';
 
 export function AdminDashboard() {
   const { profile } = useAuth();
@@ -41,22 +50,48 @@ export function AdminDashboard() {
     website: ""
   });
 
-  const [newOffer, setNewOffer] = useState({
-    title: "",
-    description: "",
-    category: "",
-    store_name: "",
-    original_price: "",
-    discounted_price: "",
-    location: "",
-    district: "",
-    city: "",
-    expiry_date: "",
-    image_url: "",
-    listing_type: "hot_offers",
-    redemption_mode: "both",
-    points_required: ""
+  // Offer form schema
+  const offerSchema = z.object({
+    merchant_id: z.string().min(1, 'Merchant selection is required'),
+    store_name: z.string().min(1, 'Store name is required'),
+    title: z.string().min(1, 'Title is required').max(100, 'Title must be under 100 characters'),
+    description: z.string().min(1, 'Description is required').max(500, 'Description must be under 500 characters'),
+    category: z.string().min(1, 'Category is required'),
+    district: z.string().min(1, 'District is required'),
+    city: z.string().min(1, 'City/Town is required'),
+    location: z.string().min(1, 'Location is required'),
+    original_price: z.number().min(0, 'Original price must be positive'),
+    discount_percentage: z.number().min(1, 'Discount must be at least 1%').max(100, 'Discount cannot exceed 100%'),
+    expiry_date: z.date(),
+    redemption_mode: z.enum(['online', 'store', 'both']),
+    listing_type: z.enum(['hot_offers', 'trending', 'local_deals']),
+    image_url: z.string().optional(),
   });
+
+  type OfferFormData = z.infer<typeof offerSchema>;
+
+  const { categories, loading: categoriesLoading } = useCategories();
+  const [selectedDate, setSelectedDate] = useState<Date>();
+  const [uploadedImage, setUploadedImage] = useState<string>('');
+  const [selectedMerchant, setSelectedMerchant] = useState<any>(null);
+  const [merchantProfiles, setMerchantProfiles] = useState<any[]>([]);
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+    setValue,
+    watch,
+    reset,
+  } = useForm<OfferFormData>({
+    resolver: zodResolver(offerSchema),
+    defaultValues: {
+      redemption_mode: 'both',
+      listing_type: 'local_deals',
+    },
+  });
+
+  const watchedValues = watch();
 
   // Redirect if not super admin
   if (profile?.role !== 'super_admin') {
@@ -105,69 +140,99 @@ export function AdminDashboard() {
     }
   };
 
-  const handleCreateOffer = async () => {
-    try {
-      // Validate required fields
-      if (!newOffer.title || !newOffer.expiry_date) {
-        toast.error("Title and expiry date are required");
-        return;
+  // Fetch merchant profiles on component mount
+  useEffect(() => {
+    const fetchMerchantProfiles = async () => {
+      try {
+        const { data, error } = await supabase
+          .from('profiles')
+          .select('*')
+          .eq('role', 'merchant');
+
+        if (error) throw error;
+        setMerchantProfiles(data || []);
+      } catch (error) {
+        console.error('Error fetching merchant profiles:', error);
       }
+    };
 
-      const originalPrice = parseFloat(newOffer.original_price) || 0;
-      const discountedPrice = parseFloat(newOffer.discounted_price) || 0;
-      const pointsRequired = parseInt(newOffer.points_required) || null;
-      
-      // Calculate discount percentage
-      const discountPercentage = originalPrice > 0 && discountedPrice < originalPrice 
-        ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
-        : 0;
+    fetchMerchantProfiles();
+  }, []);
 
-      const { error } = await supabase.from('offers').insert([{
-        title: newOffer.title,
-        description: newOffer.description,
-        category: newOffer.category,
-        store_name: newOffer.store_name,
-        location: newOffer.location,
-        district: newOffer.district,
-        city: newOffer.city,
-        image_url: newOffer.image_url || null,
-        listing_type: newOffer.listing_type,
-        redemption_mode: newOffer.redemption_mode,
-        points_required: pointsRequired,
-        original_price: originalPrice || null,
-        discounted_price: discountedPrice || null,
-        discount_percentage: discountPercentage,
-        expiry_date: new Date(newOffer.expiry_date).toISOString(),
-        merchant_id: profile?.id, // Use current admin as merchant_id
+  // Calculate discounted price
+  const discountedPrice = watchedValues.original_price 
+    ? watchedValues.original_price * (1 - (watchedValues.discount_percentage || 0) / 100)
+    : 0;
+
+  // Handle image upload with resizing
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (file) {
+      try {
+        const resizedImage = await resizeImage(file);
+        setUploadedImage(resizedImage);
+        setValue('image_url', resizedImage);
+      } catch (error) {
+        console.error('Error resizing image:', error);
+        toast.error('Failed to process image. Please try again.');
+      }
+    }
+  };
+
+  const removeImage = () => {
+    setUploadedImage('');
+    setValue('image_url', '');
+  };
+
+  // Generate preview image
+  const getPreviewImage = () => {
+    if (uploadedImage) {
+      return uploadedImage;
+    }
+    if (watchedValues.store_name) {
+      return generateDefaultImage(watchedValues.store_name);
+    }
+    return undefined;
+  };
+
+  const onSubmitOffer = async (data: OfferFormData) => {
+    try {
+      const offerData = {
+        store_name: data.store_name,
+        title: data.title,
+        description: data.description,
+        category: data.category,
+        district: data.district,
+        city: data.city,
+        location: data.location,
+        original_price: data.original_price,
+        discount_percentage: data.discount_percentage,
+        merchant_id: data.merchant_id, // Use selected merchant
+        discounted_price: data.original_price * (1 - data.discount_percentage / 100),
+        expiry_date: data.expiry_date.toISOString(),
+        listing_type: data.listing_type,
+        redemption_mode: data.redemption_mode,
+        image_url: data.image_url,
         status: 'approved', // Admin-created offers are auto-approved
         is_active: true
-      }]);
+      };
+
+      const { error } = await supabase.from('offers').insert([offerData]);
+
+      if (error) {
+        throw error;
+      }
+
+      toast.success('Offer created successfully for merchant!');
       
-      if (error) throw error;
-      
-      toast.success("Offer created successfully!");
-      setNewOffer({
-        title: "",
-        description: "",
-        category: "",
-        store_name: "",
-        original_price: "",
-        discounted_price: "",
-        location: "",
-        district: "",
-        city: "",
-        expiry_date: "",
-        image_url: "",
-        listing_type: "hot_offers",
-        redemption_mode: "both",
-        points_required: ""
-      });
-      
-      // Refresh offers list
+      reset();
+      setSelectedDate(undefined);
+      setUploadedImage('');
+      setSelectedMerchant(null);
       allOffers.refetch();
     } catch (error) {
-      toast.error("Failed to create offer");
-      console.error("Error creating offer:", error);
+      console.error('Error posting offer:', error);
+      toast.error('Failed to create offer. Please try again.');
     }
   };
 
@@ -603,185 +668,389 @@ export function AdminDashboard() {
                   </Button>
                 </CardContent>
               </Card>
+            </div>
 
-              <Card>
-                <CardHeader>
-                  <CardTitle>Create New Offer</CardTitle>
-                  <CardDescription>Post an offer for any store</CardDescription>
-                </CardHeader>
-                <CardContent className="space-y-4">
-                  <div>
-                    <Label htmlFor="offerTitle">Title *</Label>
-                    <Input
-                      id="offerTitle"
-                      value={newOffer.title}
-                      onChange={(e) => setNewOffer({...newOffer, title: e.target.value})}
-                      placeholder="Offer title"
-                    />
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="offerDescription">Description</Label>
-                    <Textarea
-                      id="offerDescription"
-                      value={newOffer.description}
-                      onChange={(e) => setNewOffer({...newOffer, description: e.target.value})}
-                      placeholder="Offer description"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="offerCategory">Category</Label>
-                      <Select value={newOffer.category} onValueChange={(value) => setNewOffer({...newOffer, category: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select category" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="food">Food & Dining</SelectItem>
-                          <SelectItem value="fashion">Fashion & Apparel</SelectItem>
-                          <SelectItem value="electronics">Electronics</SelectItem>
-                          <SelectItem value="grocery">Grocery</SelectItem>
-                          <SelectItem value="home">Home & Garden</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="offerStore">Store</Label>
-                      <Select value={newOffer.store_name} onValueChange={(value) => setNewOffer({...newOffer, store_name: value})}>
-                        <SelectTrigger>
-                          <SelectValue placeholder="Select store" />
-                        </SelectTrigger>
-                        <SelectContent>
-                          {stores?.map((store) => (
-                            <SelectItem key={store.id} value={store.name}>
-                              {store.name}
-                            </SelectItem>
-                          ))}
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="offerOriginal">Original Price</Label>
-                      <Input
-                        id="offerOriginal"
-                        type="number"
-                        value={newOffer.original_price}
-                        onChange={(e) => setNewOffer({...newOffer, original_price: e.target.value})}
-                        placeholder="0.00"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="offerDiscounted">Discounted Price</Label>
-                      <Input
-                        id="offerDiscounted"
-                        type="number"
-                        value={newOffer.discounted_price}
-                        onChange={(e) => setNewOffer({...newOffer, discounted_price: e.target.value})}
-                        placeholder="0.00"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-3 gap-2">
-                    <div>
-                      <Label htmlFor="offerLocation">Location</Label>
-                      <Input
-                        id="offerLocation"
-                        value={newOffer.location}
-                        onChange={(e) => setNewOffer({...newOffer, location: e.target.value})}
-                        placeholder="Street/Area"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="offerDistrict">District</Label>
-                      <Input
-                        id="offerDistrict"
-                        value={newOffer.district}
-                        onChange={(e) => setNewOffer({...newOffer, district: e.target.value})}
-                        placeholder="District"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="offerCity">City</Label>
-                      <Input
-                        id="offerCity"
-                        value={newOffer.city}
-                        onChange={(e) => setNewOffer({...newOffer, city: e.target.value})}
-                        placeholder="City"
-                      />
-                    </div>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="offerImage">Image URL</Label>
-                    <Input
-                      id="offerImage"
-                      value={newOffer.image_url}
-                      onChange={(e) => setNewOffer({...newOffer, image_url: e.target.value})}
-                      placeholder="https://example.com/image.jpg"
-                    />
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="offerListingType">Listing Type</Label>
-                      <Select value={newOffer.listing_type} onValueChange={(value) => setNewOffer({...newOffer, listing_type: value})}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="hot_offers">Hot Offers</SelectItem>
-                          <SelectItem value="trending">Trending</SelectItem>
-                          <SelectItem value="local_deals">Local Deals</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                    <div>
-                      <Label htmlFor="offerRedemption">Redemption Mode</Label>
-                      <Select value={newOffer.redemption_mode} onValueChange={(value) => setNewOffer({...newOffer, redemption_mode: value})}>
-                        <SelectTrigger>
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="online">Online Only</SelectItem>
-                          <SelectItem value="store">In Store Only</SelectItem>
-                          <SelectItem value="both">Both Online & In Store</SelectItem>
-                        </SelectContent>
-                      </Select>
-                    </div>
-                  </div>
-                  
-                  <div className="grid grid-cols-2 gap-2">
-                    <div>
-                      <Label htmlFor="offerPoints">Points Required</Label>
-                      <Input
-                        id="offerPoints"
-                        type="number"
-                        value={newOffer.points_required}
-                        onChange={(e) => setNewOffer({...newOffer, points_required: e.target.value})}
-                        placeholder="0"
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="offerExpiry">Expiry Date *</Label>
-                      <Input
-                        id="offerExpiry"
-                        type="date"
-                        value={newOffer.expiry_date}
-                        onChange={(e) => setNewOffer({...newOffer, expiry_date: e.target.value})}
-                      />
-                    </div>
-                  </div>
-                  
-                  <Button onClick={handleCreateOffer} className="w-full">
-                    Create Offer
-                  </Button>
-                </CardContent>
-              </Card>
+            {/* Create Offer Form - Replica of Merchant Post Offer */}
+            <div className="max-w-7xl mx-auto">
+              <div className="mb-8">
+                <h1 className="text-3xl font-bold text-foreground mb-2">
+                  {selectedMerchant ? `Create Offer for ${selectedMerchant.store_name || selectedMerchant.name}` : 'Post New Offer for Merchant'}
+                </h1>
+                <p className="text-muted-foreground">Create compelling offers on behalf of merchants</p>
+              </div>
+
+              <form onSubmit={handleSubmit(onSubmitOffer)} className="space-y-8">
+                <div className="grid md:grid-cols-3 gap-8">
+                  {/* Left Column - Merchant Selection */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Users className="h-5 w-5" />
+                        Select Merchant
+                      </CardTitle>
+                      <CardDescription>Choose which merchant to create offer for</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="merchant">Merchant *</Label>
+                        <Select 
+                          onValueChange={(value) => {
+                            const merchant = merchantProfiles.find(m => m.id === value);
+                            setSelectedMerchant(merchant);
+                            setValue('merchant_id', value);
+                            if (merchant?.store_name) setValue('store_name', merchant.store_name);
+                            if (merchant?.district) setValue('district', merchant.district);
+                            if (merchant?.city) setValue('city', merchant.city);
+                            if (merchant?.store_location) setValue('location', merchant.store_location);
+                          }}
+                        >
+                          <SelectTrigger className={errors.merchant_id ? 'border-destructive' : ''}>
+                            <SelectValue placeholder="Select a merchant" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {merchantProfiles.map((merchant) => (
+                              <SelectItem key={merchant.id} value={merchant.id}>
+                                <div className="flex flex-col">
+                                  <span className="font-medium">{merchant.store_name || merchant.name}</span>
+                                  <span className="text-xs text-muted-foreground">{merchant.email}</span>
+                                </div>
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        {errors.merchant_id && (
+                          <p className="text-sm text-destructive">{errors.merchant_id.message}</p>
+                        )}
+                      </div>
+
+                      {selectedMerchant && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <h4 className="font-medium mb-2">Selected Merchant:</h4>
+                          <p className="text-sm"><strong>Store:</strong> {selectedMerchant.store_name || selectedMerchant.name}</p>
+                          <p className="text-sm"><strong>Email:</strong> {selectedMerchant.email}</p>
+                          <p className="text-sm"><strong>Location:</strong> {selectedMerchant.city}, {selectedMerchant.district}</p>
+                        </div>
+                      )}
+                    </CardContent>
+                  </Card>
+
+                  {/* Middle Column - Basic Info */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Tag className="h-5 w-5" />
+                        Offer Details
+                      </CardTitle>
+                      <CardDescription>Basic information about the offer</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="store_name" className="flex items-center gap-2">
+                          <Store className="h-4 w-4" />
+                          Store Name *
+                        </Label>
+                        <Input
+                          id="store_name"
+                          placeholder="Enter store name"
+                          {...register('store_name')}
+                          className={errors.store_name ? 'border-destructive' : ''}
+                        />
+                        {errors.store_name && (
+                          <p className="text-sm text-destructive">{errors.store_name.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="title">Offer Title *</Label>
+                        <Input
+                          id="title"
+                          placeholder="e.g., 50% Off All Electronics"
+                          {...register('title')}
+                          className={errors.title ? 'border-destructive' : ''}
+                        />
+                        {errors.title && (
+                          <p className="text-sm text-destructive">{errors.title.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="description">Description *</Label>
+                        <Textarea
+                          id="description"
+                          placeholder="Describe the offer in detail..."
+                          rows={4}
+                          {...register('description')}
+                          className={errors.description ? 'border-destructive' : ''}
+                        />
+                        {errors.description && (
+                          <p className="text-sm text-destructive">{errors.description.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="category">Category *</Label>
+                        <Select onValueChange={(value) => setValue('category', value)}>
+                          <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
+                            <SelectValue placeholder="Select a category" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {categoriesLoading ? (
+                              <SelectItem value="loading" disabled>Loading categories...</SelectItem>
+                            ) : (
+                              categories.map((category) => (
+                                <SelectItem key={category.id} value={category.name}>
+                                  {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
+                                </SelectItem>
+                              ))
+                            )}
+                          </SelectContent>
+                        </Select>
+                        {errors.category && (
+                          <p className="text-sm text-destructive">{errors.category.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="district">District *</Label>
+                        <Input
+                          id="district"
+                          placeholder="Enter district"
+                          {...register('district')}
+                          className={errors.district ? 'border-destructive' : ''}
+                        />
+                        {errors.district && (
+                          <p className="text-sm text-destructive">{errors.district.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="city">City/Town *</Label>
+                        <Input
+                          id="city"
+                          placeholder="Enter city/town"
+                          {...register('city')}
+                          className={errors.city ? 'border-destructive' : ''}
+                        />
+                        {errors.city && (
+                          <p className="text-sm text-destructive">{errors.city.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="location" className="flex items-center gap-2">
+                          <MapPin className="h-4 w-4" />
+                          Specific Location *
+                        </Label>
+                        <Input
+                          id="location"
+                          placeholder="e.g., Downtown Mall, City Center"
+                          {...register('location')}
+                          className={errors.location ? 'border-destructive' : ''}
+                        />
+                        {errors.location && (
+                          <p className="text-sm text-destructive">{errors.location.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="image">Offer Image</Label>
+                        <div className="space-y-2">
+                          {uploadedImage ? (
+                            <div className="relative">
+                              <img
+                                src={uploadedImage}
+                                alt="Offer preview"
+                                className="w-full h-32 object-cover rounded-lg"
+                              />
+                              <Button
+                                type="button"
+                                variant="destructive"
+                                size="sm"
+                                className="absolute top-2 right-2"
+                                onClick={removeImage}
+                              >
+                                <X className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ) : (
+                            <div className="border-2 border-dashed border-muted-foreground/25 rounded-lg p-6 text-center">
+                              <Upload className="h-8 w-8 mx-auto mb-2 text-muted-foreground" />
+                              <div className="space-y-2">
+                                <Label htmlFor="image-upload" className="text-sm font-medium cursor-pointer">
+                                  Click to upload an image
+                                </Label>
+                                <p className="text-xs text-muted-foreground">
+                                  PNG, JPG up to 10MB
+                                </p>
+                              </div>
+                              <Input
+                                id="image-upload"
+                                type="file"
+                                accept="image/*"
+                                onChange={handleImageUpload}
+                                className="hidden"
+                              />
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Right Column - Pricing & Settings */}
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <DollarSign className="h-5 w-5" />
+                        Pricing & Settings
+                      </CardTitle>
+                      <CardDescription>Set pricing and display options</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                      <div className="space-y-2">
+                        <Label htmlFor="original_price">Original Price ($) *</Label>
+                        <Input
+                          id="original_price"
+                          type="number"
+                          step="0.01"
+                          placeholder="0.00"
+                          {...register('original_price', { valueAsNumber: true })}
+                          className={errors.original_price ? 'border-destructive' : ''}
+                        />
+                        {errors.original_price && (
+                          <p className="text-sm text-destructive">{errors.original_price.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label htmlFor="discount_percentage">Discount Percentage (%) *</Label>
+                        <Input
+                          id="discount_percentage"
+                          type="number"
+                          min="1"
+                          max="100"
+                          placeholder="0"
+                          {...register('discount_percentage', { valueAsNumber: true })}
+                          className={errors.discount_percentage ? 'border-destructive' : ''}
+                        />
+                        {errors.discount_percentage && (
+                          <p className="text-sm text-destructive">{errors.discount_percentage.message}</p>
+                        )}
+                      </div>
+
+                      {watchedValues.original_price && watchedValues.discount_percentage && (
+                        <div className="p-3 bg-muted rounded-lg">
+                          <p className="text-sm font-medium">Final Price: ${discountedPrice.toFixed(2)}</p>
+                          <p className="text-xs text-muted-foreground">
+                            You save: ${(watchedValues.original_price - discountedPrice).toFixed(2)}
+                          </p>
+                        </div>
+                      )}
+
+                      <div className="space-y-2">
+                        <Label className="flex items-center gap-2">
+                          <Clock className="h-4 w-4" />
+                          Expiry Date *
+                        </Label>
+                        <Popover>
+                          <PopoverTrigger asChild>
+                            <Button
+                              variant="outline"
+                              className={cn(
+                                'w-full justify-start text-left font-normal',
+                                !selectedDate && 'text-muted-foreground',
+                                errors.expiry_date && 'border-destructive'
+                              )}
+                            >
+                              <CalendarIcon className="mr-2 h-4 w-4" />
+                              {selectedDate ? format(selectedDate, 'PPP') : <span>Pick a date</span>}
+                            </Button>
+                          </PopoverTrigger>
+                          <PopoverContent className="w-auto p-0" align="start">
+                            <Calendar
+                              mode="single"
+                              selected={selectedDate}
+                              onSelect={(date) => {
+                                setSelectedDate(date);
+                                if (date) setValue('expiry_date', date);
+                              }}
+                              disabled={(date) => date < new Date()}
+                              initialFocus
+                            />
+                          </PopoverContent>
+                        </Popover>
+                        {errors.expiry_date && (
+                          <p className="text-sm text-destructive">{errors.expiry_date.message}</p>
+                        )}
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Redemption Mode *</Label>
+                        <Select onValueChange={(value: 'online' | 'store' | 'both') => setValue('redemption_mode', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select redemption mode" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="online">Online Only</SelectItem>
+                            <SelectItem value="store">In Store Only</SelectItem>
+                            <SelectItem value="both">Both Online & In Store</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <div className="space-y-2">
+                        <Label>Listing Type *</Label>
+                        <Select onValueChange={(value: 'hot_offers' | 'trending' | 'local_deals') => setValue('listing_type', value)}>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select listing type" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="hot_offers">Hot Offers</SelectItem>
+                            <SelectItem value="trending">Trending</SelectItem>
+                            <SelectItem value="local_deals">Local Deals</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+
+                      <Button type="submit" className="w-full">
+                        Create Offer for Merchant
+                      </Button>
+                    </CardContent>
+                  </Card>
+                </div>
+
+                {/* Preview Section */}
+                {watchedValues.title && selectedMerchant && (
+                  <Card>
+                    <CardHeader>
+                      <CardTitle className="flex items-center gap-2">
+                        <Eye className="h-5 w-5" />
+                        Offer Preview
+                      </CardTitle>
+                      <CardDescription>Preview how the offer will appear to customers</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                      <div className="max-w-sm">
+                        <OfferCard
+                          id="preview"
+                          shopName={watchedValues.store_name || selectedMerchant.store_name || selectedMerchant.name}
+                          offerTitle={watchedValues.title}
+                          description={watchedValues.description || ''}
+                          discount={`${watchedValues.discount_percentage || 0}%`}
+                          originalPrice={watchedValues.original_price || 0}
+                          discountedPrice={discountedPrice}
+                          expiryDate={selectedDate ? selectedDate.toISOString() : ''}
+                          location={`${watchedValues.city || ''}, ${watchedValues.district || ''}`}
+                          category={watchedValues.category || ''}
+                          image={getPreviewImage()}
+                          isHot={watchedValues.listing_type === 'hot_offers'}
+                          isTrending={watchedValues.listing_type === 'trending'}
+                        />
+                      </div>
+                    </CardContent>
+                  </Card>
+                )}
+              </form>
             </div>
           </TabsContent>
         </Tabs>
