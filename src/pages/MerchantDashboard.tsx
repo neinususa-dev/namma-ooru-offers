@@ -675,6 +675,29 @@ const MerchantDashboard = () => {
           <CardContent>
             <ResponsiveContainer width="100%" height={300}>
               <BarChart data={stats.offerPerformance} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <defs>
+                  {stats.offerPerformance.map((_, index) => {
+                    const gradientColors = [
+                      ['#6366f1', '#8b5cf6'], // Indigo to Purple
+                      ['#10b981', '#059669'], // Emerald gradient
+                      ['#f59e0b', '#f97316'], // Amber to Orange
+                      ['#ef4444', '#dc2626'], // Red gradient
+                      ['#3b82f6', '#1d4ed8'], // Blue gradient
+                      ['#8b5cf6', '#7c3aed'], // Purple gradient
+                      ['#06b6d4', '#0891b2'], // Cyan gradient
+                      ['#84cc16', '#65a30d'], // Lime gradient
+                      ['#f97316', '#ea580c'], // Orange gradient
+                      ['#ec4899', '#db2777'], // Pink gradient
+                    ];
+                    const colors = gradientColors[index % gradientColors.length];
+                    return (
+                      <linearGradient key={index} id={`gradient${index}`} x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor={colors[0]} />
+                        <stop offset="100%" stopColor={colors[1]} />
+                      </linearGradient>
+                    );
+                  })}
+                </defs>
                 <CartesianGrid strokeDasharray="3 3" />
                 <XAxis 
                   dataKey="title" 
@@ -688,7 +711,11 @@ const MerchantDashboard = () => {
                   formatter={(value, name) => [`₹${value}`, 'Revenue']}
                   labelFormatter={(label) => `Offer: ${label}`}
                 />
-                <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
+                <Bar dataKey="revenue" name="Revenue">
+                  {stats.offerPerformance.map((_, index) => (
+                    <Cell key={`cell-${index}`} fill={`url(#gradient${index})`} />
+                  ))}
+                </Bar>
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
