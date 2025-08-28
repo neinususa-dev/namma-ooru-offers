@@ -501,7 +501,21 @@ export function AdminDashboard() {
                       </Button>
                       <Button
                         onClick={() => {
-                          allOffers.updateOffer(selectedOffer.id, selectedOffer);
+                          // Only update fields that exist in the database
+                          const updateData = {
+                            title: selectedOffer.title,
+                            description: selectedOffer.description,
+                            status: selectedOffer.status,
+                            original_price: selectedOffer.original_price,
+                            discount_percentage: selectedOffer.discount_percentage,
+                            category: selectedOffer.category,
+                            location: selectedOffer.location,
+                            district: selectedOffer.district,
+                            city: selectedOffer.city,
+                            store_name: selectedOffer.store_name,
+                            is_active: selectedOffer.is_active
+                          };
+                          allOffers.updateOffer(selectedOffer.id, updateData);
                           setEditDialogOpen(false);
                         }}
                       >
