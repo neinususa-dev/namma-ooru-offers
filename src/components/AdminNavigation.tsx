@@ -21,8 +21,22 @@ import { useAuth } from '@/hooks/useAuth';
 import { SuperAdminLayout } from '@/components/SuperAdminLayout';
 
 export function AdminNavigation() {
-  const { profile } = useAuth();
+  const { profile, loading } = useAuth();
   const location = useLocation();
+
+  // Show loading state while authentication is being checked
+  if (loading) {
+    return (
+      <div className="container mx-auto p-4">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
 
   // Redirect if not super admin
   if (profile?.role !== 'super_admin') {

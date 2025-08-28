@@ -48,11 +48,13 @@ export function useAuth() {
                 fetchUserProfile(session.user.id);
               }
             }, 0);
+          } else {
+            setLoading(false); // Profile already exists, stop loading
           }
         } else {
           setProfile(null);
+          setLoading(false); // No user, stop loading
         }
-        setLoading(false);
       }
     );
 
@@ -86,6 +88,7 @@ export function useAuth() {
 
       if (error && error.code !== 'PGRST116') {
         console.error('Error fetching profile:', error);
+        setLoading(false);
         return;
       }
 
@@ -104,8 +107,11 @@ export function useAuth() {
         console.log('Setting new profile data');
         return data;
       });
+      
+      setLoading(false); // Set loading to false after profile is fetched
     } catch (error) {
       console.error('Error fetching profile:', error);
+      setLoading(false);
     }
   };
 
