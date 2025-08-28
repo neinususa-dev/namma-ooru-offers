@@ -63,6 +63,7 @@ export type Database = {
           original_price: number | null
           points_required: number | null
           redemption_mode: string | null
+          status: string
           store_name: string | null
           title: string
           updated_at: string
@@ -85,6 +86,7 @@ export type Database = {
           original_price?: number | null
           points_required?: number | null
           redemption_mode?: string | null
+          status?: string
           store_name?: string | null
           title: string
           updated_at?: string
@@ -107,6 +109,7 @@ export type Database = {
           original_price?: number | null
           points_required?: number | null
           redemption_mode?: string | null
+          status?: string
           store_name?: string | null
           title?: string
           updated_at?: string

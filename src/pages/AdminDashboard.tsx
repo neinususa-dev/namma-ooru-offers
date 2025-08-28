@@ -7,20 +7,28 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Badge } from "@/components/ui/badge";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { useOfferDatabase } from "@/hooks/useOfferDatabase";
+import { useAdminOffers } from "@/hooks/useAdminOffers";
 import { useStores } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Store, Shield, Users, ShoppingBag, Plus, Edit } from "lucide-react";
+import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle } from "lucide-react";
 import { OfferCard } from "@/components/OfferCard";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
 import { SuperAdminLayout } from "@/components/SuperAdminLayout";
+import { format } from "date-fns";
 
 export function AdminDashboard() {
   const { profile } = useAuth();
   const { offers, loading: offersLoading } = useOfferDatabase();
+  const allOffers = useAdminOffers();
   const { stores, loading: storesLoading } = useStores();
+  
+  const [statusFilter, setStatusFilter] = useState<string>("all");
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [selectedOffer, setSelectedOffer] = useState<any>(null);
   
   const [newStore, setNewStore] = useState({
     name: "",
@@ -85,6 +93,15 @@ export function AdminDashboard() {
     }
   };
 
+  const getStatusVariant = (status: string) => {
+    switch (status) {
+      case 'approved': return 'default';
+      case 'in_review': return 'secondary';
+      case 'rejected': return 'destructive';
+      default: return 'outline';
+    }
+  };
+
   const handleCreateOffer = async () => {
     try {
       const { error } = await supabase.from('offers').insert([{
@@ -92,7 +109,8 @@ export function AdminDashboard() {
         original_price: parseFloat(newOffer.original_price) || null,
         discounted_price: parseFloat(newOffer.discounted_price) || null,
         expiry_date: new Date(newOffer.expiry_date).toISOString(),
-        merchant_id: newOffer.merchant_id || null
+        merchant_id: newOffer.merchant_id || null,
+        status: 'approved' // Admin-created offers are auto-approved
       }]);
       
       if (error) throw error;
@@ -146,30 +164,30 @@ export function AdminDashboard() {
               <ShoppingBag className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">{offers?.length || 0}</div>
+              <div className="text-2xl font-bold">{allOffers.offers?.length || 0}</div>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Active Offers</CardTitle>
+              <CardTitle className="text-sm font-medium">Pending Review</CardTitle>
               <ShoppingBag className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {offers?.filter(offer => new Date(offer.expiry_date) > new Date()).length || 0}
+                {allOffers.getOffersByStatus('in_review').length || 0}
               </div>
             </CardContent>
           </Card>
           
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Categories</CardTitle>
-              <Users className="h-4 w-4 text-muted-foreground" />
+              <CardTitle className="text-sm font-medium">Approved Offers</CardTitle>
+              <ShoppingBag className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">
-                {new Set(offers?.map(offer => offer.category)).size || 0}
+                {allOffers.getOffersByStatus('approved').length || 0}
               </div>
             </CardContent>
           </Card>
@@ -280,36 +298,184 @@ export function AdminDashboard() {
 
           <TabsContent value="offers" className="space-y-4">
             <Card>
-              <CardHeader>
-                <CardTitle>All Offers</CardTitle>
-                <CardDescription>View and manage all platform offers</CardDescription>
+              <CardHeader className="pb-2">
+                <div className="flex justify-between items-start">
+                  <div>
+                    <CardTitle className="text-lg">Offer Management</CardTitle>
+                    <CardDescription>Review and manage all merchant offers</CardDescription>
+                  </div>
+                  <Select value={statusFilter} onValueChange={setStatusFilter}>
+                    <SelectTrigger className="w-48">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Offers ({allOffers.offers.length})</SelectItem>
+                      <SelectItem value="in_review">In Review ({allOffers.getOffersByStatus('in_review').length})</SelectItem>
+                      <SelectItem value="approved">Approved ({allOffers.getOffersByStatus('approved').length})</SelectItem>
+                      <SelectItem value="rejected">Rejected ({allOffers.getOffersByStatus('rejected').length})</SelectItem>
+                    </SelectContent>
+                  </Select>
+                </div>
               </CardHeader>
               <CardContent>
-                {offersLoading ? (
-                  <div>Loading offers...</div>
+                {allOffers.loading ? (
+                  <div className="flex justify-center py-8">
+                    <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary"></div>
+                  </div>
                 ) : (
-                  <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
-                    {offers?.map((offer) => (
-                      <OfferCard
-                        key={offer.id}
-                        id={offer.id}
-                        shopName={offer.merchant_name || 'Unknown Store'}
-                        offerTitle={offer.title}
-                        description={offer.description}
-                        discount="Special Offer"
-                        originalPrice={offer.original_price}
-                        discountedPrice={offer.discounted_price}
-                        category={offer.category}
-                        location={offer.location}
-                        expiryDate={offer.expiry_date}
-                        image={'/assets/default-offer-image.jpg'}
-                        displayMode="default"
-                      />
-                    ))}
+                  <div className="space-y-4">
+                    {allOffers.getOffersByStatus(statusFilter).length === 0 ? (
+                      <div className="text-center py-8 text-muted-foreground">
+                        No offers found for the selected status.
+                      </div>
+                    ) : (
+                      <div className="grid gap-4">
+                        {allOffers.getOffersByStatus(statusFilter).map((offer) => (
+                          <div key={offer.id} className="border rounded-lg p-4 space-y-3">
+                            <div className="flex justify-between items-start">
+                              <div className="space-y-2 flex-1">
+                                <div className="flex items-center gap-2">
+                                  <h3 className="font-semibold text-lg">{offer.title}</h3>
+                                  <Badge variant={getStatusVariant(offer.status)}>
+                                    {offer.status.replace('_', ' ')}
+                                  </Badge>
+                                </div>
+                                <p className="text-sm text-muted-foreground">{offer.description}</p>
+                                <div className="flex gap-4 text-sm">
+                                  <span><span className="font-medium">Store:</span> {offer.merchant_name}</span>
+                                  <span><span className="font-medium">Category:</span> {offer.category}</span>
+                                  <span><span className="font-medium">Location:</span> {offer.city}</span>
+                                  <span><span className="font-medium">Discount:</span> {offer.discount_percentage}% OFF</span>
+                                </div>
+                                <div className="text-xs text-muted-foreground">
+                                  Created: {format(new Date(offer.created_at), 'PPp')}
+                                </div>
+                              </div>
+                              <div className="flex gap-2 ml-4">
+                                {offer.status === 'in_review' && (
+                                  <>
+                                    <Button
+                                      size="sm"
+                                      onClick={() => allOffers.updateOfferStatus(offer.id, 'approved')}
+                                      className="bg-green-600 hover:bg-green-700"
+                                    >
+                                      <CheckCircle className="h-4 w-4 mr-1" />
+                                      Approve
+                                    </Button>
+                                    <Button
+                                      size="sm"
+                                      variant="destructive"
+                                      onClick={() => allOffers.updateOfferStatus(offer.id, 'rejected')}
+                                    >
+                                      <XCircle className="h-4 w-4 mr-1" />
+                                      Reject
+                                    </Button>
+                                  </>
+                                )}
+                                <Button
+                                  size="sm"
+                                  variant="outline"
+                                  onClick={() => {
+                                    setSelectedOffer(offer);
+                                    setEditDialogOpen(true);
+                                  }}
+                                >
+                                  <Edit className="h-4 w-4 mr-1" />
+                                  Edit
+                                </Button>
+                              </div>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 )}
               </CardContent>
             </Card>
+            
+            {/* Edit Offer Dialog */}
+            <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+              <DialogContent className="max-w-2xl">
+                <DialogHeader>
+                  <DialogTitle>Edit Offer</DialogTitle>
+                </DialogHeader>
+                {selectedOffer && (
+                  <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="edit-title">Title</Label>
+                        <Input
+                          id="edit-title"
+                          value={selectedOffer.title}
+                          onChange={(e) => setSelectedOffer({...selectedOffer, title: e.target.value})}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-status">Status</Label>
+                        <Select 
+                          value={selectedOffer.status} 
+                          onValueChange={(value) => setSelectedOffer({...selectedOffer, status: value})}
+                        >
+                          <SelectTrigger>
+                            <SelectValue />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="in_review">In Review</SelectItem>
+                            <SelectItem value="approved">Approved</SelectItem>
+                            <SelectItem value="rejected">Rejected</SelectItem>
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                    <div>
+                      <Label htmlFor="edit-description">Description</Label>
+                      <Textarea
+                        id="edit-description"
+                        value={selectedOffer.description}
+                        onChange={(e) => setSelectedOffer({...selectedOffer, description: e.target.value})}
+                      />
+                    </div>
+                    <div className="grid grid-cols-2 gap-4">
+                      <div>
+                        <Label htmlFor="edit-price">Original Price</Label>
+                        <Input
+                          id="edit-price"
+                          type="number"
+                          value={selectedOffer.original_price}
+                          onChange={(e) => setSelectedOffer({...selectedOffer, original_price: parseFloat(e.target.value)})}
+                        />
+                      </div>
+                      <div>
+                        <Label htmlFor="edit-discount">Discount %</Label>
+                        <Input
+                          id="edit-discount"
+                          type="number"
+                          value={selectedOffer.discount_percentage}
+                          onChange={(e) => setSelectedOffer({...selectedOffer, discount_percentage: parseInt(e.target.value)})}
+                        />
+                      </div>
+                    </div>
+                    <div className="flex gap-2 justify-end">
+                      <Button
+                        variant="outline"
+                        onClick={() => setEditDialogOpen(false)}
+                      >
+                        Cancel
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          allOffers.updateOffer(selectedOffer.id, selectedOffer);
+                          setEditDialogOpen(false);
+                        }}
+                      >
+                        Save Changes
+                      </Button>
+                    </div>
+                  </div>
+                )}
+              </DialogContent>
+            </Dialog>
           </TabsContent>
 
           <TabsContent value="create-new" className="space-y-4">

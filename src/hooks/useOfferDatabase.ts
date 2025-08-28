@@ -15,6 +15,7 @@ export interface DatabaseOffer {
   expiry_date: string;
   redemption_mode: 'online' | 'store' | 'both';
   listing_type: 'hot_offers' | 'trending' | 'local_deals';
+  status: 'applied' | 'in_review' | 'approved' | 'rejected';
   is_active: boolean;
   created_at: string;
   merchant_id: string;
@@ -38,6 +39,7 @@ export function useOfferDatabase() {
           profiles!merchant_id(name, store_name)
         `)
         .eq('is_active', true)
+        .eq('status', 'approved')
         .gte('expiry_date', new Date().toISOString())
         .order('created_at', { ascending: false });
 

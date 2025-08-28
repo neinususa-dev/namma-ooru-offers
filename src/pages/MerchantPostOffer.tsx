@@ -153,9 +153,9 @@ const MerchantPostOffer: React.FC = () => {
         merchant_id: user.id,
         discounted_price: data.original_price * (1 - data.discount_percentage / 100),
         expiry_date: data.expiry_date.toISOString(),
-        redemption_mode: data.redemption_mode,
         listing_type: data.listing_type,
         image_url: data.image_url,
+        status: 'in_review',
       };
 
       const { error } = await supabase.from('offers').insert([offerData]);
@@ -166,7 +166,7 @@ const MerchantPostOffer: React.FC = () => {
 
       toast({
         title: 'Success!',
-        description: 'Your offer has been posted successfully.',
+        description: 'Your offer has been submitted for review. It will be visible once approved by admin.',
       });
 
       reset();
