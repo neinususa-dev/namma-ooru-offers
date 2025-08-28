@@ -539,6 +539,10 @@ export type Database = {
         Args: { user_name: string }
         Returns: string
       }
+      get_current_user_role: {
+        Args: Record<PropertyKey, never>
+        Returns: string
+      }
       get_profile_stats: {
         Args: Record<PropertyKey, never>
         Returns: {
