@@ -117,7 +117,7 @@ export default function SignIn() {
 
       toast({
         title: "Reset email sent",
-        description: "Check your email for password reset instructions from Namma Ooru Offers (nammaooruoffers.official@gmail.com)",
+        description: "Check your email for password reset instructions from Namma Ooru Offers (onboarding@resend.dev)",
         variant: "default",
       });
       setResetDialogOpen(false);

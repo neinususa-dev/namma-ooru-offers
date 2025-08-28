@@ -146,7 +146,7 @@ serve(async (req) => {
 
     // Send password reset email
     const emailResponse = await resend.emails.send({
-      from: "Namma Ooru Offers <nammaooruoffers.official@gmail.com>",
+      from: "Namma Ooru Offers <onboarding@resend.dev>",
       to: [email],
       subject: "Reset Your Password - Namma Ooru Offers",
       html: emailHtml,
