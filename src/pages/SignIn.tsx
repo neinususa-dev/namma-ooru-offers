@@ -46,26 +46,41 @@ export default function SignIn() {
     const isReset = urlParams.get('reset');
     const accessToken = urlParams.get('access_token');
     const refreshToken = urlParams.get('refresh_token');
+    const type = urlParams.get('type');
     
-    if (isReset === 'true' || (accessToken && refreshToken)) {
+    console.log('URL parameters:', { isReset, accessToken: !!accessToken, refreshToken: !!refreshToken, type });
+    
+    if (type === 'recovery' || (accessToken && refreshToken)) {
+      console.log('Setting up password recovery session...');
       setIsPasswordResetMode(true);
       
-      // If we have tokens, set the session
+      // Set the session with the tokens from the URL
       if (accessToken && refreshToken) {
         supabase.auth.setSession({
           access_token: accessToken,
           refresh_token: refreshToken,
-        }).then(({ error }) => {
+        }).then(({ data, error }) => {
           if (error) {
             console.error('Error setting session:', error);
             toast({
               title: "Session error",
-              description: "There was an error setting up your password reset session. Please try again.",
+              description: "There was an error setting up your password reset session. Please try the reset process again.",
               variant: "destructive",
+            });
+            setIsPasswordResetMode(false);
+          } else {
+            console.log('Session set successfully:', data);
+            toast({
+              title: "Ready to reset",
+              description: "You can now set your new password below.",
+              variant: "default",
             });
           }
         });
       }
+    } else if (isReset === 'true') {
+      // Fallback for manual reset mode
+      setIsPasswordResetMode(true);
     }
   }, []);
 
