@@ -539,6 +539,14 @@ export type Database = {
         Args: { user_name: string }
         Returns: string
       }
+      get_profile_stats: {
+        Args: Record<PropertyKey, never>
+        Returns: {
+          customer_count: number
+          merchant_count: number
+          total_count: number
+        }[]
+      }
       phone_exists: {
         Args: { phone_to_check: string }
         Returns: boolean
