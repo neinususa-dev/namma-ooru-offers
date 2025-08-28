@@ -42,16 +42,26 @@ export function AuthButton() {
   };
 
   return (
-    <DropdownMenu>
-      <DropdownMenuTrigger asChild>
-        <Button variant="ghost" className="relative h-8 w-8 rounded-full">
-          <Avatar className="h-8 w-8">
-            <AvatarFallback className="bg-primary text-primary-foreground">
-              {getInitials(profile.name)}
-            </AvatarFallback>
-          </Avatar>
-        </Button>
-      </DropdownMenuTrigger>
+    <div className="flex items-center gap-3">
+      {/* User Name and Role Display */}
+      <div className="hidden md:flex flex-col text-right">
+        <span className="text-sm font-medium text-foreground">{profile.name}</span>
+        <span className="text-xs text-muted-foreground capitalize">
+          {profile.role === 'merchant' ? 'Merchant' : 'Customer'}
+        </span>
+      </div>
+      
+      {/* User Avatar Dropdown */}
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="relative h-10 w-10 rounded-full p-0 hover:bg-muted/50">
+            <Avatar className="h-10 w-10 border-2 border-primary/20">
+              <AvatarFallback className="bg-primary text-primary-foreground font-semibold text-sm">
+                {getInitials(profile.name)}
+              </AvatarFallback>
+            </Avatar>
+          </Button>
+        </DropdownMenuTrigger>
       <DropdownMenuContent className="w-56" align="end" forceMount>
         <DropdownMenuLabel className="font-normal">
           <div className="flex flex-col space-y-1">
@@ -86,5 +96,6 @@ export function AuthButton() {
         </DropdownMenuItem>
       </DropdownMenuContent>
     </DropdownMenu>
+    </div>
   );
 }
