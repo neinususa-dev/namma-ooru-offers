@@ -531,6 +531,10 @@ export type Database = {
         }
         Returns: undefined
       }
+      email_exists: {
+        Args: { email_to_check: string }
+        Returns: boolean
+      }
       generate_referral_code: {
         Args: { user_name: string }
         Returns: string

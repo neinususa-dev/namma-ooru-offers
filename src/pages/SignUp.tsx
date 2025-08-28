@@ -57,15 +57,12 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      // Check if email already exists in profiles table
+      // Check if email already exists using the database function
       console.log('Checking email:', signUpForm.email.toLowerCase());
-      const { data: existingProfile, error: checkError } = await supabase
-        .from('profiles')
-        .select('email')
-        .eq('email', signUpForm.email.toLowerCase())
-        .maybeSingle();
+      const { data: emailExists, error: checkError } = await supabase
+        .rpc('email_exists', { email_to_check: signUpForm.email });
 
-      console.log('Existing profile check result:', { existingProfile, checkError });
+      console.log('Email exists check result:', { emailExists, checkError });
 
       if (checkError) {
         console.error('Error checking existing email:', checkError);
@@ -78,7 +75,7 @@ export default function SignUp() {
         return;
       }
 
-      if (existingProfile) {
+      if (emailExists) {
         console.log('User already exists, showing error message');
         toast({
           title: "Account Already Exists",
