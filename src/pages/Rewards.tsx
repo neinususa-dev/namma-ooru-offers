@@ -104,7 +104,10 @@ const Rewards = () => {
           <Gift className="h-16 w-16 mx-auto animate-bounce mb-4" />
           <h1 className="text-4xl md:text-5xl font-bold mb-2">Earn Rewards with Namma Ooru Offers!</h1>
           <p className="text-white/90 mb-4 text-lg max-w-xl mx-auto">
-            Register now and instantly get 50 points. Refer friends, scan QR codes in stores, and unlock more exciting rewards across Tamil Nadu!
+            {user 
+              ? "Refer friends, scan QR codes in stores, share on Social media with your referral code and unlock more exciting rewards across Tamil Nadu!"
+              : "Register now and instantly get 50 points. Refer friends, scan QR codes in stores, and unlock more exciting rewards across Tamil Nadu!"
+            }
           </p>
           {!user ? (
             <div className="flex justify-center gap-4">
