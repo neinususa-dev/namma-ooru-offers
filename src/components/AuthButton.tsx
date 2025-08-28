@@ -44,12 +44,18 @@ export function AuthButton() {
   return (
     <div className="flex items-center gap-3">
       {/* User name and role display */}
-      <div className="hidden sm:flex flex-col items-end">
+      <div className="hidden sm:flex flex-col items-end gap-1">
         <span className="text-sm font-medium text-foreground">{profile.name}</span>
-        <span className="text-xs text-muted-foreground capitalize">
-          {profile.current_plan && profile.role === 'merchant' ? `${profile.current_plan} ` : ''}
-          {profile.role}
-        </span>
+        <div className="flex items-center gap-1">
+          {profile.current_plan && profile.role === 'merchant' && (
+            <span className="px-2 py-0.5 text-xs font-medium bg-secondary text-secondary-foreground rounded-full">
+              {profile.current_plan}
+            </span>
+          )}
+          <span className="text-xs text-muted-foreground capitalize">
+            {profile.role}
+          </span>
+        </div>
       </div>
       
       {/* Blue circular avatar with dropdown */}
