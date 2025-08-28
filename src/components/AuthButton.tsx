@@ -89,12 +89,20 @@ export function AuthButton() {
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
         {profile.role === 'super_admin' && (
-          <DropdownMenuItem asChild>
-            <Link to="/admin-dashboard" className="flex items-center">
-              <Shield className="mr-2 h-4 w-4" />
-              <span>Admin Dashboard</span>
-            </Link>
-          </DropdownMenuItem>
+          <>
+            <DropdownMenuItem asChild>
+              <Link to="/admin-dashboard" className="flex items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>Admin Dashboard</span>
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem asChild>
+              <Link to="/admin-navigation" className="flex items-center">
+                <Shield className="mr-2 h-4 w-4" />
+                <span>All Pages Navigator</span>
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuItem asChild>
           <Link to={

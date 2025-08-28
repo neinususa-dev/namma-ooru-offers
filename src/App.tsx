@@ -13,6 +13,7 @@ import MerchantDashboard from "./pages/MerchantDashboard";
 import MerchantPostOffer from "./pages/MerchantPostOffer";
 import MerchantEditOffers from "./pages/MerchantEditOffers";
 import { AdminDashboard } from "./pages/AdminDashboard";
+import { AdminNavigation } from "./components/AdminNavigation";
 import Rewards from "./pages/Rewards";
 import { Billing } from "./pages/Billing";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
@@ -39,6 +40,7 @@ const App = () => (
           <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
           <Route path="/merchant-edit-offers" element={<MerchantEditOffers />} />
           <Route path="/admin-dashboard" element={<AdminDashboard />} />
+          <Route path="/admin-navigation" element={<AdminNavigation />} />
           <Route path="/rewards" element={<Rewards />} />
           <Route path="/billing" element={<Billing />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />

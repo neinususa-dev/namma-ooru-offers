@@ -14,6 +14,7 @@ import { toast } from "sonner";
 import { Store, Shield, Users, ShoppingBag, Plus, Edit } from "lucide-react";
 import { OfferCard } from "@/components/OfferCard";
 import { Label } from "@/components/ui/label";
+import { Link } from "react-router-dom";
 
 export function AdminDashboard() {
   const { profile } = useAuth();
@@ -117,12 +118,20 @@ export function AdminDashboard() {
 
   return (
     <div className="container mx-auto p-4 space-y-6">
-      <div className="flex items-center gap-2">
-        <Shield className="h-8 w-8 text-primary" />
-        <div>
-          <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
-          <p className="text-muted-foreground">Manage stores and offers across the platform</p>
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <Shield className="h-8 w-8 text-primary" />
+          <div>
+            <h1 className="text-3xl font-bold">Super Admin Dashboard</h1>
+            <p className="text-muted-foreground">Manage stores and offers across the platform</p>
+          </div>
         </div>
+        <Button asChild>
+          <Link to="/admin-navigation" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            All Pages Navigator
+          </Link>
+        </Button>
       </div>
 
       {/* Stats Cards */}
@@ -164,21 +173,150 @@ export function AdminDashboard() {
         </Card>
       </div>
 
-      <Tabs defaultValue="stores" className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
+      <Tabs defaultValue="overview" className="w-full">
+        <TabsList className="grid w-full grid-cols-5">
+          <TabsTrigger value="overview" className="flex items-center gap-2">
+            <Shield className="h-4 w-4" />
+            Overview
+          </TabsTrigger>
+          <TabsTrigger value="pages" className="flex items-center gap-2">
+            <Users className="h-4 w-4" />
+            All Pages
+          </TabsTrigger>
           <TabsTrigger value="stores" className="flex items-center gap-2">
             <Store className="h-4 w-4" />
-            Manage Stores
+            Stores
           </TabsTrigger>
           <TabsTrigger value="offers" className="flex items-center gap-2">
             <ShoppingBag className="h-4 w-4" />
-            Manage Offers
+            Offers
           </TabsTrigger>
           <TabsTrigger value="create" className="flex items-center gap-2">
             <Plus className="h-4 w-4" />
             Create New
           </TabsTrigger>
         </TabsList>
+
+        <TabsContent value="overview" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>Super Admin Overview</CardTitle>
+              <CardDescription>Platform statistics and quick actions</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div className="text-center p-4 border rounded-lg">
+                  <Store className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <div className="text-2xl font-bold">{stores?.length || 0}</div>
+                  <p className="text-sm text-muted-foreground">Total Stores</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <ShoppingBag className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <div className="text-2xl font-bold">{offers?.length || 0}</div>
+                  <p className="text-sm text-muted-foreground">Total Offers</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <Users className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <div className="text-2xl font-bold">All</div>
+                  <p className="text-sm text-muted-foreground">Access Level</p>
+                </div>
+                <div className="text-center p-4 border rounded-lg">
+                  <Shield className="h-8 w-8 mx-auto mb-2 text-primary" />
+                  <div className="text-2xl font-bold">Admin</div>
+                  <p className="text-sm text-muted-foreground">Super User</p>
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
+
+        <TabsContent value="pages" className="space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Application Pages</CardTitle>
+              <CardDescription>Access all pages as super admin - you can view and test all features</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                {/* Customer Pages */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Users className="h-5 w-5 text-secondary" />
+                    Customer Pages
+                  </h3>
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/" target="_blank">🏠 Home Page</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/your-offers" target="_blank">🎁 Your Offers</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/rewards" target="_blank">🏆 Rewards Center</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/customer-analytics" target="_blank">📊 Customer Analytics</a>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Merchant Pages */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Store className="h-5 w-5 text-primary" />
+                    Merchant Pages
+                  </h3>
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/merchant-dashboard" target="_blank">📈 Merchant Dashboard</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/merchant-post-offer" target="_blank">➕ Post New Offer</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/merchant-edit-offers" target="_blank">✏️ Edit Offers</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/billing" target="_blank">💳 Billing & Plans</a>
+                    </Button>
+                  </div>
+                </div>
+
+                {/* Admin & Shared Pages */}
+                <div className="space-y-3">
+                  <h3 className="font-semibold text-lg flex items-center gap-2">
+                    <Shield className="h-5 w-5 text-destructive" />
+                    Admin & Shared
+                  </h3>
+                  <div className="space-y-2">
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/profile" target="_blank">👤 Profile Settings</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/about" target="_blank">ℹ️ About Us</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/signin" target="_blank">🔐 Sign In Page</a>
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start" asChild>
+                      <a href="/signup" target="_blank">📝 Sign Up Page</a>
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="mt-6 p-4 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800 rounded-lg">
+                <div className="flex items-center gap-2 mb-2">
+                  <Shield className="h-5 w-5 text-yellow-600" />
+                  <h4 className="font-medium">Super Admin Access</h4>
+                </div>
+                <p className="text-sm text-muted-foreground">
+                  As a super admin, you can access all pages and features. Links open in new tabs so you can test functionality while keeping this dashboard open. You have full read/write access to all data.
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         <TabsContent value="stores" className="space-y-4">
           <Card>
