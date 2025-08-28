@@ -10,7 +10,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
-import { User, LogOut, Store, ShoppingCart, Gift, Plus } from 'lucide-react';
+import { User, LogOut, Store, ShoppingCart, Gift, Plus, Shield } from 'lucide-react';
 
 export function AuthButton() {
   const { user, profile, signOut, loading } = useAuth();
@@ -77,7 +77,9 @@ export function AuthButton() {
               {profile.email}
             </p>
             <div className="flex items-center pt-1">
-              {profile.role === 'merchant' ? (
+              {profile.role === 'super_admin' ? (
+                <><Shield className="w-3 h-3 mr-1" /> Super Admin</>
+              ) : profile.role === 'merchant' ? (
                 <><Store className="w-3 h-3 mr-1" /> Merchant</>
               ) : (
                 <><ShoppingCart className="w-3 h-3 mr-1" /> Customer</>
@@ -86,10 +88,24 @@ export function AuthButton() {
           </div>
         </DropdownMenuLabel>
         <DropdownMenuSeparator />
+        {profile.role === 'super_admin' && (
+          <DropdownMenuItem asChild>
+            <Link to="/admin-dashboard" className="flex items-center">
+              <Shield className="mr-2 h-4 w-4" />
+              <span>Admin Dashboard</span>
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem asChild>
-          <Link to={profile.role === 'merchant' ? "/merchant-post-offer" : "/your-offers"} className="flex items-center">
-            {profile.role === 'merchant' ? <Plus className="h-4 w-4" /> : <Gift className="h-4 w-4" />}
-            <span>{profile.role === 'merchant' ? 'Post Offer' : 'Your Offers'}</span>
+          <Link to={
+            profile.role === 'super_admin' 
+              ? "/admin-dashboard" 
+              : profile.role === 'merchant' 
+                ? "/merchant-post-offer" 
+                : "/your-offers"
+          } className="flex items-center">
+            {profile.role === 'super_admin' ? <Shield className="h-4 w-4" /> : profile.role === 'merchant' ? <Plus className="h-4 w-4" /> : <Gift className="h-4 w-4" />}
+            <span>{profile.role === 'super_admin' ? 'Manage Platform' : profile.role === 'merchant' ? 'Post Offer' : 'Your Offers'}</span>
           </Link>
         </DropdownMenuItem>
         <DropdownMenuItem asChild>

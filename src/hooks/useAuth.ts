@@ -6,7 +6,7 @@ export interface Profile {
   id: string;
   name: string;
   email: string;
-  role: 'customer' | 'merchant';
+  role: 'customer' | 'merchant' | 'super_admin';
   is_premium: boolean;
   phone_number?: string;
   store_name?: string;
@@ -220,6 +220,7 @@ export function useAuth() {
 
   const isCustomer = profile?.role === 'customer';
   const isMerchant = profile?.role === 'merchant';
+  const isSuperAdmin = profile?.role === 'super_admin';
 
   return {
     user,
@@ -228,6 +229,7 @@ export function useAuth() {
     loading,
     isCustomer,
     isMerchant,
+    isSuperAdmin,
     signUp,
     signIn,
     signOut
