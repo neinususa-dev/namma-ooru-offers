@@ -21,10 +21,10 @@ import { useAuth } from "@/hooks/useAuth";
 
 const Rewards = () => {
   const { user } = useAuth();
-  const [currentPoints] = useState(50);
-  const [totalEarned] = useState(50);
-  const [level] = useState("Bronze");
-  const [nextLevelPoints] = useState(200);
+  const [currentPoints] = useState(250);
+  const [totalEarned] = useState(1840);
+  const [level] = useState("Campus Champ");
+  const [nextLevelPoints] = useState(500);
 
   return (
     <div className="min-h-screen bg-white">
@@ -119,28 +119,21 @@ const Rewards = () => {
   <div className="grid grid-cols-6 gap-4 justify-center text-center">
     <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
       <Star className="h-8 w-8 mb-2 text-yellow-400" />
-      <span className="text-sm font-medium">Newbie</span>
+      <span className="text-sm font-medium">Bronze</span>
     </Card>
     <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
       <Trophy className="h-8 w-8 mb-2 text-green-500" />
-      <span className="text-sm font-medium">Campus Champ</span>
+      <span className="text-sm font-medium">Silver</span>
     </Card>
     <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
       <Camera className="h-8 w-8 mb-2 text-blue-500" />
-      <span className="text-sm font-medium">Store Explorer</span>
+      <span className="text-sm font-medium">Gold</span>
     </Card>
     <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
       <Users className="h-8 w-8 mb-2 text-pink-500" />
-      <span className="text-sm font-medium">Referral King</span>
+      <span className="text-sm font-medium">Diamond</span>
     </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <Coins className="h-8 w-8 mb-2 text-orange-400" />
-      <span className="text-sm font-medium">Point Master</span>
-    </Card>
-    <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
-      <QrCode className="h-8 w-8 mb-2 text-purple-500" />
-      <span className="text-sm font-medium">QR Scanner Pro</span>
-    </Card>
+    
   </div>
 </div>
 
@@ -169,13 +162,13 @@ const Rewards = () => {
                 <CardTitle className="text-sm font-medium mb-2">Active Offers</CardTitle>
                 <Target className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-3xl font-bold">12</div>
-                <p className="text-white/80 text-sm">Near your college</p>
+                <p className="text-white/80 text-sm">Near your Location</p>
               </Card>
 
             </div>
 
             {/* Referral & Social Sharing */}
-            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-100 to-green-400 text-white p-6">
+            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-200 text-white p-6">
               <CardTitle className="text-2xl font-bold flex items-center mb-4">
                 <Users className="h-6 w-6 mr-2" />
                 Share & Earn Points
