@@ -33,6 +33,7 @@ interface OfferData {
   expiry_date: string;
   redemption_mode: 'online' | 'store' | 'both';
   listing_type: 'hot_offers' | 'trending' | 'local_deals';
+  status: 'applied' | 'in_review' | 'approved' | 'rejected';
   is_active: boolean;
   created_at: string;
   updated_at: string;
@@ -246,8 +247,15 @@ const MerchantEditOffers = () => {
                         {offer.description}
                       </CardDescription>
                     </div>
-                    <Badge variant={offer.is_active ? "default" : "secondary"}>
-                      {offer.is_active ? "Active" : "Inactive"}
+                    <Badge variant={
+                      offer.status === 'approved' ? "default" : 
+                      offer.status === 'rejected' ? "destructive" : 
+                      "secondary"
+                    }>
+                      {offer.status === 'approved' ? "Active" : 
+                       offer.status === 'rejected' ? "Rejected" : 
+                       offer.status === 'in_review' ? "Pending Review" :
+                       "Applied"}
                     </Badge>
                   </div>
                 </CardHeader>
