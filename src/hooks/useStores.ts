@@ -16,8 +16,20 @@ export interface Store {
   updated_at: string;
 }
 
+export interface PublicStore {
+  id: string;
+  name: string;
+  description: string | null;
+  location: string | null;
+  district: string | null;
+  city: string | null;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export function useStores() {
-  const [stores, setStores] = useState<Store[]>([]);
+  const [stores, setStores] = useState<PublicStore[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -26,10 +38,10 @@ export function useStores() {
       setLoading(true);
       setError(null);
 
+      // Use the public view that only exposes non-sensitive information
       const { data, error: fetchError } = await supabase
-        .from('stores')
+        .from('stores_public')
         .select('*')
-        .eq('is_active', true)
         .order('name', { ascending: true });
 
       if (fetchError) {

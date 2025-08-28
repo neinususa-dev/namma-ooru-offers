@@ -2,12 +2,11 @@ import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { MapPin, Phone, Mail, Globe, ExternalLink, ShoppingBag, ArrowLeft } from 'lucide-react';
-import { useStores } from '@/hooks/useStores';
+import { MapPin, ShoppingBag, ArrowLeft, ExternalLink } from 'lucide-react';
+import { useStores, type PublicStore } from '@/hooks/useStores';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OfferCard } from '@/components/OfferCard';
-import type { Store } from '@/hooks/useStores';
 
 interface StoresListProps {
   maxItems?: number;
@@ -22,7 +21,7 @@ export const StoresList: React.FC<StoresListProps> = ({
 }) => {
   const { stores, loading, error } = useStores();
   const { offers, loading: offersLoading } = useOfferDatabase();
-  const [selectedStore, setSelectedStore] = useState<Store | null>(null);
+  const [selectedStore, setSelectedStore] = useState<PublicStore | null>(null);
 
   // Function to count offers per store
   const getOfferCount = (storeName: string) => {
@@ -54,7 +53,7 @@ export const StoresList: React.FC<StoresListProps> = ({
   });
 
   // Handle store selection
-  const handleStoreSelect = (store: Store) => {
+  const handleStoreSelect = (store: PublicStore) => {
     setSelectedStore(store);
     onStoreClick?.(store.id);
   };
@@ -226,51 +225,11 @@ export const StoresList: React.FC<StoresListProps> = ({
                 </div>
               )}
 
-              <div className="flex flex-wrap gap-2">
-                {store.phone_number && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-1 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`tel:${store.phone_number}`);
-                    }}
-                  >
-                    <Phone className="h-3 w-3" />
-                    Call
-                  </Button>
-                )}
-                
-                {store.email && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-1 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(`mailto:${store.email}`);
-                    }}
-                  >
-                    <Mail className="h-3 w-3" />
-                    Email
-                  </Button>
-                )}
-                
-                {store.website && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="flex items-center gap-1 text-xs"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(store.website, '_blank');
-                    }}
-                  >
-                    <Globe className="h-3 w-3" />
-                    Website
-                  </Button>
-                )}
+              {/* Note about contacting stores */}
+              <div className="pt-2 border-t">
+                <p className="text-xs text-muted-foreground">
+                  Click to view store offers and contact information
+                </p>
               </div>
             </CardContent>
           </Card>
