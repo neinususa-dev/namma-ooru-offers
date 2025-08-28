@@ -222,7 +222,7 @@ export default function SignUp() {
               <TabsList className="grid w-full grid-cols-2 bg-muted rounded-lg p-1">
                 <TabsTrigger 
                   value="customer" 
-                  className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-primary"
+                  className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-secondary"
                 >
                   <Users className="h-4 w-4" />
                   Customer
@@ -237,9 +237,9 @@ export default function SignUp() {
               </TabsList>
 
               <TabsContent value="customer" className="space-y-4">
-                <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/10">
-                  <Users className="h-8 w-8 text-primary mx-auto mb-2" />
-                  <h3 className="font-semibold text-primary">Join as Customer</h3>
+                <div className="text-center p-4 bg-secondary/5 rounded-lg border border-secondary/10">
+                  <Users className="h-8 w-8 text-secondary mx-auto mb-2" />
+                  <h3 className="font-semibold text-secondary">Join as Customer</h3>
                   <p className="text-sm text-muted-foreground">Browse and save amazing offers from local shops</p>
                 </div>
                 
