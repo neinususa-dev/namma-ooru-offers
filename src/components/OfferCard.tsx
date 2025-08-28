@@ -195,7 +195,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       </CardHeader>
 
       <CardContent className="py-3">
-        <div className="mb-3">
+        <div className="mb-3 min-h-[60px]">
           <p className="text-sm text-muted-foreground">
             {displayDescription}
           </p>
