@@ -1100,7 +1100,7 @@ const Index = () => {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold">Platinum</div>
-                <div className="text-2xl font-bold">FREE</div>
+                <div className="text-2xl font-bold">₹1500/mo</div>
                 <div className="text-sm opacity-75">30+ Offers/mo</div>
               </div>
             </div>
