@@ -52,7 +52,10 @@ export function AdminDashboard() {
     district: "",
     city: "",
     expiry_date: "",
-    merchant_id: ""
+    image_url: "",
+    listing_type: "hot_offers",
+    redemption_mode: "both",
+    points_required: ""
   });
 
   // Redirect if not super admin
@@ -112,6 +115,7 @@ export function AdminDashboard() {
 
       const originalPrice = parseFloat(newOffer.original_price) || 0;
       const discountedPrice = parseFloat(newOffer.discounted_price) || 0;
+      const pointsRequired = parseInt(newOffer.points_required) || null;
       
       // Calculate discount percentage
       const discountPercentage = originalPrice > 0 && discountedPrice < originalPrice 
@@ -119,16 +123,24 @@ export function AdminDashboard() {
         : 0;
 
       const { error } = await supabase.from('offers').insert([{
-        ...newOffer,
+        title: newOffer.title,
+        description: newOffer.description,
+        category: newOffer.category,
+        store_name: newOffer.store_name,
+        location: newOffer.location,
+        district: newOffer.district,
+        city: newOffer.city,
+        image_url: newOffer.image_url || null,
+        listing_type: newOffer.listing_type,
+        redemption_mode: newOffer.redemption_mode,
+        points_required: pointsRequired,
         original_price: originalPrice || null,
         discounted_price: discountedPrice || null,
         discount_percentage: discountPercentage,
         expiry_date: new Date(newOffer.expiry_date).toISOString(),
         merchant_id: profile?.id, // Use current admin as merchant_id
         status: 'approved', // Admin-created offers are auto-approved
-        is_active: true,
-        redemption_mode: 'both',
-        listing_type: 'hot_offers'
+        is_active: true
       }]);
       
       if (error) throw error;
@@ -145,7 +157,10 @@ export function AdminDashboard() {
         district: "",
         city: "",
         expiry_date: "",
-        merchant_id: ""
+        image_url: "",
+        listing_type: "hot_offers",
+        redemption_mode: "both",
+        points_required: ""
       });
       
       // Refresh offers list
@@ -582,7 +597,7 @@ export function AdminDashboard() {
                 </CardHeader>
                 <CardContent className="space-y-4">
                   <div>
-                    <Label htmlFor="offerTitle">Title</Label>
+                    <Label htmlFor="offerTitle">Title *</Label>
                     <Input
                       id="offerTitle"
                       value={newOffer.title}
@@ -657,14 +672,95 @@ export function AdminDashboard() {
                     </div>
                   </div>
                   
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <Label htmlFor="offerLocation">Location</Label>
+                      <Input
+                        id="offerLocation"
+                        value={newOffer.location}
+                        onChange={(e) => setNewOffer({...newOffer, location: e.target.value})}
+                        placeholder="Street/Area"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="offerDistrict">District</Label>
+                      <Input
+                        id="offerDistrict"
+                        value={newOffer.district}
+                        onChange={(e) => setNewOffer({...newOffer, district: e.target.value})}
+                        placeholder="District"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="offerCity">City</Label>
+                      <Input
+                        id="offerCity"
+                        value={newOffer.city}
+                        onChange={(e) => setNewOffer({...newOffer, city: e.target.value})}
+                        placeholder="City"
+                      />
+                    </div>
+                  </div>
+                  
                   <div>
-                    <Label htmlFor="offerExpiry">Expiry Date</Label>
+                    <Label htmlFor="offerImage">Image URL</Label>
                     <Input
-                      id="offerExpiry"
-                      type="date"
-                      value={newOffer.expiry_date}
-                      onChange={(e) => setNewOffer({...newOffer, expiry_date: e.target.value})}
+                      id="offerImage"
+                      value={newOffer.image_url}
+                      onChange={(e) => setNewOffer({...newOffer, image_url: e.target.value})}
+                      placeholder="https://example.com/image.jpg"
                     />
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="offerListingType">Listing Type</Label>
+                      <Select value={newOffer.listing_type} onValueChange={(value) => setNewOffer({...newOffer, listing_type: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="hot_offers">Hot Offers</SelectItem>
+                          <SelectItem value="trending">Trending</SelectItem>
+                          <SelectItem value="local_deals">Local Deals</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                    <div>
+                      <Label htmlFor="offerRedemption">Redemption Mode</Label>
+                      <Select value={newOffer.redemption_mode} onValueChange={(value) => setNewOffer({...newOffer, redemption_mode: value})}>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="online">Online Only</SelectItem>
+                          <SelectItem value="store">In Store Only</SelectItem>
+                          <SelectItem value="both">Both Online & In Store</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  
+                  <div className="grid grid-cols-2 gap-2">
+                    <div>
+                      <Label htmlFor="offerPoints">Points Required</Label>
+                      <Input
+                        id="offerPoints"
+                        type="number"
+                        value={newOffer.points_required}
+                        onChange={(e) => setNewOffer({...newOffer, points_required: e.target.value})}
+                        placeholder="0"
+                      />
+                    </div>
+                    <div>
+                      <Label htmlFor="offerExpiry">Expiry Date *</Label>
+                      <Input
+                        id="offerExpiry"
+                        type="date"
+                        value={newOffer.expiry_date}
+                        onChange={(e) => setNewOffer({...newOffer, expiry_date: e.target.value})}
+                      />
+                    </div>
                   </div>
                   
                   <Button onClick={handleCreateOffer} className="w-full">
