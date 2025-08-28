@@ -67,52 +67,64 @@ const Rewards = () => {
     if (!userReward) return 0;
     const { total_earned_points } = userReward;
     const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
     
     // Check for special levels first
-    if (referralCount >= 100) return 100; // Referral King
+    if (referralCount >= 100 && total_earned_points >= 4000) return 100; // Referral King
+    if (qrScanCount >= 100 && total_earned_points >= 6000) return 100; // QR Master
     if (total_earned_points >= 2500) return 100; // Platinum
     if (total_earned_points >= 1000) return ((total_earned_points - 1000) / 1500) * 100;
     if (total_earned_points >= 500) return ((total_earned_points - 500) / 500) * 100;
     if (total_earned_points >= 200) return ((total_earned_points - 200) / 300) * 100;
-    return (total_earned_points / 200) * 100;
+    if (total_earned_points >= 25) return ((total_earned_points - 25) / 175) * 100;
+    return (total_earned_points / 25) * 100;
   };
 
   const getNextLevelPoints = () => {
-    if (!userReward) return 0;
+    if (!userReward) return 25;
     const { total_earned_points } = userReward;
     const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
     
-    if (referralCount >= 100) return 0; // Referral King
+    if (referralCount >= 100 && total_earned_points >= 4000) return 0; // Referral King
+    if (qrScanCount >= 100 && total_earned_points >= 6000) return 0; // QR Master
     if (total_earned_points >= 2500) return 0; // Platinum
     if (total_earned_points >= 1000) return 2500 - total_earned_points;
     if (total_earned_points >= 500) return 1000 - total_earned_points;
     if (total_earned_points >= 200) return 500 - total_earned_points;
-    return 200 - total_earned_points;
+    if (total_earned_points >= 25) return 200 - total_earned_points;
+    return 25 - total_earned_points;
   };
 
   const getNextLevel = () => {
-    if (!userReward) return 'Silver';
+    if (!userReward) return 'Bronze';
     const { total_earned_points } = userReward;
     const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
     
-    if (referralCount >= 100) return 'Referral King';
-    if (total_earned_points >= 2500) return 'Referral King';
+    if (referralCount >= 100 && total_earned_points >= 4000) return 'Referral King';
+    if (qrScanCount >= 100 && total_earned_points >= 6000) return 'QR Master';
+    if (total_earned_points >= 2500) return 'Referral King or QR Master';
     if (total_earned_points >= 1000) return 'Platinum';
     if (total_earned_points >= 500) return 'Gold';
     if (total_earned_points >= 200) return 'Silver';
-    return 'Silver';
+    if (total_earned_points >= 25) return 'Silver';
+    return 'Bronze';
   };
 
   const getCurrentLevel = () => {
     if (!userReward) return 'Bronze';
     const { total_earned_points } = userReward;
     const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
     
-    if (referralCount >= 100) return 'Referral King';
+    if (referralCount >= 100 && total_earned_points >= 4000) return 'Referral King';
+    if (qrScanCount >= 100 && total_earned_points >= 6000) return 'QR Master';
     if (total_earned_points >= 2500) return 'Platinum';
     if (total_earned_points >= 1000) return 'Gold';
     if (total_earned_points >= 500) return 'Gold';
     if (total_earned_points >= 200) return 'Silver';
+    if (total_earned_points >= 25) return 'Bronze';
     return 'Bronze';
   };
 
@@ -215,7 +227,7 @@ const Rewards = () => {
                   <span className={`text-sm font-bold ${
                     userReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
                   }`}>Bronze</span>
-                  <span className="text-xs text-muted-foreground">0 pts</span>
+                  <span className="text-xs text-muted-foreground">25 pts</span>
                 </div>
 
                 {/* Silver Level */}
@@ -259,28 +271,28 @@ const Rewards = () => {
 
                 {/* Referral King Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'bg-pink-100 scale-105 shadow-md' : 'bg-gray-50'
+                  referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'bg-pink-100 scale-105 shadow-md' : 'bg-gray-50'
                 }`}>
                   <Users className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'text-pink-600 animate-pulse' : 'text-gray-300'
+                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'text-pink-600 animate-pulse' : 'text-gray-300'
                   }`} />
                   <span className={`text-sm font-bold ${
-                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'text-pink-700' : 'text-gray-400'
+                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'text-pink-700' : 'text-gray-400'
                   }`}>Referral King</span>
-                  <span className="text-xs text-muted-foreground">100+ refs</span>
+                  <span className="text-xs text-muted-foreground">100+ refs & 4000 pts</span>
                 </div>
 
                 {/* QR Master Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'bg-blue-100 scale-105 shadow-md' : 'bg-gray-50'
+                  activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'bg-blue-100 scale-105 shadow-md' : 'bg-gray-50'
                 }`}>
                   <QrCode className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'text-blue-600 animate-pulse' : 'text-gray-300'
+                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'text-blue-600 animate-pulse' : 'text-gray-300'
                   }`} />
                   <span className={`text-sm font-bold ${
-                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'text-blue-700' : 'text-gray-400'
+                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'text-blue-700' : 'text-gray-400'
                   }`}>QR Master</span>
-                  <span className="text-xs text-muted-foreground">100+ scans</span>
+                  <span className="text-xs text-muted-foreground">100+ scans & 6000 pts</span>
                 </div>
               </div>
 
