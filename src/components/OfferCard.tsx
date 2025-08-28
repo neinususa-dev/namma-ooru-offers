@@ -86,7 +86,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
     await redeemOffer(id);
   };
   return (
-    <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30">
+    <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30 flex flex-col h-full">
       {/* Hot/Trending Badges */}
       {isHot && displayMode === 'default' && (
         <div className="absolute top-3 right-3 z-10">
@@ -194,7 +194,7 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         </div>
       </CardHeader>
 
-      <CardContent className="py-3">
+      <CardContent className="py-3 flex-1 flex flex-col justify-between">
         <div className="mb-3 min-h-[60px]">
           <p className="text-sm text-muted-foreground">
             {displayDescription}
