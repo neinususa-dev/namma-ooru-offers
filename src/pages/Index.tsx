@@ -669,7 +669,7 @@ const Index = () => {
           <div className="text-center text-white space-y-6">
             <h3 className="text-4xl font-bold">Are you a local business owner?</h3>
             <p className="text-xl opacity-90 max-w-2xl mx-auto">
-              Join thousands of merchants who are growing their sales with Namma OOru Offers. 
+              Join thousands of merchants who are growing their sales with Namma Ooru Offers. 
               Post your offers and reach more customers today!
             </p>
             
@@ -719,7 +719,7 @@ const Index = () => {
             >
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
-                alt="Namma OOru Offers Logo" 
+                alt="Namma Ooru Offers Logo" 
                 className="w-8 h-8 rounded"
               />
               <div>
@@ -734,7 +734,7 @@ const Index = () => {
             </button>
             
             <div className="text-sm text-muted-foreground text-center md:text-right">
-              <p>© 2024 Namma OOru Offers. Supporting local businesses across Tamil Nadu.</p>
+              <p>© 2024 Namma Ooru Offers. Supporting local businesses across Tamil Nadu.</p>
               <p className="mt-1">Made with ❤️ for Tamil Nadu</p>
             </div>
           </div>

@@ -38,12 +38,12 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
             >
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
-                alt="Namma OOru Offers Logo" 
+                alt="Namma Ooru Offers Logo" 
                 className="w-12 h-12 rounded-lg"
               />
               <div>
                 <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
-                  Namma OOru Offers
+                  Namma Ooru Offers
                 </h1>
                 <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
               </div>
