@@ -539,6 +539,10 @@ export type Database = {
         Args: { user_name: string }
         Returns: string
       }
+      phone_exists: {
+        Args: { phone_to_check: string }
+        Returns: boolean
+      }
     }
     Enums: {
       user_role: "customer" | "merchant"

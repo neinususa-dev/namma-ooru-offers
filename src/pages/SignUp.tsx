@@ -52,11 +52,54 @@ export default function SignUp() {
     }
   }, [user, profile, loading, navigate]);
 
+  const formatPhoneNumber = (phone: string) => {
+    // Remove all non-digits
+    const digits = phone.replace(/\D/g, '');
+    
+    // If phone starts with 91, don't add +91 again
+    if (digits.startsWith('91') && digits.length === 12) {
+      return `+${digits}`;
+    }
+    
+    // If phone has 10 digits, add +91
+    if (digits.length === 10) {
+      return `+91${digits}`;
+    }
+    
+    // If phone already has country code format
+    if (digits.length === 12 && !digits.startsWith('91')) {
+      return `+91${digits.slice(-10)}`;
+    }
+    
+    return `+91${digits.slice(-10)}`;
+  };
+
+  const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    // Allow only numbers, +, and spaces
+    const sanitized = value.replace(/[^\d+\s]/g, '');
+    setSignUpForm({ ...signUpForm, phoneNumber: sanitized });
+  };
+
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
+      // Format phone number with country code
+      const formattedPhone = formatPhoneNumber(signUpForm.phoneNumber);
+      
+      // Validate phone number format
+      if (!/^\+91\d{10}$/.test(formattedPhone)) {
+        toast({
+          title: "Invalid Phone Number",
+          description: "Please enter a valid 10-digit Indian phone number.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
       // Check if email already exists using the database function
       console.log('Checking email:', signUpForm.email.toLowerCase());
       const { data: emailExists, error: checkError } = await supabase
@@ -90,11 +133,40 @@ export default function SignUp() {
         return;
       }
 
-      console.log('Email is available, proceeding with signup');
+      // Check if phone number already exists
+      console.log('Checking phone:', formattedPhone);
+      const { data: phoneExists, error: phoneCheckError } = await supabase
+        .rpc('phone_exists', { phone_to_check: formattedPhone });
 
-      // Proceed with signup if email doesn't exist
+      console.log('Phone exists check result:', { phoneExists, phoneCheckError });
+
+      if (phoneCheckError) {
+        console.error('Error checking existing phone:', phoneCheckError);
+        toast({
+          title: "Error",
+          description: "Failed to validate phone number. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      if (phoneExists) {
+        console.log('Phone number already exists, showing error message');
+        toast({
+          title: "Phone Number Already Exists",
+          description: "An account with this phone number already exists. Please use a different number.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
+
+      console.log('Email and phone are available, proceeding with signup');
+
+      // Proceed with signup if email and phone don't exist
       const additionalData = {
-        phone_number: signUpForm.phoneNumber,
+        phone_number: formattedPhone,
         referral_code: signUpForm.referralCode || undefined,
         ...(signUpForm.role === 'merchant' ? {
           store_name: signUpForm.storeName,
@@ -207,13 +279,17 @@ export default function SignUp() {
                   <Input
                     id="phone-number"
                     type="tel"
-                    placeholder="Enter your phone number"
+                    placeholder="10-digit mobile number"
                     className="pl-10"
                     value={signUpForm.phoneNumber}
-                    onChange={(e) => setSignUpForm({ ...signUpForm, phoneNumber: e.target.value })}
+                    onChange={handlePhoneChange}
                     required
+                    maxLength={13}
                   />
                 </div>
+                <p className="text-xs text-muted-foreground">
+                  +91 country code will be added automatically
+                </p>
               </div>
 
               <div className="space-y-2">
