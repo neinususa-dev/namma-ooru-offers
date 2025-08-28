@@ -31,6 +31,40 @@ import { resizeImage, generateDefaultImage } from '@/utils/imageUtils';
 
 export function AdminDashboard() {
   const { profile, loading: authLoading } = useAuth();
+
+  // Show loading state while authentication is being checked
+  if (authLoading) {
+    return (
+      <div className="container mx-auto p-4">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
+            <p className="text-muted-foreground">Loading...</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  // Redirect if not super admin
+  if (profile?.role !== 'super_admin') {
+    return (
+      <div className="container mx-auto p-4">
+        <Card>
+          <CardContent className="p-6 text-center">
+            <Shield className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
+            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
+            <p className="text-muted-foreground">You don't have permission to access this page.</p>
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
+  return <AdminDashboardContent />;
+}
+
+function AdminDashboardContent() {
   const { offers, loading: offersLoading } = useOfferDatabase();
   const allOffers = useAdminOffers();
   const { stores, loading: storesLoading } = useStores();
@@ -92,35 +126,6 @@ export function AdminDashboard() {
   });
 
   const watchedValues = watch();
-
-  // Show loading state while authentication is being checked
-  if (authLoading) {
-    return (
-      <div className="container mx-auto p-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary mx-auto mb-4"></div>
-            <p className="text-muted-foreground">Loading...</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
-
-  // Redirect if not super admin
-  if (profile?.role !== 'super_admin') {
-    return (
-      <div className="container mx-auto p-4">
-        <Card>
-          <CardContent className="p-6 text-center">
-            <Shield className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
-            <h2 className="text-xl font-semibold mb-2">Access Denied</h2>
-            <p className="text-muted-foreground">You don't have permission to access this page.</p>
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
 
   const handleCreateStore = async () => {
     try {
