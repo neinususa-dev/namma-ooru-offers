@@ -77,6 +77,7 @@ export function useAuth() {
 
   const fetchUserProfile = async (userId: string) => {
     try {
+      console.log('Fetching profile for user:', userId);
       const { data, error } = await supabase
         .from('profiles')
         .select('*')
@@ -88,12 +89,19 @@ export function useAuth() {
         return;
       }
 
+      console.log('Profile data received:', data);
+
       // Only update if profile actually changed
       setProfile(prevProfile => {
-        if (!data) return null;
+        if (!data) {
+          console.log('No profile data found');
+          return null;
+        }
         if (prevProfile?.id === data.id && prevProfile?.updated_at === data.updated_at) {
+          console.log('Profile unchanged, skipping update');
           return prevProfile; // No change, don't trigger re-render
         }
+        console.log('Setting new profile data');
         return data;
       });
     } catch (error) {
@@ -138,14 +146,31 @@ export function useAuth() {
 
   const signIn = async (email: string, password: string) => {
     try {
+      // Clean up any existing auth state first
+      cleanupAuthState();
+      
+      // Attempt to sign out any existing session
+      try {
+        await supabase.auth.signOut({ scope: 'global' });
+      } catch (err) {
+        console.log('Pre-signin cleanup error (continuing):', err);
+      }
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password
       });
 
+      if (error) {
+        console.error('Sign in error:', error);
+      } else {
+        console.log('Sign in successful:', data.user?.id);
+      }
+
       // Let the auth state listener handle the redirect
       return { data, error };
     } catch (error) {
+      console.error('Sign in exception:', error);
       return { data: null, error };
     }
   };

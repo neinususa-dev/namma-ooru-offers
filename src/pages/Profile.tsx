@@ -95,6 +95,11 @@ export default function Profile() {
     }
   };
 
+  // Debug logging
+  console.log('Profile page - user:', user ? 'exists' : 'null');
+  console.log('Profile page - profile:', profile ? 'exists' : 'null');
+  console.log('Profile page - loading:', loading);
+
   if (!user || !profile) {
     return (
       <div className="min-h-screen bg-background">
@@ -102,7 +107,15 @@ export default function Profile() {
         <div className="container mx-auto px-4 py-8">
           <Card className="w-96 mx-auto">
             <CardContent className="pt-6">
-              <p className="text-center text-muted-foreground">Please sign in to view your profile.</p>
+              <p className="text-center text-muted-foreground">
+                {!user ? 'Please sign in to view your profile.' : 'Loading profile...'}
+              </p>
+              {/* Debug info */}
+              <div className="mt-4 text-xs text-muted-foreground">
+                <p>User: {user ? 'Authenticated' : 'Not authenticated'}</p>
+                <p>Profile: {profile ? 'Loaded' : 'Not loaded'}</p>
+                <p>Loading: {loading ? 'Yes' : 'No'}</p>
+              </div>
             </CardContent>
           </Card>
         </div>
