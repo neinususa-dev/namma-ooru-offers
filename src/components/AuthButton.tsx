@@ -47,6 +47,7 @@ export function AuthButton() {
       <div className="hidden sm:flex flex-col items-end">
         <span className="text-sm font-medium text-foreground">{profile.name}</span>
         <span className="text-xs text-muted-foreground capitalize">
+          {profile.current_plan && profile.role === 'merchant' ? `${profile.current_plan} ` : ''}
           {profile.role}
         </span>
       </div>

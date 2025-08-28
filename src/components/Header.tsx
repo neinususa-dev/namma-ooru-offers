@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Gift, Store, BarChart3, Plus, Flame, MapPin, Heart, Menu, X, Home } from 'lucide-react';
+import { Gift, Store, BarChart3, Plus, Flame, MapPin, Heart, Menu, X, Home, CreditCard } from 'lucide-react';
 import { AuthButton } from './AuthButton';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -53,7 +53,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
             {showNavigation && onSectionChange && (
               <nav className="hidden md:flex items-center gap-6">
                 {user && isMerchant ? (
-                  // Merchant navigation - only Dashboard and Post Offer
+                  // Merchant navigation - Dashboard, Post Offer, and Pricing
                   <>
                     <Link 
                       to="/merchant-dashboard"
@@ -68,6 +68,13 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                     >
                       <Plus className="h-4 w-4" />
                       Post Offer
+                    </Link>
+                    <Link 
+                      to="/billing"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Pricing
                     </Link>
                   </>
                 ) : (
@@ -196,6 +203,13 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       <Plus className="h-4 w-4" />
                       Post Offer
                     </Link>
+                    <Link 
+                      to="/billing"
+                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600 flex items-center gap-1"
+                    >
+                      <CreditCard className="h-4 w-4" />
+                      Pricing
+                    </Link>
                   </>
                 )}
               </nav>
@@ -315,6 +329,15 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                         >
                           <Plus className="h-5 w-5 text-blue-600" />
                           <span className="font-medium">Post Offer</span>
+                        </Link>
+                        
+                        <Link 
+                          to="/billing"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <CreditCard className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium">Pricing</span>
                         </Link>
                       </>
                     )}
