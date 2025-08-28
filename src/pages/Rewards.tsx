@@ -311,7 +311,7 @@ const Rewards = () => {
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
                     <Button 
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/sign-up?ref=${userReward.referral_code}`;
+                        const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
                         const text = `🎉 Join Namma Ooru Offers and get exclusive deals across Tamil Nadu! Use my referral code: ${userReward.referral_code} 
 ${shareUrl} 🏪✨`;
                         const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
@@ -323,7 +323,7 @@ ${shareUrl} 🏪✨`;
                     </Button>
                     <Button 
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/sign-up?ref=${userReward.referral_code}`;
+                        const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
                         const text = `🎉 Join Namma Ooru Offers with my referral code: ${userReward.referral_code} and get exclusive local deals! 
 ${shareUrl} 🏪`;
                         const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
@@ -335,7 +335,7 @@ ${shareUrl} 🏪`;
                     </Button>
                     <Button 
                       onClick={() => {
-                        const shareUrl = `${window.location.origin}/sign-up?ref=${userReward.referral_code}`;
+                        const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
                         const text = `🎉 Just discovered amazing local deals on Namma Ooru Offers! Join with my code: ${userReward.referral_code} 
 ${shareUrl} 🏪 #NammaOoruOffers #LocalDeals #TamilNadu`;
                         // For Instagram, we'll use the general share API or copy to clipboard
