@@ -578,36 +578,36 @@ const MerchantDashboard = () => {
             className="cursor-pointer hover:shadow-md transition-shadow" 
             onClick={() => navigate('/merchant-edit-offers')}
           >
-            <CardHeader><CardTitle>Total Offers</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold">{stats.totalOffers}</h2></CardContent>
+            <CardHeader><CardTitle className="text-sm">Total Offers</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-primary underline hover:no-underline transition-all">{stats.totalOffers}</h2></CardContent>
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-md transition-shadow" 
             onClick={() => navigate('/merchant-edit-offers')}
           >
-            <CardHeader><CardTitle>Approved Offers</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold text-green-600">{stats.approvedOffers}</h2></CardContent>
+            <CardHeader><CardTitle className="text-sm">Approved Offers</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-green-600 underline hover:no-underline transition-all">{stats.approvedOffers}</h2></CardContent>
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-md transition-shadow" 
             onClick={() => navigate('/merchant-edit-offers')}
           >
-            <CardHeader><CardTitle>Pending Offers</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold text-orange-600">{stats.pendingOffers}</h2></CardContent>
+            <CardHeader><CardTitle className="text-sm">Pending Offers</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-orange-600 underline hover:no-underline transition-all">{stats.pendingOffers}</h2></CardContent>
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-md transition-shadow" 
             onClick={() => document.getElementById('customer-saves-section')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <CardHeader><CardTitle>Total Saves</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold">{stats.totalSaves}</h2></CardContent>
+            <CardHeader><CardTitle className="text-sm">Total Saves</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-primary underline hover:no-underline transition-all">{stats.totalSaves}</h2></CardContent>
           </Card>
           <Card 
             className="cursor-pointer hover:shadow-md transition-shadow" 
             onClick={() => document.getElementById('customer-redemptions-section')?.scrollIntoView({ behavior: 'smooth' })}
           >
-            <CardHeader><CardTitle>Total Redemptions</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold">{stats.totalRedemptions}</h2></CardContent>
+            <CardHeader><CardTitle className="text-sm">Total Redemptions</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-primary underline hover:no-underline transition-all">{stats.totalRedemptions}</h2></CardContent>
           </Card>
           <Card>
             <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
