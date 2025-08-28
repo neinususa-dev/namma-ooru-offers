@@ -532,28 +532,6 @@ export type Database = {
           name: string | null
           updated_at: string | null
         }
-        Insert: {
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          district?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          location?: string | null
-          name?: string | null
-          updated_at?: string | null
-        }
-        Update: {
-          city?: string | null
-          created_at?: string | null
-          description?: string | null
-          district?: string | null
-          id?: string | null
-          is_active?: boolean | null
-          location?: string | null
-          name?: string | null
-          updated_at?: string | null
-        }
         Relationships: []
       }
     }
