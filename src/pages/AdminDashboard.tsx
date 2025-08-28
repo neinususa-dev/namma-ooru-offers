@@ -104,13 +104,31 @@ export function AdminDashboard() {
 
   const handleCreateOffer = async () => {
     try {
+      // Validate required fields
+      if (!newOffer.title || !newOffer.expiry_date) {
+        toast.error("Title and expiry date are required");
+        return;
+      }
+
+      const originalPrice = parseFloat(newOffer.original_price) || 0;
+      const discountedPrice = parseFloat(newOffer.discounted_price) || 0;
+      
+      // Calculate discount percentage
+      const discountPercentage = originalPrice > 0 && discountedPrice < originalPrice 
+        ? Math.round(((originalPrice - discountedPrice) / originalPrice) * 100)
+        : 0;
+
       const { error } = await supabase.from('offers').insert([{
         ...newOffer,
-        original_price: parseFloat(newOffer.original_price) || null,
-        discounted_price: parseFloat(newOffer.discounted_price) || null,
+        original_price: originalPrice || null,
+        discounted_price: discountedPrice || null,
+        discount_percentage: discountPercentage,
         expiry_date: new Date(newOffer.expiry_date).toISOString(),
-        merchant_id: newOffer.merchant_id || null,
-        status: 'approved' // Admin-created offers are auto-approved
+        merchant_id: profile?.id, // Use current admin as merchant_id
+        status: 'approved', // Admin-created offers are auto-approved
+        is_active: true,
+        redemption_mode: 'both',
+        listing_type: 'hot_offers'
       }]);
       
       if (error) throw error;
@@ -129,9 +147,12 @@ export function AdminDashboard() {
         expiry_date: "",
         merchant_id: ""
       });
+      
+      // Refresh offers list
+      allOffers.refetch();
     } catch (error) {
       toast.error("Failed to create offer");
-      console.error(error);
+      console.error("Error creating offer:", error);
     }
   };
 
