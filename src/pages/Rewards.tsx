@@ -131,7 +131,7 @@ const Rewards = () => {
     </Card>
     <Card className="p-4 flex flex-col items-center justify-center rounded-xl shadow-md">
       <Users className="h-8 w-8 mb-2 text-pink-500" />
-      <span className="text-sm font-medium">Diamond</span>
+      <span className="text-sm font-medium">Platinum</span>
     </Card>
     
   </div>
@@ -162,13 +162,13 @@ const Rewards = () => {
                 <CardTitle className="text-sm font-medium mb-2">Active Offers</CardTitle>
                 <Target className="h-6 w-6 mx-auto mb-2" />
                 <div className="text-3xl font-bold">12</div>
-                <p className="text-white/80 text-sm">Near your Location</p>
+                <p className="text-white/80 text-sm">Near your college</p>
               </Card>
 
             </div>
 
             {/* Referral & Social Sharing */}
-            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-200 text-white p-6">
+            <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6">
               <CardTitle className="text-2xl font-bold flex items-center mb-4">
                 <Users className="h-6 w-6 mr-2" />
                 Share & Earn Points
