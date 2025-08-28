@@ -66,8 +66,12 @@ const Rewards = () => {
   const getLevelProgress = () => {
     if (!userReward) return 0;
     const { total_earned_points } = userReward;
+    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
     
-    if (total_earned_points >= 1000) return 100;
+    // Check for special levels first
+    if (referralCount >= 100) return 100; // Referral King
+    if (total_earned_points >= 2500) return 100; // Platinum
+    if (total_earned_points >= 1000) return ((total_earned_points - 1000) / 1500) * 100;
     if (total_earned_points >= 500) return ((total_earned_points - 500) / 500) * 100;
     if (total_earned_points >= 200) return ((total_earned_points - 200) / 300) * 100;
     return (total_earned_points / 200) * 100;
@@ -76,8 +80,11 @@ const Rewards = () => {
   const getNextLevelPoints = () => {
     if (!userReward) return 0;
     const { total_earned_points } = userReward;
+    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
     
-    if (total_earned_points >= 1000) return 0;
+    if (referralCount >= 100) return 0; // Referral King
+    if (total_earned_points >= 2500) return 0; // Platinum
+    if (total_earned_points >= 1000) return 2500 - total_earned_points;
     if (total_earned_points >= 500) return 1000 - total_earned_points;
     if (total_earned_points >= 200) return 500 - total_earned_points;
     return 200 - total_earned_points;
@@ -86,11 +93,27 @@ const Rewards = () => {
   const getNextLevel = () => {
     if (!userReward) return 'Silver';
     const { total_earned_points } = userReward;
+    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
     
+    if (referralCount >= 100) return 'Referral King';
+    if (total_earned_points >= 2500) return 'Referral King';
     if (total_earned_points >= 1000) return 'Platinum';
-    if (total_earned_points >= 500) return 'Platinum';
-    if (total_earned_points >= 200) return 'Gold';
+    if (total_earned_points >= 500) return 'Gold';
+    if (total_earned_points >= 200) return 'Silver';
     return 'Silver';
+  };
+
+  const getCurrentLevel = () => {
+    if (!userReward) return 'Bronze';
+    const { total_earned_points } = userReward;
+    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
+    
+    if (referralCount >= 100) return 'Referral King';
+    if (total_earned_points >= 2500) return 'Platinum';
+    if (total_earned_points >= 1000) return 'Gold';
+    if (total_earned_points >= 500) return 'Gold';
+    if (total_earned_points >= 200) return 'Silver';
+    return 'Bronze';
   };
 
   return (
@@ -180,11 +203,11 @@ const Rewards = () => {
                 </p>
               </div>
               
-              {/* Level Icons Row */}
-              <div className="flex items-center justify-between mb-6">
+              {/* Level Icons Grid */}
+              <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
                 {/* Bronze Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  userReward.total_earned_points >= 0 ? 'bg-amber-100 scale-110' : 'bg-gray-100'
+                  userReward.total_earned_points >= 0 ? 'bg-amber-100 scale-105 shadow-md' : 'bg-gray-100'
                 }`}>
                   <Star className={`h-8 w-8 mb-2 transition-colors duration-300 ${
                     userReward.total_earned_points >= 0 ? 'text-amber-600 animate-pulse' : 'text-gray-400'
@@ -192,17 +215,12 @@ const Rewards = () => {
                   <span className={`text-sm font-bold ${
                     userReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
                   }`}>Bronze</span>
-                  <span className="text-xs text-muted-foreground">25 pts</span>
+                  <span className="text-xs text-muted-foreground">0 pts</span>
                 </div>
-
-                {/* Connection Line 1 */}
-                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
-                  userReward.total_earned_points >= 200 ? 'bg-gradient-to-r from-amber-400 to-gray-400' : 'bg-gray-200'
-                }`}></div>
 
                 {/* Silver Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  userReward.total_earned_points >= 200 ? 'bg-gray-100 scale-110' : 'bg-gray-50'
+                  userReward.total_earned_points >= 200 ? 'bg-gray-100 scale-105 shadow-md' : 'bg-gray-50'
                 }`}>
                   <Trophy className={`h-8 w-8 mb-2 transition-colors duration-300 ${
                     userReward.total_earned_points >= 200 ? 'text-gray-500 animate-pulse' : 'text-gray-300'
@@ -210,17 +228,12 @@ const Rewards = () => {
                   <span className={`text-sm font-bold ${
                     userReward.total_earned_points >= 200 ? 'text-gray-700' : 'text-gray-400'
                   }`}>Silver</span>
-                  <span className="text-xs text-muted-foreground">250 pts</span>
+                  <span className="text-xs text-muted-foreground">200 pts</span>
                 </div>
-
-                {/* Connection Line 2 */}
-                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
-                  userReward.total_earned_points >= 500 ? 'bg-gradient-to-r from-gray-400 to-yellow-400' : 'bg-gray-200'
-                }`}></div>
 
                 {/* Gold Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  userReward.total_earned_points >= 500 ? 'bg-yellow-100 scale-110' : 'bg-gray-50'
+                  userReward.total_earned_points >= 500 ? 'bg-yellow-100 scale-105 shadow-md' : 'bg-gray-50'
                 }`}>
                   <Award className={`h-8 w-8 mb-2 transition-colors duration-300 ${
                     userReward.total_earned_points >= 500 ? 'text-yellow-600 animate-pulse' : 'text-gray-300'
@@ -231,22 +244,43 @@ const Rewards = () => {
                   <span className="text-xs text-muted-foreground">500 pts</span>
                 </div>
 
-                {/* Connection Line 3 */}
-                <div className={`h-1 flex-1 mx-2 rounded transition-colors duration-500 ${
-                  userReward.total_earned_points >= 1000 ? 'bg-gradient-to-r from-yellow-400 to-purple-400' : 'bg-gray-200'
-                }`}></div>
-
                 {/* Platinum Level */}
                 <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                  userReward.total_earned_points >= 1000 ? 'bg-purple-100 scale-110' : 'bg-gray-50'
+                  userReward.total_earned_points >= 2500 ? 'bg-purple-100 scale-105 shadow-md' : 'bg-gray-50'
                 }`}>
                   <Crown className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                    userReward.total_earned_points >= 1000 ? 'text-purple-600 animate-pulse' : 'text-gray-300'
+                    userReward.total_earned_points >= 2500 ? 'text-purple-600 animate-pulse' : 'text-gray-300'
                   }`} />
                   <span className={`text-sm font-bold ${
-                    userReward.total_earned_points >= 1000 ? 'text-purple-700' : 'text-gray-400'
+                    userReward.total_earned_points >= 2500 ? 'text-purple-700' : 'text-gray-400'
                   }`}>Platinum</span>
-                  <span className="text-xs text-muted-foreground">1000 pts</span>
+                  <span className="text-xs text-muted-foreground">2500 pts</span>
+                </div>
+
+                {/* Referral King Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'bg-pink-100 scale-105 shadow-md' : 'bg-gray-50'
+                }`}>
+                  <Users className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'text-pink-600 animate-pulse' : 'text-gray-300'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    referrals.filter(r => r.referrer_id === user?.id).length >= 100 ? 'text-pink-700' : 'text-gray-400'
+                  }`}>Referral King</span>
+                  <span className="text-xs text-muted-foreground">100+ refs</span>
+                </div>
+
+                {/* QR Master Level */}
+                <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                  activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'bg-blue-100 scale-105 shadow-md' : 'bg-gray-50'
+                }`}>
+                  <QrCode className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'text-blue-600 animate-pulse' : 'text-gray-300'
+                  }`} />
+                  <span className={`text-sm font-bold ${
+                    activities.filter(a => a.activity_type === 'qr_scan').length >= 100 ? 'text-blue-700' : 'text-gray-400'
+                  }`}>QR Master</span>
+                  <span className="text-xs text-muted-foreground">100+ scans</span>
                 </div>
               </div>
 
@@ -255,7 +289,7 @@ const Rewards = () => {
                 <div className="flex justify-between text-sm">
                   <span className="font-medium">Current: {userReward.total_earned_points} points</span>
                   <span className="text-muted-foreground">
-                    {userReward.level_name} Level
+                    {getCurrentLevel()} Level
                   </span>
                 </div>
                 <div className="relative">
@@ -271,12 +305,37 @@ const Rewards = () => {
 
             {/* Tabs for different sections */}
             <Tabs defaultValue="dashboard" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5">
-                <TabsTrigger value="dashboard">Dashboard</TabsTrigger>
-                <TabsTrigger value="earn">Earn Points</TabsTrigger>
-                <TabsTrigger value="redeem">Redeem</TabsTrigger>
-                <TabsTrigger value="activity">Activity</TabsTrigger>
-                <TabsTrigger value="leaderboard">Leaderboard</TabsTrigger>
+              <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl">
+                <TabsTrigger 
+                  value="dashboard" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-xl font-semibold"
+                >
+                  🏠 Dashboard
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="earn" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-green-100 transition-all duration-300 rounded-xl font-semibold"
+                >
+                  💰 Earn Points
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="redeem" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-orange-100 transition-all duration-300 rounded-xl font-semibold"
+                >
+                  🎁 Redeem
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="activity" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-purple-100 transition-all duration-300 rounded-xl font-semibold"
+                >
+                  📊 Activity
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="leaderboard" 
+                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-pink-100 transition-all duration-300 rounded-xl font-semibold"
+                >
+                  🏆 Leaderboard
+                </TabsTrigger>
               </TabsList>
 
               <TabsContent value="dashboard" className="space-y-6">
