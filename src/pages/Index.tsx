@@ -12,6 +12,7 @@ import { Header } from '@/components/Header';
 import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
+import { useStats } from '@/hooks/useStats';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { generateDefaultImage } from '@/utils/imageUtils';
 import heroImage from '@/assets/hero-marketplace.jpg';
@@ -443,6 +444,7 @@ const mockOffers = [
 const Index = () => {
   const { user, isMerchant } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
+  const { stats, loading: statsLoading } = useStats();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<string>('home');
@@ -634,31 +636,49 @@ const Index = () => {
                       </p>
                     </div>
 
-                    <div className="grid sm:grid-cols-2 gap-4">
-                      <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                            <Store className="h-6 w-6 text-primary" />
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-primary">1000+</div>
-                            <div className="text-sm text-muted-foreground">Local Shops</div>
-                          </div>
-                        </div>
-                      </div>
-                      
-                      <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
-                        <div className="flex items-center gap-3">
-                          <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                            <Heart className="h-6 w-6 text-secondary" />
-                          </div>
-                          <div>
-                            <div className="text-2xl font-bold text-secondary">50K+</div>
-                            <div className="text-sm text-muted-foreground">Happy Customers</div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                     <div className="grid sm:grid-cols-3 gap-4">
+                       <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
+                         <div className="flex items-center gap-3">
+                           <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                             <Store className="h-6 w-6 text-primary" />
+                           </div>
+                           <div>
+                             <div className="text-2xl font-bold text-primary">
+                               {statsLoading ? '...' : `${stats.totalStores}+`}
+                             </div>
+                             <div className="text-sm text-muted-foreground">Local Shops</div>
+                           </div>
+                         </div>
+                       </div>
+                       
+                       <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
+                         <div className="flex items-center gap-3">
+                           <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                             <Heart className="h-6 w-6 text-secondary" />
+                           </div>
+                           <div>
+                             <div className="text-2xl font-bold text-secondary">
+                               {statsLoading ? '...' : `${stats.totalCustomers}+`}
+                             </div>
+                             <div className="text-sm text-muted-foreground">Happy Customers</div>
+                           </div>
+                         </div>
+                       </div>
+                       
+                       <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
+                         <div className="flex items-center gap-3">
+                           <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
+                             <Users className="h-6 w-6 text-accent" />
+                           </div>
+                           <div>
+                             <div className="text-2xl font-bold text-accent">
+                               {statsLoading ? '...' : `${stats.totalMerchants}+`}
+                             </div>
+                             <div className="text-sm text-muted-foreground">Happy Merchants</div>
+                           </div>
+                         </div>
+                       </div>
+                     </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
                       <Button variant="default" size="xl" className="flex-1">
