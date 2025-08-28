@@ -23,6 +23,8 @@ import {
 
 interface MerchantStats {
   totalOffers: number;
+  approvedOffers: number;
+  pendingOffers: number;
   totalSaves: number;
   totalRedemptions: number;
   totalRevenue: number;
@@ -47,6 +49,8 @@ const MerchantDashboard = () => {
   const navigate = useNavigate();
   const [stats, setStats] = useState<MerchantStats>({
     totalOffers: 0,
+    approvedOffers: 0,
+    pendingOffers: 0,
     totalSaves: 0,
     totalRedemptions: 0,
     totalRevenue: 0,
@@ -133,6 +137,8 @@ const MerchantDashboard = () => {
         // If no offers found, set empty stats and return
         setStats({
           totalOffers: 0,
+          approvedOffers: 0,
+          pendingOffers: 0,
           totalSaves: 0,
           totalRedemptions: 0,
           totalRevenue: 0,
@@ -340,6 +346,8 @@ const MerchantDashboard = () => {
 
       // Totals
       const totalOffers = offers.length;
+      const approvedOffers = offers.filter(o => o.status === 'approved').length;
+      const pendingOffers = offers.filter(o => o.status === 'in_review' || o.status === 'applied').length;
       const totalSaves = saves.length;
       const totalRedemptions = redemptions.length;
       const totalRevenue = redemptions.reduce((sum, r) => {
@@ -382,6 +390,8 @@ const MerchantDashboard = () => {
 
       setStats({
         totalOffers,
+        approvedOffers,
+        pendingOffers,
         totalSaves,
         totalRedemptions,
         totalRevenue,
@@ -563,16 +573,39 @@ const MerchantDashboard = () => {
         </Card>
 
         {/* Overview Stats */}
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card>
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => navigate('/merchant-edit-offers')}
+          >
             <CardHeader><CardTitle>Total Offers</CardTitle></CardHeader>
             <CardContent><h2 className="text-2xl font-bold">{stats.totalOffers}</h2></CardContent>
           </Card>
-          <Card>
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => navigate('/merchant-edit-offers')}
+          >
+            <CardHeader><CardTitle>Approved Offers</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-green-600">{stats.approvedOffers}</h2></CardContent>
+          </Card>
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => navigate('/merchant-edit-offers')}
+          >
+            <CardHeader><CardTitle>Pending Offers</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-orange-600">{stats.pendingOffers}</h2></CardContent>
+          </Card>
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => document.getElementById('customer-saves-section')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             <CardHeader><CardTitle>Total Saves</CardTitle></CardHeader>
             <CardContent><h2 className="text-2xl font-bold">{stats.totalSaves}</h2></CardContent>
           </Card>
-          <Card>
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => document.getElementById('customer-redemptions-section')?.scrollIntoView({ behavior: 'smooth' })}
+          >
             <CardHeader><CardTitle>Total Redemptions</CardTitle></CardHeader>
             <CardContent><h2 className="text-2xl font-bold">{stats.totalRedemptions}</h2></CardContent>
           </Card>
@@ -697,7 +730,7 @@ const MerchantDashboard = () => {
 
         {/* Customer Activity */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-6">
-          <Card>
+          <Card id="customer-saves-section">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Heart className="h-5 w-5" />
@@ -727,7 +760,7 @@ const MerchantDashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card id="customer-redemptions-section">
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <ShoppingBag className="h-5 w-5" />
