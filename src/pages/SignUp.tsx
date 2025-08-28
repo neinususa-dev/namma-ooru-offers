@@ -336,13 +336,13 @@ export default function SignUp() {
                   </div>
                 </div>
 
-                <Button 
-                  type="submit" 
-                  className="w-full bg-secondary-gradient hover:opacity-90"
-                  disabled={isLoading}
-                >
-                  {isLoading ? 'Creating Account...' : 'Create Customer Account'}
-                </Button>
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-secondary hover:bg-secondary/90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Creating Account...' : 'Create Customer Account'}
+                  </Button>
                 </form>
               </TabsContent>
 
@@ -497,7 +497,7 @@ export default function SignUp() {
 
                   <Button 
                     type="submit" 
-                    className="w-full bg-secondary-gradient hover:opacity-90"
+                    className="w-full bg-primary hover:bg-primary/90"
                     disabled={isLoading}
                   >
                     {isLoading ? 'Creating Account...' : 'Create Merchant Account'}
