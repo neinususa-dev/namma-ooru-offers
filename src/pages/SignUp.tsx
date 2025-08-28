@@ -52,33 +52,17 @@ export default function SignUp() {
     }
   }, [user, profile, loading, navigate]);
 
-  const formatPhoneNumber = (phone: string) => {
-    // Remove all non-digits
-    const digits = phone.replace(/\D/g, '');
-    
-    // If phone starts with 91, don't add +91 again
-    if (digits.startsWith('91') && digits.length === 12) {
-      return `+${digits}`;
-    }
-    
-    // If phone has 10 digits, add +91
-    if (digits.length === 10) {
-      return `+91${digits}`;
-    }
-    
-    // If phone already has country code format
-    if (digits.length === 12 && !digits.startsWith('91')) {
-      return `+91${digits.slice(-10)}`;
-    }
-    
-    return `+91${digits.slice(-10)}`;
-  };
-
   const handlePhoneChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
-    // Allow only numbers, +, and spaces
-    const sanitized = value.replace(/[^\d+\s]/g, '');
-    setSignUpForm({ ...signUpForm, phoneNumber: sanitized });
+    // Remove +91 prefix if present and keep only digits
+    const digitsOnly = value.replace(/^\+91/, '').replace(/\D/g, '');
+    // Limit to 10 digits
+    const limited = digitsOnly.slice(0, 10);
+    setSignUpForm({ ...signUpForm, phoneNumber: limited });
+  };
+
+  const getFullPhoneNumber = () => {
+    return `+91${signUpForm.phoneNumber}`;
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
@@ -86,14 +70,14 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      // Format phone number with country code
-      const formattedPhone = formatPhoneNumber(signUpForm.phoneNumber);
+      // Get full phone number with country code
+      const fullPhoneNumber = getFullPhoneNumber();
       
-      // Validate phone number format
-      if (!/^\+91\d{10}$/.test(formattedPhone)) {
+      // Validate phone number format (must be exactly 10 digits)
+      if (signUpForm.phoneNumber.length !== 10 || !/^\d{10}$/.test(signUpForm.phoneNumber)) {
         toast({
           title: "Invalid Phone Number",
-          description: "Please enter a valid 10-digit Indian phone number.",
+          description: "Please enter exactly 10 digits for your phone number.",
           variant: "destructive",
         });
         setIsLoading(false);
@@ -134,9 +118,9 @@ export default function SignUp() {
       }
 
       // Check if phone number already exists
-      console.log('Checking phone:', formattedPhone);
+      console.log('Checking phone:', fullPhoneNumber);
       const { data: phoneExists, error: phoneCheckError } = await supabase
-        .rpc('phone_exists', { phone_to_check: formattedPhone });
+        .rpc('phone_exists', { phone_to_check: fullPhoneNumber });
 
       console.log('Phone exists check result:', { phoneExists, phoneCheckError });
 
@@ -166,7 +150,7 @@ export default function SignUp() {
 
       // Proceed with signup if email and phone don't exist
       const additionalData = {
-        phone_number: formattedPhone,
+        phone_number: fullPhoneNumber,
         referral_code: signUpForm.referralCode || undefined,
         ...(signUpForm.role === 'merchant' ? {
           store_name: signUpForm.storeName,
@@ -276,19 +260,24 @@ export default function SignUp() {
                 <Label htmlFor="phone-number">Phone Number</Label>
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="phone-number"
-                    type="tel"
-                    placeholder="10-digit mobile number"
-                    className="pl-10"
-                    value={signUpForm.phoneNumber}
-                    onChange={handlePhoneChange}
-                    required
-                    maxLength={13}
-                  />
+                  <div className="flex">
+                    <div className="flex items-center px-3 py-2 bg-muted border border-r-0 rounded-l-md text-sm font-medium">
+                      +91
+                    </div>
+                    <Input
+                      id="phone-number"
+                      type="tel"
+                      placeholder="10-digit mobile number"
+                      className="pl-3 rounded-l-none border-l-0"
+                      value={signUpForm.phoneNumber}
+                      onChange={handlePhoneChange}
+                      required
+                      maxLength={10}
+                    />
+                  </div>
                 </div>
                 <p className="text-xs text-muted-foreground">
-                  +91 country code will be added automatically
+                  Enter your 10-digit mobile number
                 </p>
               </div>
 
