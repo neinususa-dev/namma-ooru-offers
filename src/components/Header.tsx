@@ -1,8 +1,11 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Gift, Store, BarChart3, Plus, Flame, MapPin, Heart } from 'lucide-react';
+import { Gift, Store, BarChart3, Plus, Flame, MapPin, Heart, Menu, X, Home } from 'lucide-react';
 import { AuthButton } from './AuthButton';
 import { useAuth } from '@/hooks/useAuth';
+import { Button } from '@/components/ui/button';
+import { Sheet, SheetContent, SheetTrigger, SheetHeader, SheetTitle } from '@/components/ui/sheet';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface HeaderProps {
   showNavigation?: boolean;
@@ -13,6 +16,8 @@ interface HeaderProps {
 export function Header({ showNavigation = true, activeSection, onSectionChange }: HeaderProps) {
   const { user, profile, isCustomer, isMerchant } = useAuth();
   const location = useLocation();
+  const isMobile = useIsMobile();
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   const navigationItems = [
     { id: 'home', label: 'Home' },
@@ -198,6 +203,126 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
           </div>
           
           <div className="flex items-center gap-3">
+            {/* Mobile menu trigger */}
+            {isMobile && user && (
+              <Sheet open={mobileMenuOpen} onOpenChange={setMobileMenuOpen}>
+                <SheetTrigger asChild>
+                  <Button variant="outline" size="sm" className="md:hidden">
+                    <Menu className="h-4 w-4" />
+                  </Button>
+                </SheetTrigger>
+                <SheetContent side="right" className="w-80">
+                  <SheetHeader>
+                    <SheetTitle className="flex items-center gap-2">
+                      <img 
+                        src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                        alt="Logo" 
+                        className="w-8 h-8 rounded-lg"
+                      />
+                      Navigation
+                    </SheetTitle>
+                  </SheetHeader>
+                  
+                  <div className="mt-6 space-y-4">
+                    {/* Home Link */}
+                    <Link 
+                      to="/"
+                      className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      <Home className="h-5 w-5 text-blue-600" />
+                      <span className="font-medium">Home</span>
+                    </Link>
+
+                    {/* Customer Navigation */}
+                    {isCustomer && (
+                      <>
+                        <div className="px-3 py-2 text-sm font-semibold text-muted-foreground">Customer</div>
+                        {navigationItems.map((item) => (
+                          item.link ? (
+                            <Link
+                              key={item.id}
+                              to={item.link}
+                              className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                                location.pathname === item.link
+                                  ? 'bg-orange-100 text-orange-600' 
+                                  : 'hover:bg-muted'
+                              }`}
+                              onClick={() => setMobileMenuOpen(false)}
+                            >
+                              <Heart className="h-5 w-5" />
+                              <span className="font-medium">{item.label}</span>
+                            </Link>
+                          ) : (
+                            <button
+                              key={item.id}
+                              onClick={() => {
+                                onSectionChange?.(item.id);
+                                setMobileMenuOpen(false);
+                              }}
+                              className={`flex items-center gap-3 p-3 rounded-lg transition-colors w-full text-left ${
+                                activeSection === item.id 
+                                  ? 'bg-orange-100 text-orange-600' 
+                                  : 'hover:bg-muted'
+                              }`}
+                            >
+                              {item.id === 'hot-deals' && <Flame className="h-5 w-5" />}
+                              {item.id === 'local-deals' && <MapPin className="h-5 w-5" />}
+                              {item.id === 'store-list' && <Store className="h-5 w-5" />}
+                              {item.id === 'home' && <Home className="h-5 w-5" />}
+                              <span className="font-medium">{item.label}</span>
+                            </button>
+                          )
+                        ))}
+                        
+                        <Link 
+                          to="/your-offers"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Gift className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium">Your Offers</span>
+                        </Link>
+                        
+                        <Link 
+                          to="/customer-analytics"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <BarChart3 className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium">Analytics</span>
+                        </Link>
+                      </>
+                    )}
+
+                    {/* Merchant Navigation */}
+                    {isMerchant && (
+                      <>
+                        <div className="px-3 py-2 text-sm font-semibold text-muted-foreground">Merchant</div>
+                        <Link 
+                          to="/merchant-dashboard"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <BarChart3 className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium">Dashboard</span>
+                        </Link>
+                        
+                        <Link 
+                          to="/merchant-post-offer"
+                          className="flex items-center gap-3 p-3 rounded-lg hover:bg-muted transition-colors"
+                          onClick={() => setMobileMenuOpen(false)}
+                        >
+                          <Plus className="h-5 w-5 text-blue-600" />
+                          <span className="font-medium">Post Offer</span>
+                        </Link>
+                      </>
+                    )}
+                  </div>
+                </SheetContent>
+              </Sheet>
+            )}
+            
             <AuthButton />
           </div>
         </div>
