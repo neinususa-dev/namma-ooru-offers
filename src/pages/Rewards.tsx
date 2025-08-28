@@ -192,7 +192,7 @@ const Rewards = () => {
                   <span className={`text-sm font-bold ${
                     userReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
                   }`}>Bronze</span>
-                  <span className="text-xs text-muted-foreground">0 pts</span>
+                  <span className="text-xs text-muted-foreground">25 pts</span>
                 </div>
 
                 {/* Connection Line 1 */}
