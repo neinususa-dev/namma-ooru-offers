@@ -33,12 +33,16 @@ export default function SignUp() {
     referralCode: ''
   });
 
-  // Handle URL referral code parameter
+  // Handle URL parameters for tab selection and referral code
   useEffect(() => {
+    const tab = searchParams.get('tab');
     const refCode = searchParams.get('ref');
-    if (refCode && !signUpForm.referralCode) {
-      setSignUpForm(prev => ({ ...prev, referralCode: refCode.toUpperCase() }));
-    }
+    
+    setSignUpForm(prev => ({
+      ...prev,
+      role: (tab === 'merchant' ? 'merchant' : 'customer') as 'customer' | 'merchant',
+      referralCode: refCode ? refCode.toUpperCase() : prev.referralCode
+    }));
   }, [searchParams]);
 
   // Redirect authenticated users
