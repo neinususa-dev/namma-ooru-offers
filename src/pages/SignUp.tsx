@@ -203,7 +203,7 @@ export default function SignUp() {
 
   return (
     <div className="min-h-screen bg-sunset-gradient flex flex-col">
-      <Header showNavigation={false} />
+      <Header showNavigation={true} />
 
       {/* Main Content */}
       <main className="flex-1 flex items-center justify-center p-4">
@@ -521,6 +521,38 @@ export default function SignUp() {
           </CardFooter>
         </Card>
       </main>
+      
+      {/* Footer */}
+      <footer className="bg-card border-t border-primary/10 py-8">
+        <div className="container mx-auto px-4">
+          <div className="flex flex-col md:flex-row items-center justify-between">
+            <Link 
+              to="/"
+              className="flex items-center gap-2 mb-4 md:mb-0 hover:opacity-80 transition-opacity"
+            >
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma Ooru Offers Logo" 
+                className="w-8 h-8 rounded"
+              />
+              <div>
+                <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
+                  Namma Ooru Offers
+                </div>
+                <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
+                <div className="text-xs text-muted-foreground">
+                  A Product of <a href="https://neinus.com" target="_blank" className="text-primary hover:underline">Neinus Private Limited</a>
+                </div>
+              </div>
+            </Link>
+            
+            <div className="text-sm text-muted-foreground text-center md:text-right">
+              <p>© 2024 Namma Ooru Offers. Supporting local businesses across Tamil Nadu.</p>
+              <p className="mt-1">Made with ❤️ for Tamil Nadu</p>
+            </div>
+          </div>
+        </div>
+      </footer>
     </div>
   );
 }
