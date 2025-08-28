@@ -208,7 +208,7 @@ const Index = () => {
                     <div className="space-y-4">
                       <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
                         <span className="bg-blue-orange-gradient bg-clip-text text-transparent">
-                          Namma&nbsp;OOru Offers
+                          Namma&nbsp;Ooru Offers
                         </span>
                       </h2>
                       <p className="text-xl text-muted-foreground">
@@ -724,9 +724,12 @@ const Index = () => {
               />
               <div>
                 <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
-                  Namma OOru Offers
+                  Namma Ooru Offers
                 </div>
                 <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
+                <div className="text-xs text-muted-foreground">
+                  A Product of <a href="https://neinus.com" target="_blank" className="text-primary hover:underline">Neinus Private Limited</a>
+                </div>
               </div>
             </button>
             
