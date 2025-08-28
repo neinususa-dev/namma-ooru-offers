@@ -36,35 +36,23 @@ export function useStats() {
         throw storesError;
       }
 
-      // Since RLS prevents counting all profiles, let's use a different approach
-      // We'll get the actual profile records first to count them
-      const { data: allProfiles, error: profilesError } = await supabase
-        .from('profiles')
-        .select('role');
+      // Use the security definer function to get profile stats
+      const { data: statsData, error: statsError } = await supabase
+        .rpc('get_profile_stats');
 
-      console.log('Profiles query result:', { profilesCount: allProfiles?.length, profilesError });
+      console.log('Profile stats query result:', { statsData, statsError });
 
-      if (profilesError) {
-        console.error('Error fetching profiles:', profilesError);
-        // If we can't access profiles due to RLS, set default values
-        const newStats = {
-          totalStores: storesCount || 0,
-          totalCustomers: 0,
-          totalMerchants: 0
-        };
-        console.log('Using fallback stats due to RLS:', newStats);
-        setStats(newStats);
-        return;
+      if (statsError) {
+        console.error('Error fetching profile stats:', statsError);
+        throw statsError;
       }
 
-      // Count by role manually
-      const customersCount = allProfiles?.filter(p => p.role === 'customer').length || 0;
-      const merchantsCount = allProfiles?.filter(p => p.role === 'merchant').length || 0;
+      const profileStats = statsData?.[0] || { customer_count: 0, merchant_count: 0 };
 
       const newStats = {
         totalStores: storesCount || 0,
-        totalCustomers: customersCount,
-        totalMerchants: merchantsCount
+        totalCustomers: Number(profileStats.customer_count) || 0,
+        totalMerchants: Number(profileStats.merchant_count) || 0
       };
 
       console.log('Stats fetched successfully:', newStats);
