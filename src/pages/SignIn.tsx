@@ -99,6 +99,7 @@ export default function SignIn() {
     setIsResetLoading(true);
 
     try {
+      console.log('Starting password reset request...');
       // Call our custom password reset function
       const { data, error } = await supabase.functions.invoke('send-password-reset', {
         body: {
@@ -107,14 +108,19 @@ export default function SignIn() {
         },
       });
 
+      console.log('Function response:', { data, error });
+
       if (error) {
+        console.error('Supabase function error:', error);
         throw error;
       }
 
       if (data?.error) {
+        console.error('Function returned error:', data.error);
         throw new Error(data.error);
       }
 
+      console.log('Password reset request successful:', data);
       toast({
         title: "Reset email sent",
         description: "Check your email for password reset instructions from Namma Ooru Offers (onboarding@resend.dev)",
@@ -124,6 +130,12 @@ export default function SignIn() {
       setResetEmail('');
     } catch (error: any) {
       console.error('Password reset error:', error);
+      console.error('Error details:', {
+        name: error.name,
+        message: error.message,
+        stack: error.stack,
+        context: error.context
+      });
       toast({
         title: "Reset failed",
         description: error.message || "Failed to send reset email. Please try again.",

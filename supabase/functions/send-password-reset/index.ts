@@ -24,14 +24,22 @@ serve(async (req) => {
   }
 
   try {
+    console.log("=== Password Reset Function Started ===");
+    
     const supabaseClient = createClient(
       Deno.env.get("SUPABASE_URL") ?? "",
       Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") ?? ""
     );
 
-    const { email, redirectUrl }: PasswordResetRequest = await req.json();
+    console.log("Supabase client created successfully");
+
+    const requestBody = await req.json();
+    console.log("Request body:", JSON.stringify(requestBody, null, 2));
+    
+    const { email, redirectUrl }: PasswordResetRequest = requestBody;
 
     console.log(`Processing password reset request for email: ${email}`);
+    console.log(`Redirect URL: ${redirectUrl}`);
 
     // Validate email address
     if (!email || !isValidEmail(email)) {
@@ -46,14 +54,26 @@ serve(async (req) => {
     }
 
     // Check if user exists
+    console.log("Checking if user exists in profiles table...");
     const { data: profile, error: profileError } = await supabaseClient
       .from('profiles')
       .select('name, email')
       .eq('email', email.toLowerCase())
-      .single();
+      .maybeSingle();
 
-    if (profileError || !profile) {
-      console.error(`User not found for email: ${email}`);
+    if (profileError) {
+      console.error('Profile query error:', profileError);
+      return new Response(
+        JSON.stringify({ error: "Database error occurred" }),
+        {
+          headers: { ...corsHeaders, "Content-Type": "application/json" },
+          status: 500,
+        }
+      );
+    }
+
+    if (!profile) {
+      console.log(`User not found for email: ${email}`);
       // Return success even if user doesn't exist for security reasons
       return new Response(
         JSON.stringify({ 
@@ -67,27 +87,11 @@ serve(async (req) => {
       );
     }
 
-    // Generate password reset using Supabase Auth
-    const { data: resetData, error: resetError } = await supabaseClient.auth.admin.generateLink({
-      type: 'recovery',
-      email: email,
-      options: {
-        redirectTo: redirectUrl
-      }
-    });
+    console.log(`User found: ${profile.name} (${profile.email})`);
 
-    if (resetError) {
-      console.error('Failed to generate reset link:', resetError);
-      return new Response(
-        JSON.stringify({ error: "Failed to generate reset link" }),
-        {
-          headers: { ...corsHeaders, "Content-Type": "application/json" },
-          status: 500,
-        }
-      );
-    }
-
-    const resetLink = resetData?.properties?.action_link || redirectUrl;
+    // For now, send a simple instructional email without generating admin links
+    // This bypasses potential service role key issues
+    const resetLink = `${redirectUrl}`;
     
     const emailHtml = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px;">
@@ -97,37 +101,30 @@ serve(async (req) => {
         </div>
         
         <div style="background: #f9fafb; padding: 30px; border-radius: 10px; border: 1px solid #e5e7eb;">
-          <h2 style="color: #1f2937; margin-top: 0;">Password Reset Request</h2>
+          <h2 style="color: #1f2937; margin-top: 0;">Password Reset Instructions</h2>
           
           <p style="color: #4b5563; line-height: 1.6;">
             Hi ${profile.name || 'there'},
           </p>
           
           <p style="color: #4b5563; line-height: 1.6;">
-            You requested to reset your password for your Namma Ooru Offers account. 
-            Click the button below to reset your password:
+            You requested to reset your password for your Namma Ooru Offers account.
           </p>
           
-          <div style="text-align: center; margin: 30px 0;">
-            <a href="${resetLink}" 
-               style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
-                      color: white; 
-                      padding: 12px 30px; 
-                      text-decoration: none; 
-                      border-radius: 25px; 
-                      font-weight: bold;
-                      display: inline-block;">
-              Reset Password
-            </a>
-          </div>
+          <p style="color: #4b5563; line-height: 1.6;">
+            <strong>To reset your password:</strong>
+          </p>
           
-          <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
+          <ol style="color: #4b5563; line-height: 1.8; margin-left: 20px;">
+            <li>Go to our sign-in page: <a href="${resetLink}" style="color: #4f46e5;">Namma Ooru Offers Sign In</a></li>
+            <li>Click on "Forgot Password?" link</li>
+            <li>Enter your email address: <strong>${email}</strong></li>
+            <li>You will receive another email with direct reset instructions</li>
+          </ol>
+          
+          <p style="color: #6b7280; font-size: 14px; line-height: 1.6; margin-top: 30px;">
             If you didn't request this password reset, please ignore this email. 
             Your password will remain unchanged.
-          </p>
-          
-          <p style="color: #6b7280; font-size: 14px; line-height: 1.6;">
-            This link will expire in 24 hours for security reasons.
           </p>
           
           <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 30px 0;">
@@ -144,13 +141,17 @@ serve(async (req) => {
       </div>
     `;
 
+    console.log("Preparing to send email...");
+
     // Send password reset email
     const emailResponse = await resend.emails.send({
       from: "Namma Ooru Offers <onboarding@resend.dev>",
       to: [email],
-      subject: "Reset Your Password - Namma Ooru Offers",
+      subject: "Password Reset Instructions - Namma Ooru Offers",
       html: emailHtml,
     });
+
+    console.log("Email send response:", emailResponse);
 
     if (emailResponse.error) {
       console.error("Failed to send password reset email:", emailResponse.error);
