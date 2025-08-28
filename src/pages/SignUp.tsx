@@ -58,11 +58,14 @@ export default function SignUp() {
 
     try {
       // Check if email already exists in profiles table
+      console.log('Checking email:', signUpForm.email.toLowerCase());
       const { data: existingProfile, error: checkError } = await supabase
         .from('profiles')
         .select('email')
         .eq('email', signUpForm.email.toLowerCase())
         .maybeSingle();
+
+      console.log('Existing profile check result:', { existingProfile, checkError });
 
       if (checkError) {
         console.error('Error checking existing email:', checkError);
