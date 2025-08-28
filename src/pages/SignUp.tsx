@@ -61,7 +61,7 @@ export default function SignUp() {
     setSignUpForm({ ...signUpForm, phoneNumber: limited });
   };
 
-  const getFullPhoneNumber = () => {
+  const getDisplayPhoneNumber = () => {
     return `+91${signUpForm.phoneNumber}`;
   };
 
@@ -70,9 +70,6 @@ export default function SignUp() {
     setIsLoading(true);
 
     try {
-      // Get full phone number with country code
-      const fullPhoneNumber = getFullPhoneNumber();
-      
       // Validate phone number format (must be exactly 10 digits)
       if (signUpForm.phoneNumber.length !== 10 || !/^\d{10}$/.test(signUpForm.phoneNumber)) {
         toast({
@@ -117,10 +114,10 @@ export default function SignUp() {
         return;
       }
 
-      // Check if phone number already exists
-      console.log('Checking phone:', fullPhoneNumber);
+      // Check if phone number already exists (check against 10-digit number)
+      console.log('Checking phone:', signUpForm.phoneNumber);
       const { data: phoneExists, error: phoneCheckError } = await supabase
-        .rpc('phone_exists', { phone_to_check: fullPhoneNumber });
+        .rpc('phone_exists', { phone_to_check: signUpForm.phoneNumber });
 
       console.log('Phone exists check result:', { phoneExists, phoneCheckError });
 
@@ -150,7 +147,7 @@ export default function SignUp() {
 
       // Proceed with signup if email and phone don't exist
       const additionalData = {
-        phone_number: fullPhoneNumber,
+        phone_number: signUpForm.phoneNumber, // Store only 10-digit number
         referral_code: signUpForm.referralCode || undefined,
         ...(signUpForm.role === 'merchant' ? {
           store_name: signUpForm.storeName,
@@ -261,7 +258,7 @@ export default function SignUp() {
                 <div className="relative">
                   <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                   <div className="flex">
-                    <div className="flex items-center px-3 py-2 bg-muted border border-r-0 rounded-l-md text-sm font-medium">
+                    <div className="flex items-center px-3 py-2 bg-muted border border-r-0 rounded-l-md text-sm font-medium ml-10">
                       +91
                     </div>
                     <Input
