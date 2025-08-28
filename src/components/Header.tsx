@@ -50,8 +50,8 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
               </div>
             </Link>
             
-            {/* Navigation Links - only show on home page */}
-            {showNavigation && onSectionChange && (
+            {/* Navigation Links - show on home page and About Us page */}
+            {showNavigation && (
               <nav className="hidden md:flex items-center gap-6">
                 {user && isMerchant ? (
                   // Merchant navigation - Dashboard, Post Offer, and Pricing
@@ -94,7 +94,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                           >
                             {item.label}
                           </Link>
-                        ) : (
+                        ) : onSectionChange ? (
                           <button
                             key={item.id}
                             onClick={() => onSectionChange(item.id)}
@@ -106,6 +106,14 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                           >
                             {item.label}
                           </button>
+                        ) : (
+                          <Link
+                            key={item.id}
+                            to="/"
+                            className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
+                          >
+                            {item.label}
+                          </Link>
                         )
                       ))}
                      {user && isCustomer && (

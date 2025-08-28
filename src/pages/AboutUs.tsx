@@ -20,7 +20,7 @@ import {
 const AboutUs = () => {
   return (
     <div className="min-h-screen bg-background">
-      <Header showNavigation={false} />
+      <Header showNavigation={true} />
       
       <main className="pt-20">
         {/* Hero Section */}
