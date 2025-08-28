@@ -15,6 +15,7 @@ import Rewards from "./pages/Rewards";
 import { Billing } from "./pages/Billing";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { PaymentCanceled } from "./pages/PaymentCanceled";
+import Profile from "./pages/Profile";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -38,6 +39,7 @@ const App = () => (
           <Route path="/billing" element={<Billing />} />
           <Route path="/payment-success" element={<PaymentSuccess />} />
           <Route path="/payment-canceled" element={<PaymentCanceled />} />
+          <Route path="/profile" element={<Profile />} />
           {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
           <Route path="*" element={<NotFound />} />
         </Routes>
