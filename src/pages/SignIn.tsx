@@ -44,8 +44,28 @@ export default function SignIn() {
   useEffect(() => {
     const urlParams = new URLSearchParams(window.location.search);
     const isReset = urlParams.get('reset');
-    if (isReset === 'true') {
+    const accessToken = urlParams.get('access_token');
+    const refreshToken = urlParams.get('refresh_token');
+    
+    if (isReset === 'true' || (accessToken && refreshToken)) {
       setIsPasswordResetMode(true);
+      
+      // If we have tokens, set the session
+      if (accessToken && refreshToken) {
+        supabase.auth.setSession({
+          access_token: accessToken,
+          refresh_token: refreshToken,
+        }).then(({ error }) => {
+          if (error) {
+            console.error('Error setting session:', error);
+            toast({
+              title: "Session error",
+              description: "There was an error setting up your password reset session. Please try again.",
+              variant: "destructive",
+            });
+          }
+        });
+      }
     }
   }, []);
 
@@ -78,25 +98,39 @@ export default function SignIn() {
 
     setIsResetLoading(true);
 
-    const { error } = await supabase.auth.resetPasswordForEmail(resetEmail, {
-      redirectTo: `${window.location.origin}/signin?reset=true`,
-    });
-
-    if (error) {
-      toast({
-        title: "Reset failed",
-        description: error.message,
-        variant: "destructive",
+    try {
+      // Call our custom password reset function
+      const { data, error } = await supabase.functions.invoke('send-password-reset', {
+        body: {
+          email: resetEmail,
+          redirectUrl: `${window.location.origin}/signin?reset=true`,
+        },
       });
-    } else {
+
+      if (error) {
+        throw error;
+      }
+
+      if (data?.error) {
+        throw new Error(data.error);
+      }
+
       toast({
         title: "Reset email sent",
-        description: "Check your email for password reset instructions",
+        description: "Check your email for password reset instructions from Namma Ooru Offers (nammaooruoffers.official@gmail.com)",
         variant: "default",
       });
       setResetDialogOpen(false);
       setResetEmail('');
+    } catch (error: any) {
+      console.error('Password reset error:', error);
+      toast({
+        title: "Reset failed",
+        description: error.message || "Failed to send reset email. Please try again.",
+        variant: "destructive",
+      });
     }
+    
     setIsResetLoading(false);
   };
 
