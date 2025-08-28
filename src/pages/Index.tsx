@@ -262,11 +262,26 @@ const Index = () => {
                      </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
-                      <Button variant="default" size="xl" className="flex-1">
+                      <Button 
+                        variant="default" 
+                        size="xl" 
+                        className="flex-1"
+                        onClick={() => {
+                          const localDealsSection = document.getElementById('local-deals-section');
+                          if (localDealsSection) {
+                            localDealsSection.scrollIntoView({ behavior: 'smooth' });
+                          }
+                        }}
+                      >
                         <Search className="h-5 w-5 mr-2" />
                         Explore Offers
                       </Button>
-                      <Button variant="secondary" size="xl" className="flex-1">
+                      <Button 
+                        variant="secondary" 
+                        size="xl" 
+                        className="flex-1"
+                        onClick={() => navigate('/signup')}
+                      >
                         <Users className="h-5 w-5 mr-2" />
                         Become a Merchant
                       </Button>
@@ -355,7 +370,7 @@ const Index = () => {
             )}
 
             {/* Local Deals Section */}
-            <section className="py-12 bg-background">
+            <section id="local-deals-section" className="py-12 bg-background">
               <div className="container mx-auto px-4">
                  <div className="mb-8 flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
                    <div>
@@ -683,7 +698,7 @@ const Index = () => {
                 <Store className="h-5 w-5 mr-2" />
                 Post Your Offers
               </Button>
-              <Button variant="outline" size="xl" className="border-white text-primary hover:bg-white/10">
+              <Button variant="outline" size="xl" className="border-white text-primary hover:bg-white/10" onClick={() => navigate('/about')}>
                 Learn More
               </Button>
             </div>

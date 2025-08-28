@@ -24,7 +24,8 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
     { id: 'hot-deals', label: 'Hot Deals' },
     { id: 'local-deals', label: 'Local Deals' },
     { id: 'store-list', label: 'Store List' },
-    { id: 'rewards', label: 'Rewards', link: '/rewards' }
+    { id: 'rewards', label: 'Rewards', link: '/rewards' },
+    { id: 'about', label: 'About Us', link: '/about' }
   ];
 
   return (
@@ -177,6 +178,16 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                      >
                        <Heart className="h-4 w-4" />
                        Rewards
+                     </Link>
+                     <Link 
+                       to="/about"
+                       className={`text-sm font-medium transition-colors hover:text-orange-500 ${
+                         location.pathname === '/about'
+                           ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
+                           : 'text-blue-600'
+                       }`}
+                     >
+                       About Us
                      </Link>
                      <Link 
                        to="/customer-analytics"
