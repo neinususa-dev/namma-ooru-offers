@@ -255,13 +255,13 @@ export default function SignUp() {
 
               <div className="space-y-2">
                 <Label htmlFor="phone-number">Phone Number</Label>
-                <div className="relative">
-                  <Phone className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+               
                   <div className="flex">
-                    <div className="flex items-center px-3 py-2 bg-muted border border-r-0 rounded-l-md text-sm font-medium ml-10">
-                      +91
-                    </div>
-                    <Input
+                     <div className="flex items-center gap-2 px-3 py-2 bg-muted border rounded-l-md text-sm font-medium">
+                    <Phone className="h-4 w-4 text-muted-foreground" />
+                    +91
+                  </div>
+                  <Input
                       id="phone-number"
                       type="tel"
                       placeholder="10-digit mobile number"
@@ -271,7 +271,7 @@ export default function SignUp() {
                       required
                       maxLength={10}
                     />
-                  </div>
+              
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Enter your 10-digit mobile number
