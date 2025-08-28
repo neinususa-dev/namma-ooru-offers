@@ -12,7 +12,6 @@ import { Header } from '@/components/Header';
 import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
-import { useStats } from '@/hooks/useStats';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { generateDefaultImage } from '@/utils/imageUtils';
 import heroImage from '@/assets/hero-marketplace.jpg';
@@ -23,11 +22,427 @@ import electronicsOfferImage from '@/assets/electronics-offer.jpg';
 import homeOfferImage from '@/assets/home-offer.jpg';
 import groceryOfferImage from '@/assets/grocery-offer.jpg';
 
+// Mock data for demonstration
+const mockOffers = [
+  // Food & Dining (5 offers)
+  {
+    id: '1',
+    shopName: 'Murugan Idli Shop',
+    offerTitle: 'Buy 2 Get 1 Free Idli Sets',
+    description: 'Authentic South Indian breakfast with amazing taste and quality.',
+    discount: 'B2G1 FREE',
+    expiryDate: '25 Dec 2024',
+    district: 'Chennai',
+    city: 'chennai-city',
+    location: 'Chennai City',
+    category: 'food',
+    isTrending: true,
+    image: foodOfferImage
+  },
+  {
+    id: '2',
+    shopName: 'Annapoorna Restaurant',
+    offerTitle: 'Family Feast Package',
+    description: 'Complete meals for family with traditional Tamil Nadu dishes.',
+    discount: '25% OFF',
+    expiryDate: '28 Dec 2024',
+    district: 'Chennai',
+    city: 'tambaram',
+    location: 'Tambaram',
+    category: 'food',
+    image: foodOfferImage
+  },
+  {
+    id: '3',
+    shopName: 'Hotel Buhari',
+    offerTitle: 'Biryani Special Combo',
+    description: 'Best biryani in town with free raita and pickle.',
+    discount: '₹100 OFF',
+    expiryDate: '30 Dec 2024',
+    district: 'Coimbatore',
+    city: 'coimbatore-city',
+    location: 'Coimbatore City',
+    category: 'food',
+    isHot: true,
+    image: foodOfferImage
+  },
+  {
+    id: '4',
+    shopName: 'A2B Restaurant',
+    offerTitle: 'South Indian Thali Special',
+    description: 'Unlimited South Indian meals with variety of dishes.',
+    discount: '30% OFF',
+    expiryDate: '2 Jan 2025',
+    district: 'Coimbatore',
+    city: 'pollachi',
+    location: 'Pollachi',
+    category: 'food',
+    image: foodOfferImage
+  },
+  {
+    id: '5',
+    shopName: 'Adyar Ananda Bhavan',
+    offerTitle: 'Sweet Box Combo',
+    description: 'Mixed sweets box perfect for festivals and celebrations.',
+    discount: '20% OFF',
+    expiryDate: '5 Jan 2025',
+    district: 'Madurai',
+    city: 'madurai-city',
+    location: 'Madurai City',
+    category: 'food',
+    image: foodOfferImage
+  },
+
+  // Fashion & Clothing (5 offers)
+  {
+    id: '6',
+    shopName: 'Saravana Stores',
+    offerTitle: '50% Off on Traditional Wear',
+    description: 'Huge discount on sarees, dhotis, and traditional clothing.',
+    discount: '50% OFF',
+    expiryDate: '31 Dec 2024',
+    district: 'Chennai',
+    city: 'ambattur',
+    location: 'Ambattur',
+    category: 'fashion',
+    isHot: true,
+    image: fashionOfferImage
+  },
+  {
+    id: '7',
+    shopName: 'Kumaran Textiles',
+    offerTitle: 'Wedding Collection Special',
+    description: 'Premium silk sarees and wedding collection with exclusive designs.',
+    discount: '40% OFF',
+    expiryDate: '15 Jan 2025',
+    district: 'Salem',
+    city: 'salem-city',
+    location: 'Salem City',
+    category: 'fashion',
+    isHot: true,
+    image: fashionOfferImage
+  },
+  {
+    id: '8',
+    shopName: 'GRT Jewellers',
+    offerTitle: 'Gold Coin with Every Purchase',
+    description: 'Free gold coin on jewelry purchase above ₹50,000.',
+    discount: 'FREE COIN',
+    expiryDate: '31 Dec 2024',
+    district: 'Salem',
+    city: 'attur',
+    location: 'Attur',
+    category: 'fashion',
+    isTrending: true,
+    image: fashionOfferImage
+  },
+  {
+    id: '9',
+    shopName: 'Pothys',
+    offerTitle: 'Designer Saree Collection',
+    description: 'Latest designer sarees with modern and traditional patterns.',
+    discount: '35% OFF',
+    expiryDate: '10 Jan 2025',
+    district: 'Tirupur',
+    city: 'tirupur-city',
+    location: 'Tirupur City',
+    category: 'fashion',
+    image: fashionOfferImage
+  },
+  {
+    id: '10',
+    shopName: 'Chennai Silks',
+    offerTitle: 'Bridal Wear Exclusive',
+    description: 'Complete bridal collection with matching accessories.',
+    discount: '45% OFF',
+    expiryDate: '20 Jan 2025',
+    district: 'Tirupur',
+    city: 'avinashi',
+    location: 'Avinashi',
+    category: 'fashion',
+    image: fashionOfferImage
+  },
+
+  // Electronics (5 offers)
+  {
+    id: '11',
+    shopName: 'Poorvika Mobiles',
+    offerTitle: 'Smartphone Festival Sale',
+    description: 'Latest smartphones with exchange offers and EMI options.',
+    discount: '₹5000 OFF',
+    expiryDate: '30 Dec 2024',
+    district: 'Vellore',
+    city: 'vellore-city',
+    location: 'Vellore City',
+    category: 'electronics',
+    image: electronicsOfferImage
+  },
+  {
+    id: '12',
+    shopName: 'Vijay Sales',
+    offerTitle: 'Home Appliance Mega Sale',
+    description: 'Refrigerators, washing machines, and ACs at best prices.',
+    discount: '₹8000 OFF',
+    expiryDate: '3 Jan 2025',
+    district: 'Vellore',
+    city: 'katpadi',
+    location: 'Katpadi',
+    category: 'electronics',
+    isHot: true,
+    image: electronicsOfferImage
+  },
+  {
+    id: '13',
+    shopName: 'Reliance Digital',
+    offerTitle: 'Laptop & Desktop Deals',
+    description: 'Best deals on laptops, desktops and computer accessories.',
+    discount: '₹10000 OFF',
+    expiryDate: '7 Jan 2025',
+    district: 'Thanjavur',
+    city: 'thanjavur-city',
+    location: 'Thanjavur City',
+    category: 'electronics',
+    isTrending: true,
+    image: electronicsOfferImage
+  },
+  {
+    id: '14',
+    shopName: 'Croma',
+    offerTitle: 'Gaming Console Special',
+    description: 'PlayStation and Xbox consoles with free games.',
+    discount: '₹3000 OFF',
+    expiryDate: '12 Jan 2025',
+    district: 'Thanjavur',
+    city: 'kumbakonam',
+    location: 'Kumbakonam',
+    category: 'electronics',
+    image: electronicsOfferImage
+  },
+  {
+    id: '15',
+    shopName: 'Sangeetha Mobiles',
+    offerTitle: 'Tablet & Smartwatch Combo',
+    description: 'Buy tablet and get smartwatch at special price.',
+    discount: 'B1G1 50%',
+    expiryDate: '15 Jan 2025',
+    district: 'Erode',
+    city: 'erode-city',
+    location: 'Erode City',
+    category: 'electronics',
+    image: electronicsOfferImage
+  },
+
+  // Services (5 offers)
+  {
+    id: '16',
+    shopName: 'Apollo Pharmacy',
+    offerTitle: 'Health Checkup Package',
+    description: 'Complete health checkup with free consultation.',
+    discount: '40% OFF',
+    expiryDate: '25 Dec 2024',
+    district: 'Erode',
+    city: 'gobichettipalayam',
+    location: 'Gobichettipalayam',
+    category: 'services',
+    image: homeOfferImage
+  },
+  {
+    id: '17',
+    shopName: 'Urban Company',
+    offerTitle: 'Home Cleaning Service',
+    description: 'Professional home cleaning with eco-friendly products.',
+    discount: '₹500 OFF',
+    expiryDate: '1 Jan 2025',
+    district: 'Kanyakumari',
+    city: 'nagercoil',
+    location: 'Nagercoil',
+    category: 'services',
+    isTrending: true,
+    image: homeOfferImage
+  },
+  {
+    id: '18',
+    shopName: 'Byju\'s Learning Hub',
+    offerTitle: 'Online Course Discount',
+    description: 'Premium online courses for students with live classes.',
+    discount: '60% OFF',
+    expiryDate: '10 Jan 2025',
+    district: 'Kanyakumari',
+    city: 'kanyakumari-town',
+    location: 'Kanyakumari Town',
+    category: 'services',
+    isHot: true,
+    image: homeOfferImage
+  },
+  {
+    id: '19',
+    shopName: 'OYO Hotels',
+    offerTitle: 'Weekend Stay Special',
+    description: 'Book weekend stays at premium hotels with breakfast.',
+    discount: '35% OFF',
+    expiryDate: '31 Dec 2024',
+    district: 'Tirunelveli',
+    city: 'tirunelveli-city',
+    location: 'Tirunelveli City',
+    category: 'services',
+    image: homeOfferImage
+  },
+  {
+    id: '20',
+    shopName: 'Zomato Pro',
+    offerTitle: 'Food Delivery Free',
+    description: 'Free delivery on all orders above ₹199 for 3 months.',
+    discount: 'FREE DELIVERY',
+    expiryDate: '5 Jan 2025',
+    district: 'Tirunelveli',
+    city: 'palayamkottai',
+    location: 'Palayamkottai',
+    category: 'services',
+    image: homeOfferImage
+  },
+
+  // Groceries (5 offers)
+  {
+    id: '21',
+    shopName: 'More Supermarket',
+    offerTitle: 'Fresh Vegetables Special',
+    description: 'Farm fresh vegetables delivered to your doorstep.',
+    discount: '25% OFF',
+    expiryDate: '28 Dec 2024',
+    district: 'Cuddalore',
+    city: 'cuddalore-city',
+    location: 'Cuddalore City',
+    category: 'groceries',
+    image: groceryOfferImage
+  },
+  {
+    id: '22',
+    shopName: 'Spencer\'s Retail',
+    offerTitle: 'Monthly Grocery Pack',
+    description: 'Complete monthly grocery needs at discounted rates.',
+    discount: '₹1000 OFF',
+    expiryDate: '2 Jan 2025',
+    district: 'Cuddalore',
+    city: 'chidambaram',
+    location: 'Chidambaram',
+    category: 'groceries',
+    isHot: true,
+    image: groceryOfferImage
+  },
+  {
+    id: '23',
+    shopName: 'Big Bazaar',
+    offerTitle: 'Buy 3 Get 1 Free',
+    description: 'Buy any 3 items and get 1 absolutely free on selected items.',
+    discount: 'B3G1 FREE',
+    expiryDate: '8 Jan 2025',
+    district: 'Tiruchirappalli',
+    city: 'trichy-city',
+    location: 'Trichy City',
+    category: 'groceries',
+    isTrending: true,
+    image: groceryOfferImage
+  },
+  {
+    id: '24',
+    shopName: 'Reliance Fresh',
+    offerTitle: 'Organic Products Sale',
+    description: 'Premium organic products for healthy living.',
+    discount: '30% OFF',
+    expiryDate: '12 Jan 2025',
+    district: 'Tiruchirappalli',
+    city: 'srirangam',
+    location: 'Srirangam',
+    category: 'groceries',
+    image: groceryOfferImage
+  },
+  {
+    id: '25',
+    shopName: 'Amma Mini Market',
+    offerTitle: 'Local Products Special',
+    description: 'Support local vendors with special prices on traditional items.',
+    discount: '20% OFF',
+    expiryDate: '18 Jan 2025',
+    district: 'Chennai',
+    city: 'avadi',
+    location: 'Avadi',
+    category: 'groceries',
+    image: groceryOfferImage
+  },
+
+  // Sathyamangalam Offers (5 offers across categories)
+  {
+    id: '26',
+    shopName: 'Sathya Restaurant',
+    offerTitle: 'Traditional South Indian Meals',
+    description: 'Authentic Tamil meals with fresh ingredients and traditional recipes.',
+    discount: '25% OFF',
+    expiryDate: '30 Dec 2024',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'food',
+    isHot: true,
+    image: foodOfferImage
+  },
+  {
+    id: '27',
+    shopName: 'Mangalam Textiles',
+    offerTitle: 'Wedding Saree Collection',
+    description: 'Beautiful handloom sarees for weddings and special occasions.',
+    discount: '40% OFF',
+    expiryDate: '15 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'fashion',
+    isTrending: true,
+    image: fashionOfferImage
+  },
+  {
+    id: '28',
+    shopName: 'Tech World Sathya',
+    offerTitle: 'Mobile & Accessories Sale',
+    description: 'Latest smartphones with cases, chargers and screen guards.',
+    discount: '₹2000 OFF',
+    expiryDate: '5 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'electronics',
+    image: electronicsOfferImage
+  },
+  {
+    id: '29',
+    shopName: 'Sathya Health Clinic',
+    offerTitle: 'Complete Health Checkup',
+    description: 'Full body checkup with blood tests and doctor consultation.',
+    discount: '50% OFF',
+    expiryDate: '20 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'services',
+    image: homeOfferImage
+  },
+  {
+    id: '30',
+    shopName: 'Mangalam Grocery Store',
+    offerTitle: 'Monthly Essentials Pack',
+    description: 'Rice, dal, oil and spices combo pack for monthly needs.',
+    discount: '₹500 OFF',
+    expiryDate: '25 Jan 2025',
+    district: 'Erode',
+    city: 'sathyamangalam',
+    location: 'Sathyamangalam',
+    category: 'groceries',
+    image: groceryOfferImage
+  }
+];
 
 const Index = () => {
   const { user, isMerchant } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
-  const { stats, loading: statsLoading } = useStats();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const [activeSection, setActiveSection] = useState<string>('home');
@@ -208,8 +623,10 @@ const Index = () => {
                     <div className="space-y-4">
                       <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
                         <span className="bg-blue-orange-gradient bg-clip-text text-transparent">
-                          Namma&nbsp;OOru Offers
+                          Namma OOru
                         </span>
+                        <br />
+                        <span className="text-foreground">Offers</span>
                       </h2>
                       <p className="text-xl text-muted-foreground">
                         Discover amazing deals and offers from your favorite local shops across Tamil Nadu. 
@@ -217,49 +634,31 @@ const Index = () => {
                       </p>
                     </div>
 
-                     <div className="grid sm:grid-cols-3 gap-4">
-                        <div className="bg-card p-3 rounded-lg shadow-md border border-primary/10">
-                         <div className="flex items-center gap-3">
-                           <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
-                             <Store className="h-6 w-6 text-primary" />
-                           </div>
-                           <div>
-                             <div className="text-2xl font-bold text-primary">
-                               {statsLoading ? '...' : `${stats.totalStores}+`}
-                             </div>
-                             <div className="text-sm text-muted-foreground">Local Shops</div>
-                           </div>
-                         </div>
-                       </div>
-                       
-                        <div className="bg-card p-3 rounded-lg shadow-md border border-primary/10">
-                         <div className="flex items-center gap-3">
-                           <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
-                             <Heart className="h-6 w-6 text-secondary" />
-                           </div>
-                           <div>
-                             <div className="text-2xl font-bold text-secondary">
-                               {statsLoading ? '...' : `${stats.totalCustomers}+`}
-                             </div>
-                             <div className="text-sm text-muted-foreground">Happy Customers</div>
-                           </div>
-                         </div>
-                       </div>
-                       
-                       <div className="bg-card p-3 rounded-lg shadow-md border border-primary/10">
-                         <div className="flex items-center gap-3">
-                           <div className="w-12 h-12 bg-accent/10 rounded-lg flex items-center justify-center">
-                             <Users className="h-6 w-6 text-accent" />
-                           </div>
-                           <div>
-                             <div className="text-2xl font-bold text-accent">
-                               {statsLoading ? '...' : `${stats.totalMerchants}+`}
-                             </div>
-                             <div className="text-sm text-muted-foreground">Happy Merchants</div>
-                           </div>
-                         </div>
-                       </div>
-                     </div>
+                    <div className="grid sm:grid-cols-2 gap-4">
+                      <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-primary/10 rounded-lg flex items-center justify-center">
+                            <Store className="h-6 w-6 text-primary" />
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-primary">1000+</div>
+                            <div className="text-sm text-muted-foreground">Local Shops</div>
+                          </div>
+                        </div>
+                      </div>
+                      
+                      <div className="bg-card p-4 rounded-lg shadow-md border border-primary/10">
+                        <div className="flex items-center gap-3">
+                          <div className="w-12 h-12 bg-secondary/10 rounded-lg flex items-center justify-center">
+                            <Heart className="h-6 w-6 text-secondary" />
+                          </div>
+                          <div>
+                            <div className="text-2xl font-bold text-secondary">50K+</div>
+                            <div className="text-sm text-muted-foreground">Happy Customers</div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
                     <div className="flex flex-col sm:flex-row gap-4">
                       <Button variant="default" size="xl" className="flex-1">
@@ -683,23 +1082,26 @@ const Index = () => {
                 <Store className="h-5 w-5 mr-2" />
                 Post Your Offers
               </Button>
-              <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10">
+              <Button variant="outline" size="xl" className="border-white text-blue hover:bg-white/10">
                 Learn More
               </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto pt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold">₹500/mo</div>
-                <div className="text-sm opacity-75">10 Offers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">₹1500/mo</div>
-                <div className="text-sm opacity-75">40 Offers</div>
-              </div>
-              <div className="text-center">
+                <div className="text-2xl font-bold">Silver</div>
                 <div className="text-2xl font-bold">FREE</div>
                 <div className="text-sm opacity-75">2 Offers/mo</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">Gold</div>
+                <div className="text-2xl font-bold">₹500/mo</div>
+                <div className="text-sm opacity-75">10 Offers/mo</div>
+              </div>
+              <div className="text-center">
+                <div className="text-2xl font-bold">Platinum</div>
+                <div className="text-2xl font-bold">FREE</div>
+                <div className="text-sm opacity-75">30+ Offers/mo</div>
               </div>
             </div>
           </div>
