@@ -5,9 +5,9 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useToast } from '@/hooks/use-toast';
-import { User, Mail, Lock, Store, MapPin, Phone } from 'lucide-react';
+import { User, Mail, Lock, Store, MapPin, Phone, Users, Building } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { DistrictSelect } from '@/components/DistrictSelect';
 import { CitySelect } from '@/components/CitySelect';
@@ -212,98 +212,193 @@ export default function SignUp() {
           </CardHeader>
 
           <CardContent>
-            <form onSubmit={handleSignUp} className="space-y-4">
-              <div className="space-y-3">
-                <Label>Account Type</Label>
-                <RadioGroup
-                  value={signUpForm.role}
-                  onValueChange={(value: 'customer' | 'merchant') => 
-                    setSignUpForm({ ...signUpForm, role: value })
-                  }
-                  className="flex flex-col space-y-2"
+            <Tabs 
+              value={signUpForm.role} 
+              onValueChange={(value: 'customer' | 'merchant') => 
+                setSignUpForm({ ...signUpForm, role: value })
+              }
+              className="space-y-6"
+            >
+              <TabsList className="grid w-full grid-cols-2 bg-muted rounded-lg p-1">
+                <TabsTrigger 
+                  value="customer" 
+                  className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-primary"
                 >
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="customer" id="customer" />
-                    <Label htmlFor="customer" className="cursor-pointer">
-                      Customer - Browse and save offers
-                    </Label>
-                  </div>
-                  <div className="flex items-center space-x-2">
-                    <RadioGroupItem value="merchant" id="merchant" />
-                    <Label htmlFor="merchant" className="cursor-pointer">
-                      Merchant - Manage your store offers
-                    </Label>
-                  </div>
-                </RadioGroup>
-              </div>
+                  <Users className="h-4 w-4" />
+                  Customer
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="merchant" 
+                  className="flex items-center gap-2 data-[state=active]:bg-white data-[state=active]:text-primary"
+                >
+                  <Building className="h-4 w-4" />
+                  Merchant
+                </TabsTrigger>
+              </TabsList>
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-name">Full Name</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signup-name"
-                    type="text"
-                    placeholder="Enter your full name"
-                    className="pl-10"
-                    value={signUpForm.name}
-                    onChange={(e) => setSignUpForm({ ...signUpForm, name: e.target.value })}
-                    required
-                  />
+              <TabsContent value="customer" className="space-y-4">
+                <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <Users className="h-8 w-8 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-primary">Join as Customer</h3>
+                  <p className="text-sm text-muted-foreground">Browse and save amazing offers from local shops</p>
                 </div>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="phone-number">Phone Number</Label>
-               
-                  <div className="flex">
-                     <div className="flex items-center gap-2 px-3 py-2 bg-muted border rounded-l-md text-sm font-medium">
-                    <Phone className="h-4 w-4 text-muted-foreground" />
-                    +91
-                  </div>
-                  <Input
-                      id="phone-number"
-                      type="tel"
-                      placeholder="10-digit mobile number"
-                      className="pl-3 rounded-l-none border-l-0"
-                      value={signUpForm.phoneNumber}
-                      onChange={handlePhoneChange}
-                      required
-                      maxLength={10}
-                    />
-              
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Enter your 10-digit mobile number
-                </p>
-              </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="referral-code">Referral Code (Optional)</Label>
-                <div className="relative">
-                  <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="referral-code"
-                    type="text"
-                    placeholder="Enter referral code from a friend"
-                    className="pl-10"
-                    value={signUpForm.referralCode}
-                    onChange={(e) => setSignUpForm({ ...signUpForm, referralCode: e.target.value.toUpperCase() })}
-                  />
-                </div>
-                <p className="text-xs text-muted-foreground">
-                  Have a referral code? Enter it to earn bonus points for both you and your friend!
-                </p>
-              </div>
-
-              {signUpForm.role === 'merchant' && (
-                <>
+                
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  {/* Customer-specific fields */}
                   <div className="space-y-2">
-                    <Label htmlFor="store-name">Store Name</Label>
+                    <Label htmlFor="customer-name">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="customer-name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        className="pl-10"
+                        value={signUpForm.name}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-phone">Phone Number</Label>
+                    <div className="flex">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted border rounded-l-md text-sm font-medium">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        +91
+                      </div>
+                      <Input
+                        id="customer-phone"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        className="pl-3 rounded-l-none border-l-0"
+                        value={signUpForm.phoneNumber}
+                        onChange={handlePhoneChange}
+                        required
+                        maxLength={10}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter your 10-digit mobile number
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="customer-referral">Referral Code (Optional)</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="customer-referral"
+                        type="text"
+                        placeholder="Enter referral code from a friend"
+                        className="pl-10"
+                        value={signUpForm.referralCode}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, referralCode: e.target.value.toUpperCase() })}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Have a referral code? Enter it to earn bonus points for both you and your friend!
+                    </p>
+                  </div>
+
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer-email">Email</Label>
+                  <div className="relative">
+                    <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="customer-email"
+                      type="email"
+                      placeholder="Enter your email"
+                      className="pl-10"
+                      value={signUpForm.email}
+                      onChange={(e) => setSignUpForm({ ...signUpForm, email: e.target.value })}
+                      required
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <Label htmlFor="customer-password">Password</Label>
+                  <div className="relative">
+                    <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                    <Input
+                      id="customer-password"
+                      type="password"
+                      placeholder="Create a password"
+                      className="pl-10"
+                      value={signUpForm.password}
+                      onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
+                      required
+                      minLength={6}
+                    />
+                  </div>
+                </div>
+
+                <Button 
+                  type="submit" 
+                  className="w-full bg-secondary-gradient hover:opacity-90"
+                  disabled={isLoading}
+                >
+                  {isLoading ? 'Creating Account...' : 'Create Customer Account'}
+                </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="merchant" className="space-y-4">
+                <div className="text-center p-4 bg-primary/5 rounded-lg border border-primary/10">
+                  <Building className="h-8 w-8 text-primary mx-auto mb-2" />
+                  <h3 className="font-semibold text-primary">Join as Merchant</h3>
+                  <p className="text-sm text-muted-foreground">Manage your store and post offers to attract customers</p>
+                </div>
+
+                <form onSubmit={handleSignUp} className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-name">Full Name</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="merchant-name"
+                        type="text"
+                        placeholder="Enter your full name"
+                        className="pl-10"
+                        value={signUpForm.name}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, name: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-phone">Phone Number</Label>
+                    <div className="flex">
+                      <div className="flex items-center gap-2 px-3 py-2 bg-muted border rounded-l-md text-sm font-medium">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        +91
+                      </div>
+                      <Input
+                        id="merchant-phone"
+                        type="tel"
+                        placeholder="10-digit mobile number"
+                        className="pl-3 rounded-l-none border-l-0"
+                        value={signUpForm.phoneNumber}
+                        onChange={handlePhoneChange}
+                        required
+                        maxLength={10}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Enter your 10-digit mobile number
+                    </p>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-store-name">Store Name</Label>
                     <div className="relative">
                       <Store className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="store-name"
+                        id="merchant-store-name"
                         type="text"
                         placeholder="Enter your store name"
                         className="pl-10"
@@ -315,11 +410,11 @@ export default function SignUp() {
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="store-location">Store Location</Label>
+                    <Label htmlFor="merchant-store-location">Store Location</Label>
                     <div className="relative">
                       <MapPin className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
                       <Input
-                        id="store-location"
+                        id="merchant-store-location"
                         type="text"
                         placeholder="Enter your store address"
                         className="pl-10"
@@ -348,50 +443,68 @@ export default function SignUp() {
                       placeholder="Select your city/town"
                     />
                   </div>
-                </>
-              )}
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-email">Email</Label>
-                <div className="relative">
-                  <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signup-email"
-                    type="email"
-                    placeholder="Enter your email"
-                    className="pl-10"
-                    value={signUpForm.email}
-                    onChange={(e) => setSignUpForm({ ...signUpForm, email: e.target.value })}
-                    required
-                  />
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-referral">Referral Code (Optional)</Label>
+                    <div className="relative">
+                      <User className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="merchant-referral"
+                        type="text"
+                        placeholder="Enter referral code from a friend"
+                        className="pl-10"
+                        value={signUpForm.referralCode}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, referralCode: e.target.value.toUpperCase() })}
+                      />
+                    </div>
+                    <p className="text-xs text-muted-foreground">
+                      Have a referral code? Enter it to earn bonus points for both you and your friend!
+                    </p>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="signup-password">Password</Label>
-                <div className="relative">
-                  <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-                  <Input
-                    id="signup-password"
-                    type="password"
-                    placeholder="Create a password"
-                    className="pl-10"
-                    value={signUpForm.password}
-                    onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
-                    required
-                    minLength={6}
-                  />
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-email">Email</Label>
+                    <div className="relative">
+                      <Mail className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="merchant-email"
+                        type="email"
+                        placeholder="Enter your email"
+                        className="pl-10"
+                        value={signUpForm.email}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, email: e.target.value })}
+                        required
+                      />
+                    </div>
+                  </div>
 
-              <Button 
-                type="submit" 
-                className="w-full bg-secondary-gradient hover:opacity-90"
-                disabled={isLoading}
-              >
-                {isLoading ? 'Creating Account...' : 'Create Account'}
-              </Button>
-            </form>
+                  <div className="space-y-2">
+                    <Label htmlFor="merchant-password">Password</Label>
+                    <div className="relative">
+                      <Lock className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                      <Input
+                        id="merchant-password"
+                        type="password"
+                        placeholder="Create a password"
+                        className="pl-10"
+                        value={signUpForm.password}
+                        onChange={(e) => setSignUpForm({ ...signUpForm, password: e.target.value })}
+                        required
+                        minLength={6}
+                      />
+                    </div>
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    className="w-full bg-secondary-gradient hover:opacity-90"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Creating Account...' : 'Create Merchant Account'}
+                  </Button>
+                </form>
+              </TabsContent>
+            </Tabs>
           </CardContent>
 
           <CardFooter className="text-center">
