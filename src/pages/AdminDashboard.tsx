@@ -793,15 +793,17 @@ export function AdminDashboard() {
                           <SelectTrigger className={errors.category ? 'border-destructive' : ''}>
                             <SelectValue placeholder="Select a category" />
                           </SelectTrigger>
-                          <SelectContent>
+                          <SelectContent className="bg-background border shadow-md z-50">
                             {categoriesLoading ? (
                               <SelectItem value="loading" disabled>Loading categories...</SelectItem>
-                            ) : (
+                            ) : categories.length > 0 ? (
                               categories.map((category) => (
                                 <SelectItem key={category.id} value={category.name}>
                                   {category.name.charAt(0).toUpperCase() + category.name.slice(1)}
                                 </SelectItem>
                               ))
+                            ) : (
+                              <SelectItem value="no-categories" disabled>No categories available</SelectItem>
                             )}
                           </SelectContent>
                         </Select>
