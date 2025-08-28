@@ -683,23 +683,26 @@ const Index = () => {
                 <Store className="h-5 w-5 mr-2" />
                 Post Your Offers
               </Button>
-              <Button variant="outline" size="xl" className="border-white text-white hover:bg-white/10">
+              <Button variant="outline" size="xl" className="border-white text-primary hover:bg-white/10">
                 Learn More
               </Button>
             </div>
 
             <div className="grid grid-cols-3 gap-8 max-w-lg mx-auto pt-8">
               <div className="text-center">
-                <div className="text-2xl font-bold">₹500/mo</div>
-                <div className="text-sm opacity-75">10 Offers</div>
-              </div>
-              <div className="text-center">
-                <div className="text-2xl font-bold">₹1500/mo</div>
-                <div className="text-sm opacity-75">40 Offers</div>
-              </div>
-              <div className="text-center">
+                <div className="text-xl font-bold">Silver</div>
                 <div className="text-2xl font-bold">FREE</div>
-                <div className="text-sm opacity-75">2 Offers/mo</div>
+                <div className="text-sm opacity-75">2 offer/mo</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold">Gold</div>
+                <div className="text-2xl font-bold">₹500/mo</div>
+                <div className="text-sm opacity-75">10 offer/mo</div>
+              </div>
+              <div className="text-center">
+                <div className="text-xl font-bold">Platinum</div>
+                <div className="text-2xl font-bold">₹1500/mo</div>
+                <div className="text-sm opacity-75">30 Offer/mo</div>
               </div>
             </div>
           </div>
