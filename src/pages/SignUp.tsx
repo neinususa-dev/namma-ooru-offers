@@ -11,6 +11,7 @@ import { User, Mail, Lock, Store, MapPin, Phone } from 'lucide-react';
 import { Header } from '@/components/Header';
 import { DistrictSelect } from '@/components/DistrictSelect';
 import { CitySelect } from '@/components/CitySelect';
+import { supabase } from '@/integrations/supabase/client';
 
 export default function SignUp() {
   const { user, profile, signUp, loading } = useAuth();
@@ -55,37 +56,80 @@ export default function SignUp() {
     e.preventDefault();
     setIsLoading(true);
 
-    const additionalData = {
-      phone_number: signUpForm.phoneNumber,
-      referral_code: signUpForm.referralCode || undefined,
-      ...(signUpForm.role === 'merchant' ? {
-        store_name: signUpForm.storeName,
-        store_location: signUpForm.storeLocation,
-        district: signUpForm.district,
-        city: signUpForm.city
-      } : {})
-    };
+    try {
+      // Check if email already exists in profiles table
+      const { data: existingProfile, error: checkError } = await supabase
+        .from('profiles')
+        .select('email')
+        .eq('email', signUpForm.email.toLowerCase())
+        .maybeSingle();
 
-    const { error } = await signUp(
-      signUpForm.email,
-      signUpForm.password,
-      signUpForm.name,
-      signUpForm.role,
-      additionalData
-    );
+      if (checkError) {
+        console.error('Error checking existing email:', checkError);
+        toast({
+          title: "Error",
+          description: "Failed to validate email. Please try again.",
+          variant: "destructive",
+        });
+        setIsLoading(false);
+        return;
+      }
 
-    if (error) {
+      if (existingProfile) {
+        toast({
+          title: "Account Already Exists",
+          description: "An account with this email already exists. Please log in instead.",
+          variant: "destructive",
+        });
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          navigate('/signin');
+        }, 2000);
+        setIsLoading(false);
+        return;
+      }
+
+      // Proceed with signup if email doesn't exist
+      const additionalData = {
+        phone_number: signUpForm.phoneNumber,
+        referral_code: signUpForm.referralCode || undefined,
+        ...(signUpForm.role === 'merchant' ? {
+          store_name: signUpForm.storeName,
+          store_location: signUpForm.storeLocation,
+          district: signUpForm.district,
+          city: signUpForm.city
+        } : {})
+      };
+
+      const { error } = await signUp(
+        signUpForm.email,
+        signUpForm.password,
+        signUpForm.name,
+        signUpForm.role,
+        additionalData
+      );
+
+      if (error) {
+        toast({
+          title: "Sign up failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      } else {
+        toast({
+          title: "Success!",
+          description: "Please check your email to confirm your account.",
+        });
+      }
+    } catch (error) {
+      console.error('Signup error:', error);
       toast({
-        title: "Sign up failed",
-        description: error.message,
+        title: "Error",
+        description: "An unexpected error occurred. Please try again.",
         variant: "destructive",
       });
-    } else {
-      toast({
-        title: "Success!",
-        description: "Please check your email to confirm your account.",
-      });
     }
+    
     setIsLoading(false);
   };
 
