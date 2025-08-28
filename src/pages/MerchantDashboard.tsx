@@ -609,9 +609,12 @@ const MerchantDashboard = () => {
             <CardHeader><CardTitle className="text-sm">Total Redemptions</CardTitle></CardHeader>
             <CardContent><h2 className="text-2xl font-bold text-primary underline hover:no-underline transition-all">{stats.totalRedemptions}</h2></CardContent>
           </Card>
-          <Card>
-            <CardHeader><CardTitle>Total Revenue</CardTitle></CardHeader>
-            <CardContent><h2 className="text-2xl font-bold">₹{stats.totalRevenue}</h2></CardContent>
+          <Card 
+            className="cursor-pointer hover:shadow-md transition-shadow" 
+            onClick={() => document.getElementById('revenue-chart-section')?.scrollIntoView({ behavior: 'smooth' })}
+          >
+            <CardHeader><CardTitle className="text-base">Total Revenue</CardTitle></CardHeader>
+            <CardContent><h2 className="text-2xl font-bold text-primary underline hover:no-underline transition-all">₹{stats.totalRevenue}</h2></CardContent>
           </Card>
         </div>
 
@@ -662,6 +665,30 @@ const MerchantDashboard = () => {
                 <Bar dataKey="offers" fill="#4ECDC4" name="Offers" />
                 <Bar dataKey="saves" fill="#FF6B6B" name="Saves" />
                 <Bar dataKey="redemptions" fill="#45B7D1" name="Redemptions" />
+              </BarChart>
+            </ResponsiveContainer>
+          </CardContent>
+        </Card>
+
+        <Card className="mt-6" id="revenue-chart-section">
+          <CardHeader><CardTitle>Revenue by Offer</CardTitle></CardHeader>
+          <CardContent>
+            <ResponsiveContainer width="100%" height={300}>
+              <BarChart data={stats.offerPerformance} margin={{ top: 20, right: 30, left: 20, bottom: 60 }}>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis 
+                  dataKey="title" 
+                  angle={-45}
+                  textAnchor="end"
+                  height={80}
+                  interval={0}
+                />
+                <YAxis />
+                <Tooltip 
+                  formatter={(value, name) => [`₹${value}`, 'Revenue']}
+                  labelFormatter={(label) => `Offer: ${label}`}
+                />
+                <Bar dataKey="revenue" fill="#22c55e" name="Revenue" />
               </BarChart>
             </ResponsiveContainer>
           </CardContent>
