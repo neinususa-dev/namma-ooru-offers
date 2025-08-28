@@ -79,18 +79,21 @@ export default function SignUp() {
       }
 
       if (existingProfile) {
+        console.log('User already exists, showing error message');
         toast({
           title: "Account Already Exists",
           description: "An account with this email already exists. Please log in instead.",
           variant: "destructive",
         });
+        setIsLoading(false);
         // Redirect to login page after a short delay
         setTimeout(() => {
           navigate('/signin');
         }, 2000);
-        setIsLoading(false);
         return;
       }
+
+      console.log('Email is available, proceeding with signup');
 
       // Proceed with signup if email doesn't exist
       const additionalData = {
