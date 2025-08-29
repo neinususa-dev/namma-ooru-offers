@@ -29,16 +29,16 @@ export default function SignIn() {
     password: ''
   });
 
-  // Redirect authenticated users
+  // Redirect authenticated users (but not during password reset)
   useEffect(() => {
-    if (user && profile && !loading) {
+    if (user && profile && !loading && !isPasswordResetMode) {
       if (profile.role === 'merchant') {
         navigate('/merchant-post-offer');
       } else {
         navigate('/');
       }
     }
-  }, [user, profile, loading, navigate]);
+  }, [user, profile, loading, navigate, isPasswordResetMode]);
 
   // Check for password reset flow
   useEffect(() => {
