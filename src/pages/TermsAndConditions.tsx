@@ -468,11 +468,11 @@ const TermsAndConditions = () => {
                   <div className="space-y-2">
                     <div className="flex items-center gap-2">
                       <Mail className="h-4 w-4 text-primary" />
-                      <span>legal@namma-ooru-offers.com</span>
+                      <span>contactus@nammaooruoffers.com</span>
                     </div>
                     <div className="flex items-center gap-2">
                       <Phone className="h-4 w-4 text-primary" />
-                      <span>+91-XXX-XXXXXXX</span>
+                      <span>+91-7200864223</span>
                     </div>
                   </div>
                 </div>
@@ -480,10 +480,10 @@ const TermsAndConditions = () => {
                 <div>
                   <h4 className="font-semibold mb-3">Business Address</h4>
                   <address className="not-italic text-muted-foreground">
-                    Namma OOru Offers<br />
-                    [Legal Business Address]<br />
+                    Namma Ooru Offers, Product of<br />
+                    Neinus Private Ltd, Sathyamangalam<br />
                     Tamil Nadu, India<br />
-                    PIN: XXXXXX
+                    PIN: 638503
                   </address>
                 </div>
               </div>
