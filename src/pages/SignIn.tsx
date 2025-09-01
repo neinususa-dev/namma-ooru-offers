@@ -9,6 +9,7 @@ import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, Di
 import { useToast } from '@/hooks/use-toast';
 import { Mail, Lock, KeyRound } from 'lucide-react';
 import { Header } from '@/components/Header';
+import { DisabledUserMessage } from '@/components/DisabledUserMessage';
 import { supabase } from '@/integrations/supabase/client';
 
 export default function SignIn() {
@@ -24,6 +25,7 @@ export default function SignIn() {
   const [isPasswordResetMode, setIsPasswordResetMode] = useState(false);
   const [newPassword, setNewPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
+  const [isAccountDisabled, setIsAccountDisabled] = useState(false);
   const [signInForm, setSignInForm] = useState({
     email: '',
     password: ''
@@ -87,15 +89,20 @@ export default function SignIn() {
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
+    setIsAccountDisabled(false);
 
     const { error } = await signIn(signInForm.email, signInForm.password);
 
     if (error) {
-      toast({
-        title: "Log in failed",
-        description: error.message,
-        variant: "destructive",
-      });
+      if (error.message === 'ACCOUNT_DISABLED') {
+        setIsAccountDisabled(true);
+      } else {
+        toast({
+          title: "Log in failed",
+          description: error.message,
+          variant: "destructive",
+        });
+      }
     }
     setIsLoading(false);
   };
@@ -234,6 +241,8 @@ export default function SignIn() {
           </CardHeader>
 
           <CardContent>
+            {isAccountDisabled && <DisabledUserMessage />}
+            
             {isPasswordResetMode ? (
               <form onSubmit={handlePasswordUpdate} className="space-y-4">
                 <div className="space-y-2">

@@ -8,6 +8,7 @@ export interface Profile {
   email: string;
   role: 'customer' | 'merchant' | 'super_admin';
   is_premium: boolean;
+  is_active: boolean;
   phone_number?: string;
   store_name?: string;
   store_location?: string;
@@ -169,7 +170,34 @@ export function useAuth() {
 
       if (error) {
         console.error('Sign in error:', error);
-      } else {
+        return { data, error };
+      }
+
+      // Check if user profile exists and is active
+      if (data.user) {
+        console.log('Checking user profile status...');
+        const { data: profileData, error: profileError } = await supabase
+          .from('profiles')
+          .select('is_active, name')
+          .eq('id', data.user.id)
+          .maybeSingle();
+
+        if (profileError) {
+          console.error('Error checking profile:', profileError);
+          return { data, error: profileError };
+        }
+
+        if (profileData && !profileData.is_active) {
+          console.log('User account is disabled');
+          // Sign out the user immediately
+          await supabase.auth.signOut();
+          
+          return { 
+            data: null, 
+            error: new Error('ACCOUNT_DISABLED') 
+          };
+        }
+        
         console.log('Sign in successful:', data.user?.id);
       }
 

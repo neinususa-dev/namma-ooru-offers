@@ -19,6 +19,7 @@ import { useOfferDatabase } from "@/hooks/useOfferDatabase";
 import { useAdminOffers } from "@/hooks/useAdminOffers";
 import { useStores } from "@/hooks/useStores";
 import { useStats } from "@/hooks/useStats";
+import { UserManagement } from "@/components/UserManagement";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle, CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Eye, BarChart3 } from "lucide-react";
@@ -287,7 +288,7 @@ function AdminDashboardContent() {
 
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:bg-muted/50"
-            onClick={() => setActiveTab("all-pages")}
+            onClick={() => setActiveTab("customers")}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
@@ -295,13 +296,13 @@ function AdminDashboardContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-cyan-600">{stats.totalCustomers || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">Click to view pages</p>
+              <p className="text-xs text-muted-foreground mt-1">Click to manage customers</p>
             </CardContent>
           </Card>
 
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:bg-muted/50"
-            onClick={() => setActiveTab("all-pages")}
+            onClick={() => setActiveTab("merchants")}
           >
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
               <CardTitle className="text-sm font-medium">Total Merchants</CardTitle>
@@ -309,7 +310,7 @@ function AdminDashboardContent() {
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold text-indigo-600">{stats.totalMerchants || 0}</div>
-              <p className="text-xs text-muted-foreground mt-1">Click to view pages</p>
+              <p className="text-xs text-muted-foreground mt-1">Click to manage merchants</p>
             </CardContent>
           </Card>
           
@@ -361,7 +362,7 @@ function AdminDashboardContent() {
         </div>
 
         <Tabs value={activeTab} onValueChange={setActiveTab} className="space-y-4">
-          <TabsList className="grid grid-cols-2 lg:grid-cols-5 gap-2 p-1 bg-muted rounded-xl h-auto">
+          <TabsList className="grid grid-cols-3 lg:grid-cols-7 gap-2 p-1 bg-muted rounded-xl h-auto">
             <TabsTrigger 
               value="overview" 
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
@@ -391,8 +392,22 @@ function AdminDashboardContent() {
               <span className="hidden sm:inline">Offers</span>
             </TabsTrigger>
             <TabsTrigger 
+              value="customers" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-cyan-500 data-[state=active]:to-cyan-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-cyan-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <Users className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Customers</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="merchants" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-indigo-500 data-[state=active]:to-indigo-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-indigo-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <Users className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Merchants</span>
+            </TabsTrigger>
+            <TabsTrigger 
               value="create-new" 
-              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-red-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1 col-span-2 lg:col-span-1"
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-red-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1 col-span-3 lg:col-span-1"
             >
               <Plus className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Create New</span>
@@ -1150,6 +1165,14 @@ function AdminDashboardContent() {
                 )}
               </form>
             </div>
+          </TabsContent>
+
+          <TabsContent value="customers" className="space-y-4">
+            <UserManagement role="customer" title="Customer Management" />
+          </TabsContent>
+
+          <TabsContent value="merchants" className="space-y-4">
+            <UserManagement role="merchant" title="Merchant Management" />
           </TabsContent>
         </Tabs>
       </div>

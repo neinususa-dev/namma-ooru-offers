@@ -132,6 +132,7 @@ export type Database = {
           district: string | null
           email: string
           id: string
+          is_active: boolean
           is_premium: boolean | null
           name: string
           payment_method: string | null
@@ -151,6 +152,7 @@ export type Database = {
           district?: string | null
           email: string
           id: string
+          is_active?: boolean
           is_premium?: boolean | null
           name: string
           payment_method?: string | null
@@ -170,6 +172,7 @@ export type Database = {
           district?: string | null
           email?: string
           id?: string
+          is_active?: boolean
           is_premium?: boolean | null
           name?: string
           payment_method?: string | null
