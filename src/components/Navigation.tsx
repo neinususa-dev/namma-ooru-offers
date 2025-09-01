@@ -1,5 +1,5 @@
 import React from 'react';
-import { NavigationMenu, NavigationMenuContent, NavigationMenuItem, NavigationMenuLink, NavigationMenuList, NavigationMenuTrigger } from '@/components/ui/navigation-menu';
+import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface NavigationProps {
@@ -18,24 +18,24 @@ export const Navigation: React.FC<NavigationProps> = ({ activeSection, onSection
   return (
     <div className="w-full bg-background border-b border-border">
       <div className="container mx-auto px-4">
-        <NavigationMenu className="max-w-full justify-center">
-          <NavigationMenuList className="gap-1">
+        <div className="flex items-center justify-center">
+          <div className="flex gap-1">
             {menuItems.map((item) => (
-              <NavigationMenuItem key={item.id}>
-                <NavigationMenuLink
-                  className={cn(
-                    "group inline-flex h-12 w-max items-center justify-center rounded-lg px-6 py-2 text-base font-medium transition-smooth cursor-pointer",
-                    "text-primary hover:text-secondary hover:bg-secondary/10 focus:text-secondary focus:bg-secondary/10 focus:outline-none",
-                    activeSection === item.id && "text-secondary bg-secondary/10 border-b-2 border-secondary"
-                  )}
-                  onClick={() => onSectionChange(item.id)}
-                >
-                  {item.label}
-                </NavigationMenuLink>
-              </NavigationMenuItem>
+              <Button
+                key={item.id}
+                variant="ghost"
+                className={cn(
+                  "h-12 px-6 py-2 text-base font-medium transition-smooth rounded-lg",
+                  "text-primary hover:text-secondary hover:bg-secondary/10 focus:text-secondary focus:bg-secondary/10",
+                  activeSection === item.id && "text-secondary bg-secondary/10 border-b-2 border-secondary"
+                )}
+                onClick={() => onSectionChange(item.id)}
+              >
+                {item.label}
+              </Button>
             ))}
-          </NavigationMenuList>
-        </NavigationMenu>
+          </div>
+        </div>
       </div>
     </div>
   );
