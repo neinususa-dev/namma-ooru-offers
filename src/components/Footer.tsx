@@ -114,29 +114,29 @@ const Footer = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
                 <div className="text-sm text-muted-foreground">
-                  <p>[Business Address]</p>
+                  <p>Neinus Private Ltd, Sathyamangalam</p>
                   <p>Tamil Nadu, India</p>
-                  <p>PIN: XXXXXX</p>
+                  <p>PIN: 638503</p>
                 </div>
               </div>
               
               <div className="flex items-center gap-3">
                 <Phone className="h-4 w-4 text-primary flex-shrink-0" />
                 <a 
-                  href="tel:+91XXXXXXXXXX" 
+                  href="tel:+917200864223" 
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  +91-XXX-XXXXXXX
+                  +91-7200864223
                 </a>
               </div>
               
               <div className="flex items-center gap-3">
                 <Mail className="h-4 w-4 text-primary flex-shrink-0" />
                 <a 
-                  href="mailto:info@namma-ooru-offers.com" 
+                  href="mailto:contactus@nammaooruoffers.com" 
                   className="text-sm text-muted-foreground hover:text-primary transition-colors"
                 >
-                  info@namma-ooru-offers.com
+                  contactus@nammaooruoffers.com
                 </a>
               </div>
             </div>
