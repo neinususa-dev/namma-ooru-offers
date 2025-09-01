@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -18,7 +18,7 @@ import { toast } from 'sonner';
 const Rewards = () => {
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState<string>('rewards');
-  const { user } = useAuth();
+  const { user, profile, loading: authLoading } = useAuth();
   const { 
     userReward, 
     activities, 
@@ -30,6 +30,13 @@ const Rewards = () => {
     copyReferralCode,
     refetch
   } = useRewards();
+
+  // Redirect super-admin users away from rewards page
+  useEffect(() => {
+    if (profile?.role === 'super_admin') {
+      navigate('/admin-navigation');
+    }
+  }, [profile, navigate]);
 
   const handleSectionChange = (section: string) => {
     setActiveSection(section);
@@ -147,14 +154,14 @@ const Rewards = () => {
           {!user ? (
             <div className="flex justify-center gap-4">
               <Button 
-                onClick={() => navigate('/sign-up')}
+                onClick={() => navigate('/signup')}
                 className="px-6 py-3 bg-white text-blue-600 font-bold rounded-xl shadow-lg 
                           hover:text-white hover:bg-blue-600 transition-colors duration-300"
               >
                 Sign Up Now
               </Button>
               <Button 
-                onClick={() => navigate('/sign-in')}
+                onClick={() => navigate('/signin')}
                 className="px-6 py-3 bg-orange-500 text-white font-bold rounded-xl hover:bg-orange-600 transition-colors"
               >
                 Login
