@@ -325,7 +325,7 @@ const Rewards = () => {
             {/* Tabs for different sections */}
             <Tabs defaultValue="dashboard" className="space-y-6">
               <div className="w-full overflow-x-auto pb-2">
-                <div className="grid grid-cols-5 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl">
+                <TabsList className="grid grid-cols-5 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl w-full">
                   <TabsTrigger 
                     value="dashboard" 
                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
@@ -366,7 +366,7 @@ const Rewards = () => {
                     <span className="hidden sm:inline">Leader</span>
                     <span className="sm:hidden">🏆</span>
                   </TabsTrigger>
-                </div>
+                </TabsList>
               </div>
 
               <TabsContent value="dashboard" className="space-y-6">
