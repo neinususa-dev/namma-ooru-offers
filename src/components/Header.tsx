@@ -21,7 +21,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
 
   const navigationItems = [
     { id: 'home', label: 'Home' },
-    { id: 'hot-deals', label: 'Hot Deals' },
     { id: 'local-deals', label: 'Local Deals' },
     { id: 'store-list', label: 'Store List' },
     { id: 'rewards', label: 'Rewards', link: '/rewards' },
@@ -152,12 +151,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                   Home
                 </Link>
                     <Link
-                      to="/?section=hot-deals"
-                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
-                    >
-                      Hot Deals
-                    </Link>
-                    <Link
                       to="/?section=local-deals"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                     >
@@ -287,24 +280,23 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                               <span className="font-medium">{item.label}</span>
                             </Link>
                           ) : (
-                            <button
-                              key={item.id}
-                              onClick={() => {
-                                onSectionChange?.(item.id);
-                                setMobileMenuOpen(false);
-                              }}
-                              className={`flex items-center gap-3 p-3 rounded-lg transition-colors w-full text-left ${
-                                activeSection === item.id 
-                                  ? 'bg-orange-100 text-orange-600' 
-                                  : 'hover:bg-muted'
-                              }`}
-                            >
-                              {item.id === 'hot-deals' && <Flame className="h-5 w-5" />}
-                              {item.id === 'local-deals' && <MapPin className="h-5 w-5" />}
-                              {item.id === 'store-list' && <Store className="h-5 w-5" />}
-                              {item.id === 'home' && <Home className="h-5 w-5" />}
-                              <span className="font-medium">{item.label}</span>
-                            </button>
+                             <button
+                               key={item.id}
+                               onClick={() => {
+                                 onSectionChange?.(item.id);
+                                 setMobileMenuOpen(false);
+                               }}
+                               className={`flex items-center gap-3 p-3 rounded-lg transition-colors w-full text-left ${
+                                 activeSection === item.id 
+                                   ? 'bg-orange-100 text-orange-600' 
+                                   : 'hover:bg-muted'
+                               }`}
+                             >
+                               {item.id === 'local-deals' && <MapPin className="h-5 w-5" />}
+                               {item.id === 'store-list' && <Store className="h-5 w-5" />}
+                               {item.id === 'home' && <Home className="h-5 w-5" />}
+                               <span className="font-medium">{item.label}</span>
+                             </button>
                           )
                         ))}
                         
