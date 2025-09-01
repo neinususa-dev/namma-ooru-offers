@@ -1,5 +1,7 @@
 import React from 'react';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Header } from '@/components/Header';
 import { Link } from 'react-router-dom';
 import { 
@@ -16,10 +18,56 @@ import {
   Target,
   Search
 } from 'lucide-react';
+import { generateFAQStructuredData } from '@/utils/seoUtils';
 
 const AboutUs = () => {
+  // FAQ data for SEO
+  const faqData = [
+    {
+      question: "What is Namma OOru Offers?",
+      answer: "Namma OOru Offers is Tamil Nadu's premier local deals platform that connects customers with amazing offers from local businesses across the state."
+    },
+    {
+      question: "How can I save money with Namma OOru Offers?",
+      answer: "Browse through hundreds of exclusive deals from local shops, restaurants, and service providers. Save up to 70% on your favorite products and services."
+    },
+    {
+      question: "Can I become a merchant on the platform?",
+      answer: "Yes! Local businesses can join our platform to reach more customers. We offer flexible plans starting from free Silver membership with 2 offers per month."
+    },
+    {
+      question: "Which areas does Namma OOru Offers cover?",
+      answer: "We cover all major districts in Tamil Nadu including Chennai, Coimbatore, Madurai, Salem, Erode, Tirupur, and many more cities and towns."
+    }
+  ];
+
+  const faqStructuredData = generateFAQStructuredData(faqData);
+
+  // About page structured data
+  const aboutPageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    "name": "About Namma OOru Offers",
+    "description": "Learn about Namma OOru Offers - Tamil Nadu's premier local deals platform connecting customers with local businesses",
+    "url": "https://namma-ooru-offers.com/about",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Namma OOru Offers",
+      "description": "Tamil Nadu's premier local deals and offers platform"
+    }
+  };
+
   return (
     <div className="min-h-screen bg-background">
+      <SEO 
+        title="About Us - Learn About Namma OOru Offers | Tamil Nadu's Local Deals Platform"
+        description="Discover how Namma OOru Offers connects Tamil Nadu customers with amazing local deals. Learn about our mission to support local businesses and help customers save money."
+        keywords="about Namma OOru Offers, Tamil Nadu local business platform, local deals company, supporting Tamil Nadu merchants, customer savings platform"
+        structuredData={aboutPageStructuredData}
+        url="https://namma-ooru-offers.com/about"
+        canonical="https://namma-ooru-offers.com/about"
+        type="website"
+      />
       <Header showNavigation={true} />
       
       <main className="pt-20">
@@ -229,7 +277,38 @@ const AboutUs = () => {
           </div>
         </section>
 
-        {/* Footer */}
+      {/* FAQ Section with Structured Data */}
+      <section className="py-16 bg-muted/30">
+        <div className="container mx-auto px-4">
+          <div className="text-center mb-12">
+            <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+            <p className="text-muted-foreground max-w-2xl mx-auto">
+              Get answers to common questions about Namma OOru Offers
+            </p>
+          </div>
+          
+          <div className="max-w-4xl mx-auto grid md:grid-cols-2 gap-6">
+            {faqData.map((faq, index) => (
+              <Card key={index} className="h-full">
+                <CardHeader>
+                  <CardTitle className="text-lg">{faq.question}</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-muted-foreground">{faq.answer}</p>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+        
+        {/* FAQ Structured Data */}
+        <script 
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqStructuredData) }}
+        />
+      </section>
+
+      {/* Footer */}
         <footer className="bg-card border-t py-8">
           <div className="container mx-auto px-4">
             <div className="flex flex-col md:flex-row justify-between items-center gap-4">

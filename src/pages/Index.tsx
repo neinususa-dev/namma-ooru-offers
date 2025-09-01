@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter, Gift, Plus, BarChart3 } from 'lucide-react';
+import SEO from '@/components/SEO';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DistrictSelect } from '@/components/DistrictSelect';
@@ -22,6 +23,12 @@ import fashionOfferImage from '@/assets/fashion-offer.jpg';
 import electronicsOfferImage from '@/assets/electronics-offer.jpg';
 import homeOfferImage from '@/assets/home-offer.jpg';
 import groceryOfferImage from '@/assets/grocery-offer.jpg';
+import { 
+  generateWebsiteStructuredData, 
+  generateOrganizationStructuredData,
+  generateLocationStructuredData,
+  generateBreadcrumbStructuredData
+} from '@/utils/seoUtils';
 
 
 const Index = () => {
@@ -718,14 +725,38 @@ const Index = () => {
     }
   };
 
-  // If user is authenticated and is a merchant, show merchant home page
+  // Generate SEO structured data
+  const websiteStructuredData = generateWebsiteStructuredData();
+  const organizationStructuredData = generateOrganizationStructuredData();
+  const breadcrumbStructuredData = generateBreadcrumbStructuredData([
+    { name: 'Home', url: 'https://namma-ooru-offers.com/' }
+  ]);
+
+  const combinedStructuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      websiteStructuredData,
+      organizationStructuredData,
+      breadcrumbStructuredData
+    ]
+  };
+
+  // Show merchant home page if user is a merchant
   if (user && isMerchant) {
     return <MerchantHomePage />;
   }
 
   return (
-    <div className="min-h-screen bg-sunset-gradient">
-      <Header 
+    <div className="min-h-screen bg-background">
+      <SEO 
+        title="Namma OOru Offers - Your Local Savings Hub | Tamil Nadu"
+        description="Discover amazing deals and offers from local shops across Tamil Nadu. Save money while supporting local businesses with Namma OOru Offers."
+        keywords="Tamil Nadu offers, local deals, coupons Chennai, discounts Coimbatore, Madurai offers, Salem deals, local shops Tamil Nadu, South India coupons, merchant offers, customer savings, Erode deals, Tirupur offers"
+        structuredData={combinedStructuredData}
+        url="https://namma-ooru-offers.com/"
+        canonical="https://namma-ooru-offers.com/"
+      />
+      <Header
         showNavigation={true}
         activeSection={activeSection}
         onSectionChange={setActiveSection}

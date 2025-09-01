@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import SEO from '@/components/SEO';
 import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
@@ -30,6 +31,15 @@ export default function SignIn() {
     email: '',
     password: ''
   });
+
+  // SEO structured data for Sign In page
+  const signInPageStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "WebPage",
+    "name": "Sign In to Namma OOru Offers",
+    "description": "Sign in to your Namma OOru Offers account to access exclusive local deals and manage your preferences",
+    "url": "https://namma-ooru-offers.com/signin"
+  };
 
   // Redirect authenticated users (but not during password reset)
   useEffect(() => {
@@ -225,7 +235,16 @@ export default function SignIn() {
   }
 
   return (
-    <div className="min-h-screen bg-sunset-gradient flex flex-col">
+    <div className="min-h-screen bg-background flex flex-col">
+      <SEO 
+        title="Sign In to Your Account | Namma OOru Offers"
+        description="Sign in to your Namma OOru Offers account to access exclusive local deals from Tamil Nadu merchants and manage your saved offers."
+        keywords="sign in Namma OOru Offers, login Tamil Nadu deals, local offers account, merchant login, customer login"
+        structuredData={signInPageStructuredData}
+        url="https://namma-ooru-offers.com/signin"
+        canonical="https://namma-ooru-offers.com/signin"
+        type="website"
+      />
       <Header showNavigation={false} />
 
       {/* Main Content */}
