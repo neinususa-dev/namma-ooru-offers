@@ -325,7 +325,7 @@ const Rewards = () => {
             {/* Tabs for different sections */}
             <Tabs defaultValue="dashboard" className="space-y-6">
               <div className="w-full overflow-x-auto pb-2">
-                <TabsList className="grid grid-cols-5 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl w-full">
+                <TabsList className="grid grid-cols-4 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl w-full">
                   <TabsTrigger 
                     value="dashboard" 
                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-blue-100 hover:bg-blue-200 data-[state=active]:hover:bg-blue-600 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-1 md:px-4 flex flex-col items-center justify-center gap-1 min-w-[70px] md:min-w-0 text-blue-700 data-[state=active]:text-white"
@@ -354,19 +354,12 @@ const Rewards = () => {
                     <TrendingUp className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
                     <span className="text-[10px] md:text-sm font-medium leading-tight">Activity</span>
                   </TabsTrigger>
-                  <TabsTrigger 
-                    value="leaderboard" 
-                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-pink-100 hover:bg-pink-200 data-[state=active]:hover:bg-pink-600 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-1 md:px-4 flex flex-col items-center justify-center gap-1 min-w-[70px] md:min-w-0 text-pink-700 data-[state=active]:text-white"
-                  >
-                    <Trophy className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
-                    <span className="text-[10px] md:text-sm font-medium leading-tight">Leader</span>
-                  </TabsTrigger>
                 </TabsList>
               </div>
 
               <TabsContent value="dashboard" className="space-y-6">
                 {/* Referral & Social Sharing */}
-                <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-green-400 to-green-600 text-white p-6">
+                <Card className="rounded-2xl shadow-lg bg-gradient-to-r from-orange-300 to-orange-400 text-white p-6">
                   <CardTitle className="text-2xl font-bold flex items-center mb-4">
                     <Users className="h-6 w-6 mr-2" />
                     Share & Earn Points
@@ -495,9 +488,6 @@ ${shareUrl} 🏪 #NammaOoruOffers #LocalDeals #TamilNadu`;
                 <ActivityHistory activities={activities} loading={loading} />
               </TabsContent>
 
-              <TabsContent value="leaderboard">
-                <Leaderboard />
-              </TabsContent>
             </Tabs>
           </div>
         )}
