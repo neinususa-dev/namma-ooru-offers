@@ -308,6 +308,16 @@ const Footer = () => {
                   : ' Your privacy and data security are our top priorities.'
                 }
               </p>
+              <div className="mt-3">
+                <a 
+                  href="https://neinus.com" 
+                  target="_blank" 
+                  rel="noopener noreferrer"
+                  className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
+                >
+                  Developed with <Heart className="h-3 w-3 text-red-500 fill-current" /> Neinus technologies
+                </a>
+              </div>
             </div>
           </div>
         </div>
