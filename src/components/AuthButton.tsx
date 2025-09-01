@@ -18,7 +18,7 @@ export function AuthButton() {
 
   const getSuperAdminViewContext = (pathname: string) => {
     const customerRoutes = ['/', '/rewards', '/your-offers', '/customer-analytics', '/about', '/profile'];
-    const merchantRoutes = ['/merchant-dashboard', '/merchant-post-offer', '/merchant-edit-offers', '/billing', '/payment-success', '/payment-canceled'];
+    const merchantRoutes = ['/merchant-dashboard', '/merchant-post-offer', '/merchant-edit-offers', '/billing'];
     const adminRoutes = ['/admin-dashboard', '/admin-navigation'];
 
     if (customerRoutes.includes(pathname)) {
