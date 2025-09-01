@@ -314,7 +314,7 @@ function AdminDashboardContent() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-4">
-          <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 p-1 bg-muted rounded-xl">
+          <TabsList className="grid grid-cols-2 lg:grid-cols-5 gap-2 p-1 bg-muted rounded-xl h-auto">
             <TabsTrigger 
               value="overview" 
               className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
@@ -350,7 +350,7 @@ function AdminDashboardContent() {
               <Plus className="h-3 w-3 md:h-4 md:w-4" />
               <span className="hidden sm:inline">Create New</span>
             </TabsTrigger>
-          </div>
+          </TabsList>
           
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
