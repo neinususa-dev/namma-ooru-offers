@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover
 import { useOfferDatabase } from "@/hooks/useOfferDatabase";
 import { useAdminOffers } from "@/hooks/useAdminOffers";
 import { useStores } from "@/hooks/useStores";
+import { useStats } from "@/hooks/useStats";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
 import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle, CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Eye, BarChart3 } from "lucide-react";
@@ -68,6 +69,7 @@ function AdminDashboardContent() {
   const { offers, loading: offersLoading } = useOfferDatabase();
   const allOffers = useAdminOffers();
   const { stores, loading: storesLoading } = useStores();
+  const { stats, loading: statsLoading } = useStats();
   
   const [statusFilter, setStatusFilter] = useState<string>("all");
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -268,7 +270,7 @@ function AdminDashboardContent() {
         </div>
 
         {/* Stats Cards */}
-        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4 mb-6">
+        <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-6 mb-6">
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:bg-muted/50"
             onClick={() => setActiveTab("stores")}
@@ -280,6 +282,34 @@ function AdminDashboardContent() {
             <CardContent>
               <div className="text-2xl font-bold text-green-600">{stores?.length || 0}</div>
               <p className="text-xs text-muted-foreground mt-1">Click to view stores</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:bg-muted/50"
+            onClick={() => setActiveTab("all-pages")}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Customers</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-cyan-600">{stats.totalCustomers || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">Click to view pages</p>
+            </CardContent>
+          </Card>
+
+          <Card 
+            className="cursor-pointer hover:shadow-lg transition-shadow duration-200 hover:bg-muted/50"
+            onClick={() => setActiveTab("all-pages")}
+          >
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">Total Merchants</CardTitle>
+              <Users className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-indigo-600">{stats.totalMerchants || 0}</div>
+              <p className="text-xs text-muted-foreground mt-1">Click to view pages</p>
             </CardContent>
           </Card>
           
