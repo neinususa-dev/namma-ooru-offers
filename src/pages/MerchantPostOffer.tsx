@@ -228,7 +228,7 @@ const MerchantPostOffer: React.FC = () => {
 
           {/* Plan Information Card */}
           {!limitsLoading && (
-            <Card className="mb-8 border-primary/20">
+            <Card className="mb-8 border-primary/20 bg-gradient-to-r from-primary/5 to-primary/10">
               <CardHeader>
                 <CardTitle className="flex items-center gap-2">
                   <Crown className="h-5 w-5 text-primary" />
@@ -239,7 +239,8 @@ const MerchantPostOffer: React.FC = () => {
                 <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
                   <div className="flex-1">
                     <p className="text-sm text-muted-foreground mb-2">
-                      Since you are a <span className="font-semibold text-foreground">{currentPlan}</span> member, 
+                      Hello <span className="font-semibold text-foreground">{profile?.store_name || 'Merchant'}</span>! 
+                      You are a <span className="font-semibold text-foreground">{currentPlan}</span> member and 
                       you can post <span className="font-semibold text-foreground">{maxOffers} offers</span> for this month.
                     </p>
                     <div className="flex gap-4 text-sm">
