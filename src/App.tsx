@@ -19,7 +19,10 @@ import { Billing } from "./pages/Billing";
 import { PaymentSuccess } from "./pages/PaymentSuccess";
 import { PaymentCanceled } from "./pages/PaymentCanceled";
 import Profile from "./pages/Profile";
+import PrivacyPolicy from "./pages/PrivacyPolicy";
+import TermsAndConditions from "./pages/TermsAndConditions";
 import NotFound from "./pages/NotFound";
+import Footer from "./components/Footer";
 
 const queryClient = new QueryClient();
 
@@ -29,26 +32,33 @@ const App = () => (
       <Toaster />
       <Sonner />
       <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Index />} />
-          <Route path="/signin" element={<SignIn />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/about" element={<AboutUs />} />
-          <Route path="/your-offers" element={<YourOffers />} />
-          <Route path="/customer-analytics" element={<CustomerAnalytics />} />
-          <Route path="/merchant-dashboard" element={<MerchantDashboard />} />
-          <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
-          <Route path="/merchant-edit-offers" element={<MerchantEditOffers />} />
-          <Route path="/admin-dashboard" element={<AdminDashboard />} />
-          <Route path="/admin-navigation" element={<AdminNavigation />} />
-          <Route path="/rewards" element={<Rewards />} />
-          <Route path="/billing" element={<Billing />} />
-          <Route path="/payment-success" element={<PaymentSuccess />} />
-          <Route path="/payment-canceled" element={<PaymentCanceled />} />
-          <Route path="/profile" element={<Profile />} />
-          {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-          <Route path="*" element={<NotFound />} />
-        </Routes>
+        <div className="min-h-screen flex flex-col">
+          <div className="flex-1">
+            <Routes>
+              <Route path="/" element={<Index />} />
+              <Route path="/signin" element={<SignIn />} />
+              <Route path="/signup" element={<SignUp />} />
+              <Route path="/about" element={<AboutUs />} />
+              <Route path="/your-offers" element={<YourOffers />} />
+              <Route path="/customer-analytics" element={<CustomerAnalytics />} />
+              <Route path="/merchant-dashboard" element={<MerchantDashboard />} />
+              <Route path="/merchant-post-offer" element={<MerchantPostOffer />} />
+              <Route path="/merchant-edit-offers" element={<MerchantEditOffers />} />
+              <Route path="/admin-dashboard" element={<AdminDashboard />} />
+              <Route path="/admin-navigation" element={<AdminNavigation />} />
+              <Route path="/rewards" element={<Rewards />} />
+              <Route path="/billing" element={<Billing />} />
+              <Route path="/payment-success" element={<PaymentSuccess />} />
+              <Route path="/payment-canceled" element={<PaymentCanceled />} />
+              <Route path="/profile" element={<Profile />} />
+              <Route path="/privacy-policy" element={<PrivacyPolicy />} />
+              <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </div>
+          <Footer />
+        </div>
       </BrowserRouter>
     </TooltipProvider>
   </QueryClientProvider>

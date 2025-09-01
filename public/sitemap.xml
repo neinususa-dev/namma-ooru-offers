@@ -35,6 +35,30 @@
     <priority>0.7</priority>
   </url>
   
+  <!-- Terms & Conditions -->
+  <url>
+    <loc>https://namma-ooru-offers.com/terms-and-conditions</loc>
+    <lastmod>2024-09-01T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Privacy Policy -->
+  <url>
+    <loc>https://namma-ooru-offers.com/privacy-policy</loc>
+    <lastmod>2024-09-01T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
+  <!-- Profile -->
+  <url>
+    <loc>https://namma-ooru-offers.com/profile</loc>
+    <lastmod>2024-09-01T00:00:00+00:00</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.6</priority>
+  </url>
+  
   <!-- Rewards -->
   <url>
     <loc>https://namma-ooru-offers.com/rewards</loc>
