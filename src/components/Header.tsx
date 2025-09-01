@@ -21,7 +21,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
 
   const navigationItems = [
     { id: 'home', label: 'Home' },
-    { id: 'hot-deals', label: 'Hot Deals' },
     { id: 'local-deals', label: 'Local Deals' },
     { id: 'store-list', label: 'Store List' },
     { id: 'rewards', label: 'Rewards', link: '/rewards' },
@@ -40,7 +39,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
                 alt="Namma Ooru Offers Logo" 
-                className="w-12 h-12 rounded-lg"
+                className="w-16 h-16 rounded-lg"
               />
               <div>
                 <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
@@ -152,12 +151,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                   Home
                 </Link>
                     <Link
-                      to="/?section=hot-deals"
-                      className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
-                    >
-                      Hot Deals
-                    </Link>
-                    <Link
                       to="/?section=local-deals"
                       className="text-sm font-medium transition-colors hover:text-orange-500 text-blue-600"
                     >
@@ -250,7 +243,7 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                       <img 
                         src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
                         alt="Logo" 
-                        className="w-8 h-8 rounded-lg"
+                        className="w-10 h-10 rounded-lg"
                       />
                       Navigation
                     </SheetTitle>
@@ -299,7 +292,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                                   : 'hover:bg-muted'
                               }`}
                             >
-                              {item.id === 'hot-deals' && <Flame className="h-5 w-5" />}
                               {item.id === 'local-deals' && <MapPin className="h-5 w-5" />}
                               {item.id === 'store-list' && <Store className="h-5 w-5" />}
                               {item.id === 'home' && <Home className="h-5 w-5" />}
