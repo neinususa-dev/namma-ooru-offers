@@ -315,7 +315,7 @@ const Footer = () => {
                   rel="noopener noreferrer"
                   className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
                 >
-                  Developed with <Heart className="h-3 w-3 text-red-500 fill-current" /> Neinus technologies
+                  Developed with <Heart className="h-3 w-3 text-red-500 fill-current" /> Neinus Technologies
                 </a>
               </div>
             </div>
