@@ -324,8 +324,8 @@ const Rewards = () => {
 
             {/* Tabs for different sections */}
             <Tabs defaultValue="dashboard" className="space-y-6">
-              <div className="w-full overflow-x-auto pb-2">
-                <TabsList className="grid grid-cols-4 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl w-full">
+              <div className="w-full overflow-x-auto md:overflow-visible pb-2">
+                <TabsList className="grid grid-cols-4 gap-1 md:gap-2 min-w-max md:w-full bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl">
                   <TabsTrigger 
                     value="dashboard" 
                     className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg bg-blue-100 hover:bg-blue-200 data-[state=active]:hover:bg-blue-600 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-1 md:px-4 flex flex-col items-center justify-center gap-1 min-w-[70px] md:min-w-0 text-blue-700 data-[state=active]:text-white"
