@@ -24,7 +24,7 @@ const Footer = () => {
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           
           {/* Quick Links */}
           <div className="space-y-4">
@@ -140,16 +140,16 @@ const Footer = () => {
                 </a>
               </div>
             </div>
+          </div>
 
-            {/* Business Hours */}
-            <div className="pt-4">
-              <h5 className="text-sm font-semibold text-foreground mb-2">Business Hours</h5>
-              <div className="text-xs text-muted-foreground space-y-1">
-                <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
-                <p>Saturday: 10:00 AM - 4:00 PM</p>
-                <p>Sunday: Closed</p>
-                <p className="text-primary font-medium">IST (Indian Standard Time)</p>
-              </div>
+          {/* Business Hours */}
+          <div className="space-y-4">
+            <h4 className="text-base font-semibold text-foreground">Business Hours</h4>
+            <div className="text-xs text-muted-foreground space-y-1">
+              <p>Monday - Friday: 9:00 AM - 6:00 PM</p>
+              <p>Saturday: 10:00 AM - 4:00 PM</p>
+              <p>Sunday: Closed</p>
+              <p className="text-primary font-medium">IST (Indian Standard Time)</p>
             </div>
           </div>
         </div>
