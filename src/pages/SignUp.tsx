@@ -543,29 +543,9 @@ export default function SignUp() {
       {/* Footer with Legal Links */}
       <footer className="bg-card border-t border-primary/10 py-8">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
-            <Link 
-              to="/"
-              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
-            >
-              <img 
-                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
-                alt="Namma Ooru Offers Logo" 
-                className="w-8 h-8 rounded"
-              />
-              <div>
-                <div className="font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
-                  Namma Ooru Offers
-                </div>
-                <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
-                <div className="text-xs text-muted-foreground">
-                  A Product of <a href="https://neinus.com" target="_blank" className="text-primary hover:underline">Neinus Private Limited</a>
-                </div>
-              </div>
-            </Link>
-            
+          <div className="text-center space-y-4">
             {/* Legal Links - Prominent for compliance */}
-            <div className="flex flex-col md:flex-row items-center gap-4 text-sm">
+            <div className="flex flex-col md:flex-row items-center justify-center gap-4 text-sm">
               <Link 
                 to="/privacy-policy" 
                 className="text-muted-foreground hover:text-primary transition-colors font-medium"
@@ -586,9 +566,25 @@ export default function SignUp() {
               </Link>
             </div>
             
-            <div className="text-sm text-muted-foreground text-center md:text-right">
-              <p>© 2024 Namma Ooru Offers. Supporting local businesses across Tamil Nadu.</p>
-              <p className="mt-1">Made with ❤️ for Tamil Nadu</p>
+            {/* Company Information in Copyright Section */}
+            <div className="flex items-center justify-center gap-3 pt-4 border-t">
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma Ooru Offers Logo" 
+                className="w-8 h-8 rounded"
+              />
+              <div className="text-center">
+                <div className="text-sm font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
+                  Namma Ooru Offers
+                </div>
+                <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
+                <div className="text-xs text-muted-foreground">
+                  A Product of <a href="https://neinus.com" target="_blank" className="text-primary hover:underline">Neinus Private Limited</a>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  © {new Date().getFullYear()} Namma Ooru Offers. All rights reserved.
+                </p>
+              </div>
             </div>
           </div>
         </div>

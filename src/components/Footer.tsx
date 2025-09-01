@@ -24,38 +24,8 @@ const Footer = () => {
     <footer className="bg-card border-t border-border">
       <div className="container mx-auto px-4 py-12">
         {/* Main Footer Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8 mb-8">
+        <div className="grid gap-8">
           
-          {/* Company Information */}
-          <div className="space-y-4">
-            <div className="flex items-center gap-2">
-              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-                <Heart className="h-5 w-5 text-primary-foreground" />
-              </div>
-              <div>
-                <h3 className="text-lg font-bold text-foreground">Namma OOru Offers</h3>
-                <p className="text-xs text-muted-foreground">Your Local Savings Hub</p>
-              </div>
-            </div>
-            <p className="text-sm text-muted-foreground">
-              Connecting Tamil Nadu customers with amazing local deals and helping businesses grow through our marketplace platform.
-            </p>
-            <div className="flex space-x-4">
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Facebook className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Twitter className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Instagram className="h-5 w-5" />
-              </a>
-              <a href="#" className="text-muted-foreground hover:text-primary transition-colors">
-                <Linkedin className="h-5 w-5" />
-              </a>
-            </div>
-          </div>
-
           {/* Quick Links */}
           <div className="space-y-4">
             <h4 className="text-base font-semibold text-foreground">Quick Links</h4>
@@ -144,7 +114,6 @@ const Footer = () => {
               <div className="flex items-start gap-3">
                 <MapPin className="h-4 w-4 text-primary mt-1 flex-shrink-0" />
                 <div className="text-sm text-muted-foreground">
-                  <p>Namma OOru Offers</p>
                   <p>[Business Address]</p>
                   <p>Tamil Nadu, India</p>
                   <p>PIN: XXXXXX</p>
@@ -279,14 +248,25 @@ const Footer = () => {
         <div className="border-t border-border pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
             
-            {/* Copyright */}
-            <div className="text-center md:text-left">
-              <p className="text-sm text-muted-foreground">
-                © {new Date().getFullYear()} Namma OOru Offers. All rights reserved.
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                Proudly serving Tamil Nadu with love ❤️ | Built for local communities
-              </p>
+            {/* Company Information in Copyright Section */}
+            <div className="flex items-center gap-3">
+              <img 
+                src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
+                alt="Namma Ooru Offers Logo" 
+                className="w-8 h-8 rounded"
+              />
+              <div className="text-center md:text-left">
+                <div className="text-sm font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
+                  Namma Ooru Offers
+                </div>
+                <div className="text-xs text-muted-foreground">Your Local Savings Hub</div>
+                <div className="text-xs text-muted-foreground">
+                  A Product of <a href="https://neinus.com" target="_blank" className="text-primary hover:underline">Neinus Private Limited</a>
+                </div>
+                <p className="text-xs text-muted-foreground mt-1">
+                  © {new Date().getFullYear()} Namma Ooru Offers. All rights reserved.
+                </p>
+              </div>
             </div>
 
             {/* Legal Links */}
