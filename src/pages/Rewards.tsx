@@ -324,38 +324,50 @@ const Rewards = () => {
 
             {/* Tabs for different sections */}
             <Tabs defaultValue="dashboard" className="space-y-6">
-              <TabsList className="grid w-full grid-cols-5 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl">
-                <TabsTrigger 
-                  value="dashboard" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-xl font-semibold"
-                >
-                  🏠 Dashboard
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="earn" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-green-100 transition-all duration-300 rounded-xl font-semibold"
-                >
-                  💰 Earn Points
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="redeem" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-orange-100 transition-all duration-300 rounded-xl font-semibold"
-                >
-                  🎁 Redeem
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="activity" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-purple-100 transition-all duration-300 rounded-xl font-semibold"
-                >
-                  📊 Activity
-                </TabsTrigger>
-                <TabsTrigger 
-                  value="leaderboard" 
-                  className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-pink-100 transition-all duration-300 rounded-xl font-semibold"
-                >
-                  🏆 Leaderboard
-                </TabsTrigger>
-              </TabsList>
+              <div className="w-full overflow-x-auto pb-2">
+                <div className="grid grid-cols-5 gap-1 md:gap-2 min-w-max md:min-w-0 bg-gradient-to-r from-blue-50 to-purple-50 p-2 rounded-2xl">
+                  <TabsTrigger 
+                    value="dashboard" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
+                  >
+                    <Users className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">Dashboard</span>
+                    <span className="sm:hidden">🏠</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="earn" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-green-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
+                  >
+                    <Coins className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">Earn</span>
+                    <span className="sm:hidden">💰</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="redeem" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-orange-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
+                  >
+                    <Gift className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">Redeem</span>
+                    <span className="sm:hidden">🎁</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="activity" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-purple-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
+                  >
+                    <TrendingUp className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">Activity</span>
+                    <span className="sm:hidden">📊</span>
+                  </TabsTrigger>
+                  <TabsTrigger 
+                    value="leaderboard" 
+                    className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-pink-500 data-[state=active]:to-pink-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-pink-100 transition-all duration-300 rounded-xl font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex flex-col md:flex-row items-center justify-center gap-1 min-w-[80px] md:min-w-0"
+                  >
+                    <Trophy className="h-3 w-3 md:h-4 md:w-4 flex-shrink-0" />
+                    <span className="hidden sm:inline">Leader</span>
+                    <span className="sm:hidden">🏆</span>
+                  </TabsTrigger>
+                </div>
+              </div>
 
               <TabsContent value="dashboard" className="space-y-6">
                 {/* Referral & Social Sharing */}

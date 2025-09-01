@@ -20,7 +20,7 @@ import { useAdminOffers } from "@/hooks/useAdminOffers";
 import { useStores } from "@/hooks/useStores";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle, CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Eye } from "lucide-react";
+import { Store, Shield, Users, ShoppingBag, Plus, Edit, CheckCircle, XCircle, CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Eye, BarChart3 } from "lucide-react";
 import { OfferCard } from "@/components/OfferCard";
 import { Label } from "@/components/ui/label";
 import { Link } from "react-router-dom";
@@ -314,13 +314,43 @@ function AdminDashboardContent() {
         </div>
 
         <Tabs defaultValue="overview" className="space-y-4">
-          <TabsList>
-            <TabsTrigger value="overview">Overview</TabsTrigger>
-            <TabsTrigger value="all-pages">All Pages</TabsTrigger>
-            <TabsTrigger value="stores">Stores</TabsTrigger>
-            <TabsTrigger value="offers">Offers</TabsTrigger>
-            <TabsTrigger value="create-new">Create New</TabsTrigger>
-          </TabsList>
+          <div className="grid grid-cols-2 lg:grid-cols-5 gap-2 p-1 bg-muted rounded-xl">
+            <TabsTrigger 
+              value="overview" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-blue-500 data-[state=active]:to-blue-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-blue-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <BarChart3 className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Overview</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="all-pages" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-purple-500 data-[state=active]:to-purple-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-purple-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <Shield className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">All Pages</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="stores" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-green-500 data-[state=active]:to-green-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-green-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <Store className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Stores</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="offers" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-orange-500 data-[state=active]:to-orange-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-orange-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1"
+            >
+              <ShoppingBag className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Offers</span>
+            </TabsTrigger>
+            <TabsTrigger 
+              value="create-new" 
+              className="data-[state=active]:bg-gradient-to-r data-[state=active]:from-red-500 data-[state=active]:to-red-600 data-[state=active]:text-white data-[state=active]:shadow-lg hover:bg-red-100 transition-all duration-300 rounded-lg font-semibold text-xs md:text-sm py-2 md:py-3 px-2 md:px-4 flex items-center justify-center gap-1 col-span-2 lg:col-span-1"
+            >
+              <Plus className="h-3 w-3 md:h-4 md:w-4" />
+              <span className="hidden sm:inline">Create New</span>
+            </TabsTrigger>
+          </div>
           
           <TabsContent value="overview" className="space-y-4">
             <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
