@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter, Gift } from 'lucide-react';
+import { Search, MapPin, Users, TrendingUp, Store, Flame, Heart, ShoppingBag, X, Filter, Gift, Plus, BarChart3 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { DistrictSelect } from '@/components/DistrictSelect';
@@ -25,7 +25,7 @@ import groceryOfferImage from '@/assets/grocery-offer.jpg';
 
 
 const Index = () => {
-  const { user, isMerchant } = useAuth();
+  const { user, isMerchant, profile } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
   const { stats, loading: statsLoading } = useStats();
   const navigate = useNavigate();
@@ -199,6 +199,62 @@ const Index = () => {
       case 'home':
         return (
           <>
+            {/* Welcome Section for Logged In Users */}
+            {user && profile && (
+              <section className="relative py-8 overflow-hidden">
+                <div className="absolute inset-0 bg-primary-gradient"></div>
+                <div className="container mx-auto px-4 relative z-10">
+                  <div className="text-center text-primary-foreground">
+                    <h1 className="text-3xl md:text-4xl font-bold mb-2">
+                      Welcome back, {profile.name}! 👋
+                    </h1>
+                    <p className="text-lg text-primary-foreground/80 mb-4">
+                      {isMerchant 
+                        ? `Since you are a ${profile.current_plan || 'Silver'} member, explore your dashboard to manage offers and grow your business.`
+                        : "Discover amazing deals and offers from your favorite local shops. Save money while supporting local businesses!"
+                      }
+                    </p>
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+                      {isMerchant ? (
+                        <>
+                          <Link to="/merchant-dashboard">
+                            <Button variant="secondary" size="lg" className="flex items-center gap-2">
+                              <BarChart3 className="h-5 w-5" />
+                              View Dashboard
+                            </Button>
+                          </Link>
+                          <Link to="/merchant-post-offer">
+                            <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                              <Plus className="h-5 w-5 mr-2" />
+                              Post New Offer
+                            </Button>
+                          </Link>
+                        </>
+                      ) : (
+                        <>
+                          <Link to="/rewards">
+                            <Button variant="secondary" size="lg" className="flex items-center gap-2">
+                              <Gift className="h-5 w-5" />
+                              Your Rewards
+                            </Button>
+                          </Link>
+                          <Button 
+                            variant="outline" 
+                            size="lg" 
+                            className="bg-white/10 border-white/20 text-white hover:bg-white/20"
+                            onClick={() => setActiveSection('local-deals')}
+                          >
+                            <ShoppingBag className="h-5 w-5 mr-2" />
+                            Browse Offers
+                          </Button>
+                        </>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </section>
+            )}
+
             {/* Hero Section */}
             <section className="relative py-16 overflow-hidden">
               <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-secondary/20"></div>

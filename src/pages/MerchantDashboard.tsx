@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -492,15 +492,47 @@ const MerchantDashboard = () => {
     );
   }
 
-  // Don't render if user is not a merchant
-  if (profile.role !== 'merchant') {
-    return null;
-  }
-
   return (
     <div className="min-h-screen bg-background">
       <Header showNavigation={false} />
-      <main className="container mx-auto px-4 py-8">
+      
+      {/* Welcome Section */}
+      <section className="relative py-8 overflow-hidden">
+        <div className="absolute inset-0 bg-primary-gradient"></div>
+        <div className="container mx-auto px-4 relative z-10">
+          <div className="text-center text-primary-foreground">
+            <h1 className="text-3xl md:text-4xl font-bold mb-2">
+              Welcome to your Dashboard, {profile.name}! 🚀
+            </h1>
+            <p className="text-lg text-primary-foreground/80 mb-4">
+              Since you are a <span className="font-semibold">{profile.current_plan || 'Silver'}</span> member, 
+              manage your offers and track your business performance from here.
+            </p>
+            <div className="flex flex-col sm:flex-row gap-3 justify-center items-center">
+              <Link to="/merchant-post-offer">
+                <Button variant="secondary" size="lg" className="flex items-center gap-2">
+                  <Plus className="h-5 w-5" />
+                  Post New Offer
+                </Button>
+              </Link>
+              <Link to="/merchant-edit-offers">
+                <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <Edit3 className="h-5 w-5 mr-2" />
+                  Manage Offers
+                </Button>
+              </Link>
+              <Link to="/billing">
+                <Button variant="outline" size="lg" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                  <DollarSign className="h-5 w-5 mr-2" />
+                  Upgrade Plan
+                </Button>
+              </Link>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <div className="container mx-auto px-4 py-8">{/* Fixed: Removed duplicate div wrapper */}
         {/* Header and Post Offer */}
         <div className="flex justify-between items-start mb-8">
           <div>
@@ -846,7 +878,7 @@ const MerchantDashboard = () => {
             </CardContent>
           </Card>
         </div>
-      </main>
+      </div>
     </div>
   );
 };
