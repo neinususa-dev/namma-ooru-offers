@@ -431,6 +431,25 @@ export default function SignIn() {
                     Join now
                   </Link>
                 </p>
+                
+                {/* Legal Compliance Links */}
+                <div className="text-xs text-muted-foreground mt-4 pt-4 border-t">
+                  <p className="mb-2">By using this platform, you acknowledge our:</p>
+                  <div className="flex flex-col gap-1">
+                    <Link 
+                      to="/privacy-policy" 
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Privacy Policy
+                    </Link>
+                    <Link 
+                      to="/terms-and-conditions" 
+                      className="text-primary hover:underline font-medium"
+                    >
+                      Terms & Conditions
+                    </Link>
+                  </div>
+                </div>
               </>
             )}
           </CardFooter>

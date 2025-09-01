@@ -35,6 +35,14 @@
     <priority>0.7</priority>
   </url>
   
+  <!-- Legal Compliance Hub -->
+  <url>
+    <loc>https://namma-ooru-offers.com/legal</loc>
+    <lastmod>2024-09-01T00:00:00+00:00</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  
   <!-- Terms & Conditions -->
   <url>
     <loc>https://namma-ooru-offers.com/terms-and-conditions</loc>

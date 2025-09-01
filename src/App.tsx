@@ -21,6 +21,7 @@ import { PaymentCanceled } from "./pages/PaymentCanceled";
 import Profile from "./pages/Profile";
 import PrivacyPolicy from "./pages/PrivacyPolicy";
 import TermsAndConditions from "./pages/TermsAndConditions";
+import LegalCompliance from "./pages/LegalCompliance";
 import NotFound from "./pages/NotFound";
 import Footer from "./components/Footer";
 
@@ -53,6 +54,7 @@ const App = () => (
               <Route path="/profile" element={<Profile />} />
               <Route path="/privacy-policy" element={<PrivacyPolicy />} />
               <Route path="/terms-and-conditions" element={<TermsAndConditions />} />
+              <Route path="/legal" element={<LegalCompliance />} />
               {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
               <Route path="*" element={<NotFound />} />
             </Routes>

@@ -511,7 +511,25 @@ export default function SignUp() {
             </Tabs>
           </CardContent>
 
-          <CardFooter className="text-center">
+          <CardFooter className="text-center space-y-4">
+            {/* Legal Compliance Notice */}
+            <div className="text-xs text-muted-foreground bg-muted/30 p-3 rounded-lg">
+              <p className="mb-2">
+                By creating an account, you agree to our{' '}
+                <Link to="/terms-and-conditions" className="text-primary hover:underline font-medium">
+                  Terms & Conditions
+                </Link>
+                {' '}and acknowledge that you have read our{' '}
+                <Link to="/privacy-policy" className="text-primary hover:underline font-medium">
+                  Privacy Policy
+                </Link>
+                .
+              </p>
+              <p>
+                We are committed to protecting your personal information and will use it only as described in our privacy policy.
+              </p>
+            </div>
+            
             <p className="text-sm text-muted-foreground">
               Already have an account?{' '}
               <Link to="/signin" className="text-primary hover:underline">
@@ -522,13 +540,13 @@ export default function SignUp() {
         </Card>
       </main>
       
-      {/* Footer */}
+      {/* Footer with Legal Links */}
       <footer className="bg-card border-t border-primary/10 py-8">
         <div className="container mx-auto px-4">
-          <div className="flex flex-col md:flex-row items-center justify-between">
+          <div className="flex flex-col md:flex-row items-center justify-between gap-4">
             <Link 
               to="/"
-              className="flex items-center gap-2 mb-4 md:mb-0 hover:opacity-80 transition-opacity"
+              className="flex items-center gap-2 hover:opacity-80 transition-opacity"
             >
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
@@ -545,6 +563,28 @@ export default function SignUp() {
                 </div>
               </div>
             </Link>
+            
+            {/* Legal Links - Prominent for compliance */}
+            <div className="flex flex-col md:flex-row items-center gap-4 text-sm">
+              <Link 
+                to="/privacy-policy" 
+                className="text-muted-foreground hover:text-primary transition-colors font-medium"
+              >
+                Privacy Policy
+              </Link>
+              <Link 
+                to="/terms-and-conditions" 
+                className="text-muted-foreground hover:text-primary transition-colors font-medium"
+              >
+                Terms & Conditions
+              </Link>
+              <Link 
+                to="/about" 
+                className="text-muted-foreground hover:text-primary transition-colors"
+              >
+                About Us
+              </Link>
+            </div>
             
             <div className="text-sm text-muted-foreground text-center md:text-right">
               <p>© 2024 Namma Ooru Offers. Supporting local businesses across Tamil Nadu.</p>
