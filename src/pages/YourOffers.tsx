@@ -39,7 +39,7 @@ export default function YourOffers() {
               Please login to view your saved and redeemed offers.
             </p>
             <Button asChild className="bg-primary-gradient">
-              <Link to="/auth">Login Now</Link>
+              <Link to="/signin">Login Now</Link>
             </Button>
           </CardContent>
         </Card>

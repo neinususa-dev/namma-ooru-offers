@@ -133,32 +133,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                          </Link>
                        </>
                      )}
-                     
-                     {/* Legal Pages - Always visible for compliance */}
-                     {!user && (
-                       <>
-                         <Link 
-                           to="/privacy-policy"
-                           className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                             location.pathname === '/privacy-policy'
-                               ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                               : 'text-blue-600'
-                           }`}
-                         >
-                           Privacy
-                         </Link>
-                         <Link 
-                           to="/terms-and-conditions"
-                           className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                             location.pathname === '/terms-and-conditions'
-                               ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                               : 'text-blue-600'
-                           }`}
-                         >
-                           Terms
-                         </Link>
-                       </>
-                     )}
                   </>
                 )}
               </nav>
@@ -182,26 +156,6 @@ export function Header({ showNavigation = true, activeSection, onSectionChange }
                   }`}
                 >
                   About
-                </Link>
-                <Link 
-                  to="/privacy-policy"
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    location.pathname === '/privacy-policy'
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Privacy Policy
-                </Link>
-                <Link 
-                  to="/terms-and-conditions"
-                  className={`text-sm font-medium transition-colors hover:text-orange-500 ${
-                    location.pathname === '/terms-and-conditions'
-                      ? 'text-orange-500 border-b-2 border-orange-500 pb-1' 
-                      : 'text-blue-600'
-                  }`}
-                >
-                  Terms & Conditions
                 </Link>
               </nav>
             )}
