@@ -7,6 +7,7 @@ import { OfferCard } from '@/components/OfferCard';
 import { Header } from '@/components/Header';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
+import { useOfferLimits } from '@/hooks/useOfferLimits';
 import { Link } from 'react-router-dom';
 
 const pricingTiers = [
@@ -60,6 +61,13 @@ const pricingTiers = [
 export const MerchantHomePage: React.FC = () => {
   const { user, profile } = useAuth();
   const { offers, loading } = useOfferDatabase();
+  const { 
+    currentPlan, 
+    monthlyOfferCount, 
+    maxOffers, 
+    remainingOffers, 
+    canPostMoreOffers 
+  } = useOfferLimits();
   const [merchantOffers, setMerchantOffers] = useState<any[]>([]);
 
   useEffect(() => {
@@ -80,8 +88,7 @@ export const MerchantHomePage: React.FC = () => {
     );
   }
 
-  const currentTier = profile?.is_premium ? 'Gold' : 'Silver'; // Simplified tier detection
-  const currentMonthOffers = merchantOffers.length; // Simplified count for current month
+  // Use actual plan data from useOfferLimits hook
 
   return (
     <div className="min-h-screen bg-background">
@@ -98,12 +105,30 @@ export const MerchantHomePage: React.FC = () => {
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-center items-center">
               <Badge variant="secondary" className="text-lg px-4 py-2">
-                Current Plan: {currentTier}
+                Current Plan: {currentPlan}
               </Badge>
               <Badge variant="outline" className="text-lg px-4 py-2 bg-white/10 text-white border-white/20">
-                Offers this month: {currentMonthOffers}
+                Offers this month: {monthlyOfferCount}/{maxOffers}
               </Badge>
+              {remainingOffers > 0 && (
+                <Badge variant="outline" className="text-lg px-4 py-2 bg-green-500/10 text-green-100 border-green-400/20">
+                  {remainingOffers} remaining
+                </Badge>
+              )}
             </div>
+            
+            {(currentPlan === 'Silver' || currentPlan === 'Gold') && (
+              <div className="mt-4">
+                <p className="text-primary-foreground/80 text-sm">
+                  Since you are a {currentPlan} member, you can post {maxOffers} offers for this month.
+                </p>
+                <Link to="/billing" className="inline-block mt-2">
+                  <Button variant="outline" size="sm" className="bg-white/10 border-white/20 text-white hover:bg-white/20">
+                    Upgrade to post more offers for more business
+                  </Button>
+                </Link>
+              </div>
+            )}
           </div>
         </div>
       </section>
@@ -123,7 +148,7 @@ export const MerchantHomePage: React.FC = () => {
           <div className="grid md:grid-cols-3 gap-8">
             {pricingTiers.map((tier) => {
               const IconComponent = tier.icon;
-              const isCurrentTier = tier.name === currentTier;
+              const isCurrentTier = tier.name === currentPlan;
               
               return (
                 <Card 

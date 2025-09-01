@@ -4,8 +4,9 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
 import { useAuth } from '@/hooks/useAuth';
 import { useCategories } from '@/hooks/useCategories';
+import { useOfferLimits } from '@/hooks/useOfferLimits';
 import { supabase } from '@/integrations/supabase/client';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { Header } from '@/components/Header';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -14,8 +15,9 @@ import { Label } from '@/components/ui/label';
 import { Checkbox } from '@/components/ui/checkbox';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Alert, AlertDescription } from '@/components/ui/alert';
 import { useToast } from '@/hooks/use-toast';
-import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Store, Eye } from 'lucide-react';
+import { CalendarIcon, MapPin, Tag, DollarSign, Clock, Upload, X, Store, Eye, AlertTriangle, Crown } from 'lucide-react';
 import { Calendar } from '@/components/ui/calendar';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 import { format } from 'date-fns';
@@ -44,6 +46,14 @@ type OfferFormData = z.infer<typeof offerSchema>;
 const MerchantPostOffer: React.FC = () => {
   const { user, profile, loading } = useAuth();
   const { categories, loading: categoriesLoading } = useCategories();
+  const { 
+    currentPlan, 
+    monthlyOfferCount, 
+    maxOffers, 
+    remainingOffers, 
+    canPostMoreOffers, 
+    loading: limitsLoading 
+  } = useOfferLimits();
   const navigate = useNavigate();
   const { toast } = useToast();
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -138,6 +148,16 @@ const MerchantPostOffer: React.FC = () => {
   const onSubmit = async (data: OfferFormData) => {
     if (!user) return;
 
+    // Check offer limits before submitting
+    if (!canPostMoreOffers) {
+      toast({
+        title: 'Offer limit reached',
+        description: `You have reached your ${currentPlan} plan limit of ${maxOffers} offers per month. Please upgrade your plan to post more offers.`,
+        variant: 'destructive',
+      });
+      return;
+    }
+
     setIsSubmitting(true);
     try {
       const offerData = {
@@ -205,6 +225,63 @@ const MerchantPostOffer: React.FC = () => {
             <h1 className="text-3xl font-bold text-foreground mb-2">Post New Offer</h1>
             <p className="text-muted-foreground">Create compelling offers to attract customers to your business</p>
           </div>
+
+          {/* Plan Information Card */}
+          {!limitsLoading && (
+            <Card className="mb-8 border-primary/20">
+              <CardHeader>
+                <CardTitle className="flex items-center gap-2">
+                  <Crown className="h-5 w-5 text-primary" />
+                  Your Plan Information
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-col md:flex-row gap-6 items-start justify-between">
+                  <div className="flex-1">
+                    <p className="text-sm text-muted-foreground mb-2">
+                      Since you are a <span className="font-semibold text-foreground">{currentPlan}</span> member, 
+                      you can post <span className="font-semibold text-foreground">{maxOffers} offers</span> for this month.
+                    </p>
+                    <div className="flex gap-4 text-sm">
+                      <span className="text-muted-foreground">
+                        Offers posted: <span className="font-semibold text-foreground">{monthlyOfferCount}</span>
+                      </span>
+                      <span className="text-muted-foreground">
+                        Remaining: <span className="font-semibold text-primary">{remainingOffers}</span>
+                      </span>
+                    </div>
+                  </div>
+                  
+                  {(currentPlan === 'Silver' || currentPlan === 'Gold') && (
+                    <div className="text-right">
+                      <Button 
+                        variant="outline" 
+                        size="sm" 
+                        asChild
+                        className="border-primary text-primary hover:bg-primary/10"
+                      >
+                        <Link to="/billing">
+                          Upgrade to post more offers for more business
+                        </Link>
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                {!canPostMoreOffers && (
+                  <Alert className="mt-4 border-destructive/50">
+                    <AlertTriangle className="h-4 w-4" />
+                    <AlertDescription>
+                      You have reached your monthly limit of {maxOffers} offers. 
+                      {(currentPlan === 'Silver' || currentPlan === 'Gold') && (
+                        <span> Upgrade your plan to post more offers this month.</span>
+                      )}
+                    </AlertDescription>
+                  </Alert>
+                )}
+              </CardContent>
+            </Card>
+          )}
 
           <form onSubmit={handleSubmit(onSubmit)} className="space-y-8">
             <div className="grid md:grid-cols-2 gap-8">
@@ -586,8 +663,12 @@ const MerchantPostOffer: React.FC = () => {
               >
                 Cancel
               </Button>
-              <Button type="submit" disabled={isSubmitting || !consentChecked}>
-                {isSubmitting ? 'Posting...' : 'Post Offer'}
+              <Button 
+                type="submit" 
+                disabled={isSubmitting || !consentChecked || !canPostMoreOffers}
+                className="w-full"
+              >
+                {!canPostMoreOffers ? 'Limit Reached' : isSubmitting ? 'Posting...' : 'Post Offer'}
               </Button>
             </div>
           </form>
