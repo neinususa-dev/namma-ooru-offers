@@ -12,6 +12,26 @@ export function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
   const { profile } = useAuth();
   const location = useLocation();
 
+  const getSuperAdminViewContext = (pathname: string) => {
+    const customerRoutes = ['/', '/rewards', '/your-offers', '/customer-analytics', '/about', '/profile'];
+    const merchantRoutes = ['/merchant-dashboard', '/merchant-post-offer', '/merchant-edit-offers', '/billing', '/payment-success', '/payment-canceled'];
+    const adminRoutes = ['/admin-dashboard', '/admin-navigation'];
+
+    if (customerRoutes.includes(pathname)) {
+      return 'Customer View';
+    } else if (merchantRoutes.includes(pathname)) {
+      return 'Merchant View';
+    } else if (adminRoutes.includes(pathname)) {
+      return '';
+    }
+    return '';
+  };
+
+  const getHeaderTitle = () => {
+    const viewContext = getSuperAdminViewContext(location.pathname);
+    return viewContext ? `Super Admin Panel - ${viewContext}` : 'Super Admin Panel';
+  };
+
   // Redirect if not super admin
   if (profile?.role !== 'super_admin') {
     return null;
@@ -42,7 +62,7 @@ export function SuperAdminLayout({ children }: SuperAdminLayoutProps) {
                 <div>
                   <h1 className="text-xl font-bold bg-blue-orange-gradient bg-clip-text text-transparent flex items-center gap-2">
                     <Shield className="h-5 w-5 text-primary" />
-                    Super Admin Panel
+                    {getHeaderTitle()}
                   </h1>
                   <p className="text-xs text-muted-foreground">Platform Management</p>
                 </div>
