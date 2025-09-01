@@ -45,12 +45,81 @@ const Rewards = () => {
   };
 
   const isSuperAdminInMerchantView = profile?.role === 'super_admin' && getSuperAdminViewContext(location.pathname) === 'merchant';
+  const isSuperAdminInCustomerView = profile?.role === 'super_admin' && getSuperAdminViewContext(location.pathname) === 'customer';
+
+  // Mock customer data for super admin in customer view
+  const mockCustomerReward = {
+    id: 'mock-reward',
+    user_id: user?.id || '',
+    current_points: 1250,
+    total_earned_points: 3450,
+    total_redeemed_points: 2200,
+    level_name: 'Gold',
+    referral_code: 'BALAN2024',
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  };
+
+  const mockActivities = [
+    {
+      id: '1',
+      user_id: user?.id || '',
+      activity_type: 'qr_scan' as const,
+      points: 25,
+      points_awarded: 25,
+      description: 'QR code scanned at Local Electronics Store',
+      created_at: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: '2', 
+      user_id: user?.id || '',
+      activity_type: 'referral' as const,
+      points: 100,
+      points_awarded: 100,
+      description: 'Friend joined using your referral code',
+      created_at: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: '3',
+      user_id: user?.id || '',
+      activity_type: 'social_share' as const,
+      points: 15,
+      points_awarded: 15,
+      description: 'Shared offer on social media',
+      created_at: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  ];
+
+  const mockReferrals = [
+    {
+      id: '1',
+      referrer_id: user?.id || '',
+      referred_id: 'mock-user-1',
+      referral_code: 'BALAN2024',
+      points_awarded: 100,
+      created_at: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()
+    },
+    {
+      id: '2', 
+      referrer_id: user?.id || '',
+      referred_id: 'mock-user-2',
+      referral_code: 'BALAN2024',
+      points_awarded: 100,
+      created_at: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000).toISOString()
+    }
+  ];
+
+  // Use mock data for super admin in customer view, otherwise use real data
+  const displayUserReward = isSuperAdminInCustomerView ? mockCustomerReward : userReward;
+  const displayActivities = isSuperAdminInCustomerView ? mockActivities : activities;
+  const displayReferrals = isSuperAdminInCustomerView ? mockReferrals : referrals;
 
   const getLevelProgress = () => {
-    if (!userReward) return 0;
-    const { total_earned_points } = userReward;
-    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
-    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
+    const rewardData = displayUserReward;
+    if (!rewardData) return 0;
+    const { total_earned_points } = rewardData;
+    const referralCount = displayReferrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = displayActivities.filter(a => a.activity_type === 'qr_scan').length;
     
     // Check for special levels first
     if (referralCount >= 100 && total_earned_points >= 4000) return 100; // Referral King
@@ -64,10 +133,11 @@ const Rewards = () => {
   };
 
   const getNextLevelPoints = () => {
-    if (!userReward) return 25;
-    const { total_earned_points } = userReward;
-    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
-    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
+    const rewardData = displayUserReward;
+    if (!rewardData) return 25;
+    const { total_earned_points } = rewardData;
+    const referralCount = displayReferrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = displayActivities.filter(a => a.activity_type === 'qr_scan').length;
     
     if (referralCount >= 100 && total_earned_points >= 4000) return 0; // Referral King
     if (qrScanCount >= 100 && total_earned_points >= 6000) return 0; // QR Master
@@ -80,10 +150,11 @@ const Rewards = () => {
   };
 
   const getNextLevel = () => {
-    if (!userReward) return 'Bronze';
-    const { total_earned_points } = userReward;
-    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
-    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
+    const rewardData = displayUserReward;
+    if (!rewardData) return 'Bronze';
+    const { total_earned_points } = rewardData;
+    const referralCount = displayReferrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = displayActivities.filter(a => a.activity_type === 'qr_scan').length;
     
     if (referralCount >= 100 && total_earned_points >= 4000) return 'Referral King';
     if (qrScanCount >= 100 && total_earned_points >= 6000) return 'QR Master';
@@ -96,10 +167,11 @@ const Rewards = () => {
   };
 
   const getCurrentLevel = () => {
-    if (!userReward) return 'Bronze';
-    const { total_earned_points } = userReward;
-    const referralCount = referrals.filter(r => r.referrer_id === user?.id).length;
-    const qrScanCount = activities.filter(a => a.activity_type === 'qr_scan').length;
+    const rewardData = displayUserReward;
+    if (!rewardData) return 'Bronze';
+    const { total_earned_points } = rewardData;
+    const referralCount = displayReferrals.filter(r => r.referrer_id === user?.id).length;
+    const qrScanCount = displayActivities.filter(a => a.activity_type === 'qr_scan').length;
     
     if (referralCount >= 100 && total_earned_points >= 4000) return 'Referral King';
     if (qrScanCount >= 100 && total_earned_points >= 6000) return 'QR Master';
@@ -277,34 +349,34 @@ const Rewards = () => {
             </Card>
 
             {/* User Dashboard - visible after login */}
-            {user && userReward && (
+            {user && displayUserReward && (
               <div className="space-y-8">
                 <div className="grid md:grid-cols-4 gap-6">
                   <Card className="rounded-2xl shadow-md bg-gradient-to-r from-green-400 to-green-600 text-white p-6 text-center">
                     <CardTitle className="text-sm font-medium mb-2">Current Points</CardTitle>
                     <Coins className="h-6 w-6 mx-auto mb-2" />
-                    <div className="text-3xl font-bold">{userReward.current_points}</div>
+                    <div className="text-3xl font-bold">{displayUserReward.current_points}</div>
                     <p className="text-white/80 text-sm">Ready to redeem!</p>
                   </Card>
 
                   <Card className="rounded-2xl shadow-md bg-gradient-to-r from-orange-400 to-orange-600 text-white p-6 text-center">
                     <CardTitle className="text-sm font-medium mb-2">Total Earned</CardTitle>
                     <Trophy className="h-6 w-6 mx-auto mb-2" />
-                    <div className="text-3xl font-bold">{userReward.total_earned_points}</div>
+                    <div className="text-3xl font-bold">{displayUserReward.total_earned_points}</div>
                     <p className="text-white/80 text-sm">Since joining</p>
                   </Card>
 
                   <Card className="rounded-2xl shadow-md bg-gradient-to-r from-purple-400 to-purple-600 text-white p-6 text-center">
                     <CardTitle className="text-sm font-medium mb-2">Level</CardTitle>
                     <Crown className="h-6 w-6 mx-auto mb-2" />
-                    <div className="text-2xl font-bold">{userReward.level_name}</div>
+                    <div className="text-2xl font-bold">{displayUserReward.level_name}</div>
                     <p className="text-white/80 text-sm">Your status</p>
                   </Card>
 
                   <Card className="rounded-2xl shadow-md bg-gradient-to-r from-blue-400 to-blue-600 text-white p-6 text-center">
                     <CardTitle className="text-sm font-medium mb-2">Referrals</CardTitle>
                     <Users className="h-6 w-6 mx-auto mb-2" />
-                    <div className="text-3xl font-bold">{referrals.filter(r => r.referrer_id === user.id).length}</div>
+                    <div className="text-3xl font-bold">{displayReferrals.filter(r => r.referrer_id === user.id).length}</div>
                     <p className="text-white/80 text-sm">Friends invited</p>
                   </Card>
                 </div>
@@ -324,80 +396,80 @@ const Rewards = () => {
                   {/* Level Icons Grid */}
                   <div className="grid grid-cols-2 md:grid-cols-6 gap-4 mb-6">
                     {/* Bronze Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      userReward.total_earned_points >= 0 ? 'bg-amber-100 scale-105 shadow-md' : 'bg-gray-100'
-                    }`}>
-                      <Star className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        userReward.total_earned_points >= 0 ? 'text-amber-600 animate-pulse' : 'text-gray-400'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        userReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
-                      }`}>Bronze</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayUserReward.total_earned_points >= 0 ? 'bg-amber-100 scale-105 shadow-md' : 'bg-gray-100'
+                     }`}>
+                       <Star className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayUserReward.total_earned_points >= 0 ? 'text-amber-600 animate-pulse' : 'text-gray-400'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayUserReward.total_earned_points >= 0 ? 'text-amber-700' : 'text-gray-500'
+                       }`}>Bronze</span>
                       <span className="text-xs text-muted-foreground">25 pts</span>
                     </div>
 
                     {/* Silver Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      userReward.total_earned_points >= 200 ? 'bg-gray-100 scale-105 shadow-md' : 'bg-gray-50'
-                    }`}>
-                      <Trophy className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        userReward.total_earned_points >= 200 ? 'text-gray-500 animate-pulse' : 'text-gray-300'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        userReward.total_earned_points >= 200 ? 'text-gray-700' : 'text-gray-400'
-                      }`}>Silver</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayUserReward.total_earned_points >= 200 ? 'bg-gray-100 scale-105 shadow-md' : 'bg-gray-50'
+                     }`}>
+                       <Trophy className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayUserReward.total_earned_points >= 200 ? 'text-gray-500 animate-pulse' : 'text-gray-300'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayUserReward.total_earned_points >= 200 ? 'text-gray-700' : 'text-gray-400'
+                       }`}>Silver</span>
                       <span className="text-xs text-muted-foreground">200 pts</span>
                     </div>
 
                     {/* Gold Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      userReward.total_earned_points >= 500 ? 'bg-yellow-100 scale-105 shadow-md' : 'bg-gray-50'
-                    }`}>
-                      <Award className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        userReward.total_earned_points >= 500 ? 'text-yellow-600 animate-pulse' : 'text-gray-300'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        userReward.total_earned_points >= 500 ? 'text-yellow-700' : 'text-gray-400'
-                      }`}>Gold</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayUserReward.total_earned_points >= 500 ? 'bg-yellow-100 scale-105 shadow-md' : 'bg-gray-50'
+                     }`}>
+                       <Award className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayUserReward.total_earned_points >= 500 ? 'text-yellow-600 animate-pulse' : 'text-gray-300'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayUserReward.total_earned_points >= 500 ? 'text-yellow-700' : 'text-gray-400'
+                       }`}>Gold</span>
                       <span className="text-xs text-muted-foreground">500 pts</span>
                     </div>
 
                     {/* Platinum Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      userReward.total_earned_points >= 2500 ? 'bg-purple-100 scale-105 shadow-md' : 'bg-gray-50'
-                    }`}>
-                      <Crown className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        userReward.total_earned_points >= 2500 ? 'text-purple-600 animate-pulse' : 'text-gray-300'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        userReward.total_earned_points >= 2500 ? 'text-purple-700' : 'text-gray-400'
-                      }`}>Platinum</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayUserReward.total_earned_points >= 2500 ? 'bg-purple-100 scale-105 shadow-md' : 'bg-gray-50'
+                     }`}>
+                       <Crown className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayUserReward.total_earned_points >= 2500 ? 'text-purple-600 animate-pulse' : 'text-gray-300'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayUserReward.total_earned_points >= 2500 ? 'text-purple-700' : 'text-gray-400'
+                       }`}>Platinum</span>
                       <span className="text-xs text-muted-foreground">2500 pts</span>
                     </div>
 
                     {/* Referral King Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'bg-pink-100 scale-105 shadow-md' : 'bg-gray-50'
-                    }`}>
-                      <Users className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'text-pink-600 animate-pulse' : 'text-gray-300'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        referrals.filter(r => r.referrer_id === user?.id).length >= 100 && userReward.total_earned_points >= 4000 ? 'text-pink-700' : 'text-gray-400'
-                      }`}>Referral King</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayReferrals.filter(r => r.referrer_id === user?.id).length >= 100 && displayUserReward.total_earned_points >= 4000 ? 'bg-pink-100 scale-105 shadow-md' : 'bg-gray-50'
+                     }`}>
+                       <Users className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayReferrals.filter(r => r.referrer_id === user?.id).length >= 100 && displayUserReward.total_earned_points >= 4000 ? 'text-pink-600 animate-pulse' : 'text-gray-300'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayReferrals.filter(r => r.referrer_id === user?.id).length >= 100 && displayUserReward.total_earned_points >= 4000 ? 'text-pink-700' : 'text-gray-400'
+                       }`}>Referral King</span>
                       <span className="text-xs text-muted-foreground">100+ refs & 4000 pts</span>
                     </div>
 
                     {/* QR Master Level */}
-                    <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
-                      activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'bg-blue-100 scale-105 shadow-md' : 'bg-gray-50'
-                    }`}>
-                      <QrCode className={`h-8 w-8 mb-2 transition-colors duration-300 ${
-                        activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'text-blue-600 animate-pulse' : 'text-gray-300'
-                      }`} />
-                      <span className={`text-sm font-bold ${
-                        activities.filter(a => a.activity_type === 'qr_scan').length >= 100 && userReward.total_earned_points >= 6000 ? 'text-blue-700' : 'text-gray-400'
-                      }`}>QR Master</span>
+                     <div className={`flex flex-col items-center p-3 rounded-xl transition-all duration-300 ${
+                       displayActivities.filter(a => a.activity_type === 'qr_scan').length >= 100 && displayUserReward.total_earned_points >= 6000 ? 'bg-blue-100 scale-105 shadow-md' : 'bg-gray-50'
+                     }`}>
+                       <QrCode className={`h-8 w-8 mb-2 transition-colors duration-300 ${
+                         displayActivities.filter(a => a.activity_type === 'qr_scan').length >= 100 && displayUserReward.total_earned_points >= 6000 ? 'text-blue-600 animate-pulse' : 'text-gray-300'
+                       }`} />
+                       <span className={`text-sm font-bold ${
+                         displayActivities.filter(a => a.activity_type === 'qr_scan').length >= 100 && displayUserReward.total_earned_points >= 6000 ? 'text-blue-700' : 'text-gray-400'
+                       }`}>QR Master</span>
                       <span className="text-xs text-muted-foreground">100+ scans & 6000 pts</span>
                     </div>
                   </div>
@@ -405,7 +477,7 @@ const Rewards = () => {
                   {/* Current Progress Bar */}
                   <div className="space-y-2">
                     <div className="flex justify-between text-sm">
-                      <span className="font-medium">Current: {userReward.total_earned_points} points</span>
+                      <span className="font-medium">Current: {displayUserReward.total_earned_points} points</span>
                       <span className="text-muted-foreground">
                         {getCurrentLevel()} Level
                       </span>
@@ -468,9 +540,9 @@ const Rewards = () => {
                           Your Unique Referral Code:
                         </p>
                         <div className="flex items-center justify-between bg-white/20 rounded-lg p-3">
-                          <span className="font-mono text-2xl font-bold text-white">
-                            {userReward.referral_code}
-                          </span>
+                           <span className="font-mono text-2xl font-bold text-white">
+                             {displayUserReward.referral_code || 'BALAN2024'}
+                           </span>
                           <Button
                             onClick={handleCopyReferralCode}
                             variant="ghost"
@@ -486,48 +558,48 @@ const Rewards = () => {
                         Share with friends and earn <span className="font-bold">25 points</span> for each successful referral!
                       </p>
                       <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                        <Button 
-                          onClick={() => {
-                            const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
-                            const text = `🎉 Join Namma Ooru Offers and get exclusive deals across Tamil Nadu! Use my referral code: ${userReward.referral_code} 
+                         <Button 
+                           onClick={() => {
+                             const shareUrl = `${window.location.origin}/signup?ref=${displayUserReward.referral_code || 'BALAN2024'}`;
+                             const text = `🎉 Join Namma Ooru Offers and get exclusive deals across Tamil Nadu! Use my referral code: ${displayUserReward.referral_code || 'BALAN2024'} 
 ${shareUrl} 🏪✨`;
-                            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                          }}
-                          className="bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
-                        >
-                          <Share2 className="h-4 w-4 mr-2" /> WhatsApp
-                        </Button>
-                        <Button 
-                          onClick={() => {
-                            const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
-                            const text = `🎉 Join Namma Ooru Offers with my referral code: ${userReward.referral_code} and get exclusive local deals! 
+                             const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+                             window.open(url, '_blank');
+                           }}
+                           className="bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
+                         >
+                           <Share2 className="h-4 w-4 mr-2" /> WhatsApp
+                         </Button>
+                         <Button 
+                           onClick={() => {
+                             const shareUrl = `${window.location.origin}/signup?ref=${displayUserReward.referral_code || 'BALAN2024'}`;
+                             const text = `🎉 Join Namma Ooru Offers with my referral code: ${displayUserReward.referral_code || 'BALAN2024'} and get exclusive local deals! 
 ${shareUrl} 🏪`;
-                            const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
-                            window.open(url, '_blank');
-                          }}
-                          className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
-                        >
-                          <Share2 className="h-4 w-4 mr-2" /> Telegram
-                        </Button>
-                        <Button 
-                          onClick={() => {
-                            const shareUrl = `${window.location.origin}/signup?ref=${userReward.referral_code}`;
-                            const text = `🎉 Just discovered amazing local deals on Namma Ooru Offers! Join with my code: ${userReward.referral_code} 
+                             const url = `https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(text)}`;
+                             window.open(url, '_blank');
+                           }}
+                           className="bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
+                         >
+                           <Share2 className="h-4 w-4 mr-2" /> Telegram
+                         </Button>
+                         <Button 
+                           onClick={() => {
+                             const shareUrl = `${window.location.origin}/signup?ref=${displayUserReward.referral_code || 'BALAN2024'}`;
+                             const text = `🎉 Just discovered amazing local deals on Namma Ooru Offers! Join with my code: ${displayUserReward.referral_code || 'BALAN2024'} 
 ${shareUrl} 🏪 #NammaOoruOffers #LocalDeals #TamilNadu`;
-                            // For Instagram, we'll use the general share API or copy to clipboard
-                            navigator.clipboard.writeText(text).then(() => {
-                              toast.success('Instagram share text copied to clipboard!');
-                            });
-                          }}
-                          className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
-                        >
-                          <Share2 className="h-4 w-4 mr-2" /> Instagram
-                        </Button>
+                             // For Instagram, we'll use the general share API or copy to clipboard
+                             navigator.clipboard.writeText(text).then(() => {
+                               toast.success('Instagram share text copied to clipboard!');
+                             });
+                           }}
+                           className="bg-gradient-to-r from-purple-500 to-pink-500 hover:from-purple-600 hover:to-pink-600 text-white font-bold rounded-xl transition-colors px-4 py-3 flex items-center justify-center"
+                         >
+                           <Share2 className="h-4 w-4 mr-2" /> Instagram
+                         </Button>
                       </div>
                     </Card>
 
-                    <ActivityHistory activities={activities} loading={loading} />
+                     <ActivityHistory activities={displayActivities} loading={loading} />
                   </TabsContent>
 
                   <TabsContent value="earn" className="space-y-6">
@@ -575,17 +647,17 @@ ${shareUrl} 🏪 #NammaOoruOffers #LocalDeals #TamilNadu`;
                     </div>
                   </TabsContent>
 
-                  <TabsContent value="redeem">
-                    <RewardOffers 
-                      offers={rewardOffers} 
-                      userReward={userReward} 
-                      onRedeem={redeemRewardOffer} 
-                    />
-                  </TabsContent>
+                   <TabsContent value="redeem">
+                     <RewardOffers 
+                       offers={rewardOffers} 
+                       userReward={displayUserReward} 
+                       onRedeem={redeemRewardOffer} 
+                     />
+                   </TabsContent>
 
-                  <TabsContent value="activity">
-                    <ActivityHistory activities={activities} loading={loading} />
-                  </TabsContent>
+                   <TabsContent value="activity">
+                     <ActivityHistory activities={displayActivities} loading={loading} />
+                   </TabsContent>
 
                   <TabsContent value="leaderboard">
                     <Leaderboard />
