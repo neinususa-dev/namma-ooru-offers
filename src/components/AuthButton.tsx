@@ -1,4 +1,4 @@
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useAuth } from '@/hooks/useAuth';
 import { Button } from '@/components/ui/button';
 import { 
@@ -14,30 +14,6 @@ import { User, LogOut, Store, ShoppingCart, Gift, Plus, Shield } from 'lucide-re
 
 export function AuthButton() {
   const { user, profile, signOut, loading } = useAuth();
-  const location = useLocation();
-
-  const getSuperAdminViewContext = (pathname: string) => {
-    const customerRoutes = ['/', '/rewards', '/your-offers', '/customer-analytics', '/about', '/profile'];
-    const merchantRoutes = ['/merchant-dashboard', '/merchant-post-offer', '/merchant-edit-offers', '/billing'];
-    const adminRoutes = ['/admin-dashboard', '/admin-navigation'];
-
-    if (customerRoutes.includes(pathname)) {
-      return 'customer view';
-    } else if (merchantRoutes.includes(pathname)) {
-      return 'merchant view';
-    } else if (adminRoutes.includes(pathname)) {
-      return '';
-    }
-    return '';
-  };
-  
-  const getDisplayRole = () => {
-    if (profile?.role === 'super_admin') {
-      const viewContext = getSuperAdminViewContext(location.pathname);
-      return viewContext ? `Super_admin(${viewContext})` : 'Super_admin';
-    }
-    return profile?.role;
-  };
 
   if (loading) {
     return <div className="w-8 h-8 bg-muted rounded-full animate-pulse" />;
@@ -76,8 +52,8 @@ export function AuthButton() {
               {profile.current_plan}
             </span>
           )}
-          <span className="text-xs text-muted-foreground">
-            {getDisplayRole()}
+          <span className="text-xs text-muted-foreground capitalize">
+            {profile.role}
           </span>
         </div>
       </div>
@@ -102,7 +78,7 @@ export function AuthButton() {
             </p>
             <div className="flex items-center pt-1">
               {profile.role === 'super_admin' ? (
-                <><Shield className="w-3 h-3 mr-1" /> {getDisplayRole()}</>
+                <><Shield className="w-3 h-3 mr-1" /> Super Admin</>
               ) : profile.role === 'merchant' ? (
                 <><Store className="w-3 h-3 mr-1" /> Merchant</>
               ) : (

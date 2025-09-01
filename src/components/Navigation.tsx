@@ -9,6 +9,7 @@ interface NavigationProps {
 
 export const Navigation: React.FC<NavigationProps> = ({ activeSection, onSectionChange }) => {
   const menuItems = [
+    { id: 'hot-deals', label: 'Hot Deals' },
     { id: 'local-deals', label: 'Local Deals' },
     { id: 'store-list', label: 'Store List' },
     { id: 'rewards', label: 'Rewards' }
