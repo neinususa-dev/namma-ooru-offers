@@ -52,8 +52,8 @@ export function AdminNavigation() {
 
   const merchantPages = [
     { path: '/merchant-dashboard', label: 'Merchant Dashboard', icon: Store, description: 'Main merchant control panel' },
-    { path: '/merchant-post-offer', label: 'Post New Offer', icon: ShoppingBag, description: 'Create new offers' },
-    { path: '/merchant-edit-offers', label: 'Edit Offers', icon: Settings, description: 'Manage existing offers' },
+    { path: '/admin-dashboard?tab=create-new', label: 'Post New Offer', icon: ShoppingBag, description: 'Create new offers' },
+    { path: '/admin-dashboard?tab=offers', label: 'Edit Offers', icon: Settings, description: 'Manage existing offers' },
     { path: '/billing', label: 'Billing & Plans', icon: CreditCard, description: 'Subscription management' },
   ];
 
