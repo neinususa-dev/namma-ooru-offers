@@ -95,6 +95,18 @@ export function useAuth() {
 
       console.log('Profile data received:', data);
 
+      // Check if user account is disabled
+      if (data && !data.is_active) {
+        console.log('User account is disabled, signing out...');
+        // Sign out the user immediately
+        await supabase.auth.signOut();
+        setUser(null);
+        setSession(null);
+        setProfile(null);
+        setLoading(false);
+        return;
+      }
+
       // Only update if profile actually changed
       setProfile(prevProfile => {
         if (!data) {
