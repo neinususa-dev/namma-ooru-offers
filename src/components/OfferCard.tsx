@@ -1,11 +1,11 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift, Clock } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useAuth } from '@/hooks/useAuth';
 import { useOffers } from '@/hooks/useOffers';
-import defaultOfferImage from '@/assets/default-offer-image.jpg';
+import { generateDefaultImage } from '@/utils/imageUtils';
 
 interface OfferCardProps {
   id: string;
@@ -53,6 +53,12 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  
+  // Generate default image with merchant name
+  const defaultImageWithMerchantName = useMemo(() => 
+    generateDefaultImage(shopName || 'Local Merchant'), 
+    [shopName]
+  );
   
   const isDescriptionLong = description && description.length > 100;
   const displayDescription = showFullDescription || !isDescriptionLong 
@@ -151,11 +157,11 @@ export const OfferCard: React.FC<OfferCardProps> = ({
       {/* Offer Image - Show for all display modes */}
       <div className="h-48 bg-gradient-to-br from-primary/10 to-secondary/10 flex items-center justify-center">
         <img 
-          src={image || defaultOfferImage} 
-          alt={offerTitle}
+          src={image || defaultImageWithMerchantName} 
+          alt={`${offerTitle} - ${shopName}`}
           className="w-full h-full object-cover"
           onError={(e) => {
-            e.currentTarget.src = defaultOfferImage;
+            e.currentTarget.src = defaultImageWithMerchantName;
           }}
         />
       </div>
