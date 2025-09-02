@@ -108,28 +108,35 @@ export default function YourOffers() {
               </Card>
             ) : (
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {savedOffers.map((savedOffer) => (
-                  <OfferCard
-                    key={savedOffer.id}
-                    id={savedOffer.offer_id}
-                    shopName={savedOffer.offers?.profiles?.store_name || 
-                             savedOffer.offers?.profiles?.name || 
-                             savedOffer.offers?.store_name || 
-                             'Local Merchant'}
-                    offerTitle={savedOffer.offers?.title || 'Special Offer'}
-                    description={savedOffer.offers?.description || 'Great discount available!'}
-                    discount={`${savedOffer.offers?.discount_percentage || 20}% OFF`}
-                    originalPrice={savedOffer.offers?.original_price}
-                    discountedPrice={savedOffer.offers?.discounted_price}
-                    expiryDate={savedOffer.offers?.expiry_date ? new Date(savedOffer.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
-                    location={savedOffer.offers?.city || savedOffer.offers?.location || 'Local Area'}
-                    category={savedOffer.offers?.category || 'general'}
-                     displayMode="saved"
-                     onRemove={() => removeSavedOffer(savedOffer.id)}
-                     couponCode={savedOffer.id.substring(0, 8).toUpperCase()}
-                     image={savedOffer.offers?.image_url || generateDefaultImage(savedOffer.offers?.profiles?.store_name || savedOffer.offers?.profiles?.name || savedOffer.offers?.store_name || 'Local Merchant')}
-                  />
-                ))}
+                {savedOffers.map((savedOffer) => {
+                  const hasPendingRedemption = redeemedOffers.some(
+                    redemption => redemption.offer_id === savedOffer.offer_id && redemption.status === 'pending'
+                  );
+                  
+                  return (
+                    <OfferCard
+                      key={savedOffer.id}
+                      id={savedOffer.offer_id}
+                      shopName={savedOffer.offers?.profiles?.store_name || 
+                               savedOffer.offers?.profiles?.name || 
+                               savedOffer.offers?.store_name || 
+                               'Local Merchant'}
+                      offerTitle={savedOffer.offers?.title || 'Special Offer'}
+                      description={savedOffer.offers?.description || 'Great discount available!'}
+                      discount={`${savedOffer.offers?.discount_percentage || 20}% OFF`}
+                      originalPrice={savedOffer.offers?.original_price}
+                      discountedPrice={savedOffer.offers?.discounted_price}
+                      expiryDate={savedOffer.offers?.expiry_date ? new Date(savedOffer.offers.expiry_date).toLocaleDateString() : 'Dec 31, 2024'}
+                      location={savedOffer.offers?.city || savedOffer.offers?.location || 'Local Area'}
+                      category={savedOffer.offers?.category || 'general'}
+                      displayMode="saved"
+                      onRemove={() => removeSavedOffer(savedOffer.id)}
+                      couponCode={savedOffer.id.substring(0, 8).toUpperCase()}
+                      image={savedOffer.offers?.image_url || generateDefaultImage(savedOffer.offers?.profiles?.store_name || savedOffer.offers?.profiles?.name || savedOffer.offers?.store_name || 'Local Merchant')}
+                      hasPendingRedemption={hasPendingRedemption}
+                    />
+                  );
+                })}
               </div>
             )}
           </TabsContent>

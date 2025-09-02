@@ -340,17 +340,7 @@ export function useOffers() {
         // Don't fail the redemption if email fails
       }
 
-      // Remove from saved offers if it was saved
-      const { error: removeError } = await supabase
-        .from('saved_offers')
-        .delete()
-        .eq('user_id', user.id)
-        .eq('offer_id', offerId);
-
-      if (removeError) {
-        console.error('Error removing from saved offers:', removeError);
-        // Don't throw error here, redemption was successful
-      }
+      // Don't remove from saved offers until approved - keep for pending state
 
       toast({
         title: "Redemption Request Sent!",
@@ -444,6 +434,17 @@ export function useOffers() {
       } catch (emailError) {
         console.error('Failed to send approval emails:', emailError);
         // Don't fail the approval if email fails
+      }
+
+      // Remove from saved offers when approved
+      const { error: removeError } = await supabase
+        .from('saved_offers')
+        .delete()
+        .eq('user_id', redemptionData.user_id)
+        .eq('offer_id', redemptionData.offer_id);
+
+      if (removeError) {
+        console.error('Error removing from saved offers:', removeError);
       }
 
       toast({

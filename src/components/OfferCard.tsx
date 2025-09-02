@@ -31,6 +31,7 @@ interface OfferCardProps {
   disableMerchantActions?: boolean;
   isSaved?: boolean;
   isRedeemed?: boolean;
+  hasPendingRedemption?: boolean;
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({
@@ -54,7 +55,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   redemptionStatus,
   disableMerchantActions = false,
   isSaved = false,
-  isRedeemed = false
+  isRedeemed = false,
+  hasPendingRedemption = false
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
@@ -297,11 +299,16 @@ export const OfferCard: React.FC<OfferCardProps> = ({
         {displayMode === 'saved' && (
           <Button 
             className="w-full" 
-            variant="hero"
-            onClick={handleRedeemOffer}
-            disabled={isRedeeming}
+            variant={hasPendingRedemption ? "secondary" : "hero"}
+            onClick={hasPendingRedemption ? undefined : handleRedeemOffer}
+            disabled={isRedeeming || hasPendingRedemption}
           >
-            {isRedeeming ? (
+            {hasPendingRedemption ? (
+              <>
+                <Clock className="w-4 h-4 mr-2" />
+                Pending Redemption
+              </>
+            ) : isRedeeming ? (
               <>
                 <Gift className="w-4 h-4 mr-2 animate-spin" />
                 Redeeming...
