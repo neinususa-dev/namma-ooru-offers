@@ -32,29 +32,43 @@ export function useOfferDatabase() {
       setLoading(true);
       setError(null);
 
+      // Optimized query with pagination and simplified joins
       const { data, error: fetchError } = await supabase
         .from('offers')
         .select(`
-          *,
-          profiles!merchant_id(name, store_name)
+          id, title, description, category, location, district, city,
+          original_price, discount_percentage, discounted_price, expiry_date,
+          redemption_mode, listing_type, status, is_active, created_at,
+          merchant_id, store_name
         `)
         .eq('is_active', true)
         .eq('status', 'approved')
         .gte('expiry_date', new Date().toISOString())
-        .order('created_at', { ascending: false });
+        .order('created_at', { ascending: false })
+        .limit(50); // Add pagination limit
 
       if (fetchError) {
         throw fetchError;
       }
 
+      // Get merchant names in a separate optimized query
+      const merchantIds = [...new Set((data || []).map(offer => offer.merchant_id))];
+      const { data: merchants } = await supabase
+        .from('profiles')
+        .select('id, name, store_name')
+        .in('id', merchantIds);
+
+      const merchantMap = new Map(merchants?.map(m => [m.id, m]) || []);
+
       const offersWithMerchantNames = (data || []).map(offer => {
-        const merchantName = offer.profiles?.store_name || offer.profiles?.name || offer.store_name || 'Local Merchant';
-        console.log('Processing offer:', offer.title, 'profiles:', offer.profiles, 'store_name from offers:', offer.store_name, 'final merchant_name:', merchantName);
+        const merchant = merchantMap.get(offer.merchant_id);
+        const merchantName = merchant?.store_name || merchant?.name || offer.store_name || 'Local Merchant';
         return {
           ...offer,
           merchant_name: merchantName
         };
       });
+      
       setOffers(offersWithMerchantNames as DatabaseOffer[]);
     } catch (err) {
       console.error('Error fetching offers:', err);

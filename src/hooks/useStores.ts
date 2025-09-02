@@ -37,23 +37,19 @@ export function useStores() {
     try {
       setLoading(true);
       setError(null);
-
-      console.log('Fetching stores from stores_public view...');
       
-      // Use the public view that only exposes non-sensitive information
+      // Optimized query with specific field selection and limit
       const { data, error: fetchError } = await supabase
         .from('stores_public')
-        .select('*')
-        .order('name', { ascending: true });
-
-      console.log('Stores fetch result:', { data, error: fetchError });
+        .select('id, name, description, location, district, city, is_active, created_at, updated_at')
+        .eq('is_active', true)
+        .order('name', { ascending: true })
+        .limit(100);
 
       if (fetchError) {
-        console.error('Supabase error:', fetchError);
         throw fetchError;
       }
 
-      console.log(`Successfully fetched ${data?.length || 0} stores`);
       setStores(data || []);
     } catch (err) {
       console.error('Error fetching stores:', err);
