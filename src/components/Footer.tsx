@@ -253,7 +253,7 @@ const Footer = () => {
               <img 
                 src="/lovable-uploads/3c633683-8c9d-4ff2-ace7-6658272f2afd.png" 
                 alt="Namma Ooru Offers Logo" 
-                className="w-8 h-8 rounded"
+                className="w-10 h-10 rounded"
               />
               <div className="text-center md:text-left">
                 <div className="text-sm font-bold bg-blue-orange-gradient bg-clip-text text-transparent">
@@ -269,25 +269,15 @@ const Footer = () => {
               </div>
             </div>
 
-            {/* Legal Links */}
-            <div className="flex items-center space-x-6">
-              <Link 
-                to="/privacy-policy" 
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                Privacy
-              </Link>
-              <Link 
-                to="/terms-and-conditions" 
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
-              >
-                Terms
-              </Link>
+            {/* Developer Credit */}
+            <div className="flex items-center">
               <a 
-                href="mailto:legal@namma-ooru-offers.com" 
-                className="text-xs text-muted-foreground hover:text-primary transition-colors"
+                href="https://neinus.com" 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
               >
-                Legal
+                Developed with <Heart className="h-3 w-3 text-red-500 fill-current" /> Neinus Technologies
               </a>
             </div>
 
@@ -308,16 +298,6 @@ const Footer = () => {
                   : ' Your privacy and data security are our top priorities.'
                 }
               </p>
-              <div className="mt-3">
-                <a 
-                  href="https://neinus.com" 
-                  target="_blank" 
-                  rel="noopener noreferrer"
-                  className="text-xs text-muted-foreground hover:text-primary transition-colors inline-flex items-center gap-1"
-                >
-                  Developed with <Heart className="h-3 w-3 text-red-500 fill-current" /> Neinus Technologies
-                </a>
-              </div>
             </div>
           </div>
         </div>
