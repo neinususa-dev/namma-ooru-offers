@@ -270,7 +270,7 @@ const Index = () => {
                   <div className="space-y-6">
                     <div className="space-y-4">
                       {/* Made with Love for Tamil Nadu */}
-                      <div className="text-center mb-8">
+                      <div className="text-center mb-4">
                         <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm border border-primary/30 rounded-full animate-pulse">
                           <Heart className="h-4 w-4 text-red-500 fill-current animate-pulse" />
                           <span className="text-sm font-medium bg-blue-orange-gradient bg-clip-text text-transparent">
@@ -280,7 +280,7 @@ const Index = () => {
                         </div>
                       </div>
                       
-                      <h2 className="text-4xl lg:text-6xl font-bold leading-tight text-center">
+                      <h2 className="text-4xl lg:text-6xl font-bold leading-tight">
                         <span className="bg-blue-orange-gradient bg-clip-text text-transparent">
                           Namma&nbsp;Ooru Offers
                         </span>
