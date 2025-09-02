@@ -271,12 +271,12 @@ const Index = () => {
                     <div className="space-y-4">
                       {/* Made with Love for Tamil Nadu */}
                       <div className="text-center mb-4">
-                        <div className="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm border border-primary/30 rounded-full animate-pulse">
-                          <Heart className="h-4 w-4 text-red-500 fill-current animate-pulse" />
-                          <span className="text-sm font-medium bg-blue-orange-gradient bg-clip-text text-transparent">
+                        <div className="inline-flex items-center gap-2 px-4 sm:px-6 py-2 sm:py-3 bg-gradient-to-r from-primary/20 to-secondary/20 backdrop-blur-sm border border-primary/30 rounded-full animate-pulse">
+                          <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-red-500 fill-current animate-pulse" />
+                          <span className="text-xs sm:text-sm font-medium bg-blue-orange-gradient bg-clip-text text-transparent">
                             Made with love for local merchants in Tamil Nadu
                           </span>
-                          <Heart className="h-4 w-4 text-red-500 fill-current animate-pulse" />
+                          <Heart className="h-3 w-3 sm:h-4 sm:w-4 text-red-500 fill-current animate-pulse" />
                         </div>
                       </div>
                       
