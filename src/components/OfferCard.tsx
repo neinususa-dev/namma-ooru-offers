@@ -27,6 +27,8 @@ interface OfferCardProps {
   redeemedDate?: string;
   redemptionStatus?: 'pending' | 'approved' | 'rejected';
   disableMerchantActions?: boolean;
+  isSaved?: boolean;
+  isRedeemed?: boolean;
 }
 
 export const OfferCard: React.FC<OfferCardProps> = ({
@@ -48,7 +50,9 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   couponCode,
   redeemedDate,
   redemptionStatus,
-  disableMerchantActions = false
+  disableMerchantActions = false,
+  isSaved = false,
+  isRedeemed = false
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
@@ -243,9 +247,12 @@ export const OfferCard: React.FC<OfferCardProps> = ({
             className="w-full" 
             variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
             onClick={handleGetCoupon}
-            disabled={disableMerchantActions}
+            disabled={disableMerchantActions || isSaved || isRedeemed}
           >
-            {disableMerchantActions ? "View Only" : "Get Coupon"}
+            {disableMerchantActions ? "View Only" : 
+             isRedeemed ? "Redeemed" :
+             isSaved ? "Offer Saved" : 
+             "Get Coupon"}
           </Button>
         )}
         

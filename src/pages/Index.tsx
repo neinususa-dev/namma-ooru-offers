@@ -13,6 +13,7 @@ import { Header } from '@/components/Header';
 import { MerchantHomePage } from '@/components/MerchantHomePage';
 import { useAuth } from '@/hooks/useAuth';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
+import { useOffers } from '@/hooks/useOffers';
 import { useStats } from '@/hooks/useStats';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { generateDefaultImage } from '@/utils/imageUtils';
@@ -34,6 +35,7 @@ import {
 const Index = () => {
   const { user, isMerchant, profile } = useAuth();
   const { offers, loading, getOffersByType, getOffersByCategory, searchOffers } = useOfferDatabase();
+  const { savedOffers, redeemedOffers } = useOffers();
   const { stats, loading: statsLoading } = useStats();
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
@@ -54,6 +56,11 @@ const Index = () => {
 
   const convertToOfferCardProps = (dbOffer: any) => {
     console.log('Converting offer:', dbOffer.title, 'merchant_name:', dbOffer.merchant_name);
+    
+    // Check if offer is saved or redeemed by current user
+    const isSaved = user ? savedOffers.some(saved => saved.offer_id === dbOffer.id) : false;
+    const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === dbOffer.id) : false;
+    
     return {
       id: dbOffer.id,
       shopName: dbOffer.merchant_name || 'Local Merchant',
@@ -69,7 +76,9 @@ const Index = () => {
       category: dbOffer.category,
       isHot: dbOffer.listing_type === 'hot_offers',
       isTrending: dbOffer.listing_type === 'trending',
-      image: dbOffer.image_url || generateDefaultImage(dbOffer.merchant_name || 'Local Merchant')
+      image: dbOffer.image_url || generateDefaultImage(dbOffer.merchant_name || 'Local Merchant'),
+      isSaved,
+      isRedeemed
     };
   };
 
