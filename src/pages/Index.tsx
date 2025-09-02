@@ -544,9 +544,22 @@ const Index = () => {
                 </div>
 
                 <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {filteredOffers.slice(0, 12).map(offer => (
-                    <OfferCard key={offer.id} {...offer} disableMerchantActions={isMerchant} />
-                  ))}
+                  {filteredOffers.slice(0, 12).map(offer => {
+                    const isSaved = user ? savedOffers.some(saved => saved.offer_id === offer.id) : false;
+                    const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'approved') : false;
+                    const hasPendingRedemption = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'pending') : false;
+                    
+                    return (
+                      <OfferCard 
+                        key={offer.id} 
+                        {...offer} 
+                        disableMerchantActions={isMerchant}
+                        isSaved={isSaved}
+                        isRedeemed={isRedeemed}
+                        hasPendingRedemption={hasPendingRedemption}
+                      />
+                    );
+                  })}
                 </div>
 
                 {filteredOffers.length === 0 && (
@@ -706,9 +719,22 @@ const Index = () => {
               </div>
 
               <div className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                {filteredOffers.map(offer => (
-                  <OfferCard key={offer.id} {...offer} disableMerchantActions={isMerchant} />
-                ))}
+                {filteredOffers.map(offer => {
+                  const isSaved = user ? savedOffers.some(saved => saved.offer_id === offer.id) : false;
+                  const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'approved') : false;
+                  const hasPendingRedemption = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'pending') : false;
+                  
+                  return (
+                    <OfferCard 
+                      key={offer.id} 
+                      {...offer} 
+                      disableMerchantActions={isMerchant}
+                      isSaved={isSaved}
+                      isRedeemed={isRedeemed}
+                      hasPendingRedemption={hasPendingRedemption}
+                    />
+                  );
+                })}
               </div>
 
               {filteredOffers.length === 0 && (

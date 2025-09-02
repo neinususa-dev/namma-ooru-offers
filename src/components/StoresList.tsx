@@ -5,6 +5,8 @@ import { Button } from '@/components/ui/button';
 import { MapPin, ShoppingBag, ArrowLeft, ExternalLink } from 'lucide-react';
 import { useStores, type PublicStore } from '@/hooks/useStores';
 import { useOfferDatabase } from '@/hooks/useOfferDatabase';
+import { useOffers } from '@/hooks/useOffers';
+import { useAuth } from '@/hooks/useAuth';
 import { Skeleton } from '@/components/ui/skeleton';
 import { OfferCard } from '@/components/OfferCard';
 
@@ -21,6 +23,8 @@ export const StoresList: React.FC<StoresListProps> = ({
 }) => {
   const { stores, loading, error } = useStores();
   const { offers, loading: offersLoading } = useOfferDatabase();
+  const { savedOffers, redeemedOffers } = useOffers();
+  const { user } = useAuth();
   const [selectedStore, setSelectedStore] = useState<PublicStore | null>(null);
 
   // Function to count offers per store
@@ -35,22 +39,31 @@ export const StoresList: React.FC<StoresListProps> = ({
     return offers.filter(offer => offer.merchant_name === storeName);
   };
 
-  // Convert DatabaseOffer to OfferCard props
-  const convertToOfferCard = (offer: any) => ({
-    id: offer.id,
-    shopName: offer.merchant_name,
-    offerTitle: offer.title,
-    description: offer.description || '',
-    discount: offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Special Offer',
-    originalPrice: offer.original_price,
-    discountedPrice: offer.discounted_price,
-    expiryDate: new Date(offer.expiry_date).toLocaleDateString(),
-    location: offer.city || '',
-    category: offer.category || '',
-    isHot: offer.listing_type === 'hot_offers',
-    isTrending: offer.listing_type === 'trending',
-    image: offer.image_url
-  });
+  // Convert DatabaseOffer to OfferCard props with user status
+  const convertToOfferCard = (offer: any) => {
+    const isSaved = user ? savedOffers.some(saved => saved.offer_id === offer.id) : false;
+    const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'approved') : false;
+    const hasPendingRedemption = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'pending') : false;
+    
+    return {
+      id: offer.id,
+      shopName: offer.merchant_name,
+      offerTitle: offer.title,
+      description: offer.description || '',
+      discount: offer.discount_percentage ? `${offer.discount_percentage}% OFF` : 'Special Offer',
+      originalPrice: offer.original_price,
+      discountedPrice: offer.discounted_price,
+      expiryDate: new Date(offer.expiry_date).toLocaleDateString(),
+      location: offer.city || '',
+      category: offer.category || '',
+      isHot: offer.listing_type === 'hot_offers',
+      isTrending: offer.listing_type === 'trending',
+      image: offer.image_url,
+      isSaved,
+      isRedeemed,
+      hasPendingRedemption
+    };
+  };
 
   // Handle store selection
   const handleStoreSelect = (store: PublicStore) => {

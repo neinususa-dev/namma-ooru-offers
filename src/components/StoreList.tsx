@@ -3,6 +3,8 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Badge } from '@/components/ui/badge';
 import { MapPin, Store } from 'lucide-react';
 import { OfferCard } from './OfferCard';
+import { useOffers } from '@/hooks/useOffers';
+import { useAuth } from '@/hooks/useAuth';
 
 interface Store {
   id: string;
@@ -38,6 +40,8 @@ interface StoreListProps {
 
 export const StoreList: React.FC<StoreListProps> = ({ offers, showTitle = true }) => {
   const [selectedStore, setSelectedStore] = useState<string | null>(null);
+  const { savedOffers, redeemedOffers } = useOffers();
+  const { user } = useAuth();
 
   // Extract unique stores from offers
   const stores: Store[] = Array.from(
@@ -91,9 +95,21 @@ export const StoreList: React.FC<StoreListProps> = ({ offers, showTitle = true }
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-          {storeOffers.map(offer => (
-            <OfferCard key={offer.id} {...offer} />
-          ))}
+          {storeOffers.map(offer => {
+            const isSaved = user ? savedOffers.some(saved => saved.offer_id === offer.id) : false;
+            const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'approved') : false;
+            const hasPendingRedemption = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'pending') : false;
+            
+            return (
+              <OfferCard 
+                key={offer.id} 
+                {...offer} 
+                isSaved={isSaved}
+                isRedeemed={isRedeemed}
+                hasPendingRedemption={hasPendingRedemption}
+              />
+            );
+          })}
         </div>
       </div>
     );

@@ -2,6 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { OfferCard } from '@/components/OfferCard';
+import { useOffers } from '@/hooks/useOffers';
+import { useAuth } from '@/hooks/useAuth';
 import {
   Pagination,
   PaginationContent,
@@ -42,6 +44,8 @@ export const PaginatedOffersSection: React.FC<PaginatedOffersSectionProps> = ({
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [isAutoScrolling, setIsAutoScrolling] = useState(true);
+  const { savedOffers, redeemedOffers } = useOffers();
+  const { user } = useAuth();
   const offersPerPage = 4;
   const totalPages = Math.ceil(offers.length / offersPerPage);
 
@@ -101,9 +105,21 @@ export const PaginatedOffersSection: React.FC<PaginatedOffersSectionProps> = ({
         
         {/* Offers Grid - Always show 4 columns with smooth transition */}
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-6 transition-all duration-700 ease-in-out">
-          {getCurrentOffers().map(offer => (
-            <OfferCard key={offer.id} {...offer} />
-          ))}
+          {getCurrentOffers().map(offer => {
+            const isSaved = user ? savedOffers.some(saved => saved.offer_id === offer.id) : false;
+            const isRedeemed = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'approved') : false;
+            const hasPendingRedemption = user ? redeemedOffers.some(redeemed => redeemed.offer_id === offer.id && redeemed.status === 'pending') : false;
+            
+            return (
+              <OfferCard 
+                key={offer.id} 
+                {...offer}
+                isSaved={isSaved}
+                isRedeemed={isRedeemed}
+                hasPendingRedemption={hasPendingRedemption}
+              />
+            );
+          })}
           {/* Fill empty slots if less than 4 offers on current page */}
           {Array.from({ length: Math.max(0, offersPerPage - getCurrentOffers().length) }).map((_, index) => (
             <div key={`empty-${index}`} className="hidden lg:block"></div>
