@@ -1,8 +1,9 @@
 import React, { useState, useMemo } from 'react';
-import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift, Clock } from 'lucide-react';
+import { Calendar, MapPin, Store, Flame, TrendingUp, Trash2, Gift, Clock, Check } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardFooter, CardHeader } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useOffers } from '@/hooks/useOffers';
 import { generateDefaultImage } from '@/utils/imageUtils';
@@ -57,6 +58,8 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
   const [showFullDescription, setShowFullDescription] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   
   // Generate default image with merchant name
   const defaultImageWithMerchantName = useMemo(() => 
@@ -70,26 +73,34 @@ export const OfferCard: React.FC<OfferCardProps> = ({
     : description?.substring(0, 100) + '...';
 
   const handleGetCoupon = async () => {
-    // Don't allow merchants to save offers
-    if (disableMerchantActions) return;
+    // Don't allow merchants to save offers or if already loading
+    if (disableMerchantActions || isLoading) return;
     
-    // Always save the offer first, regardless of login status
-    const offerData = {
-      id,
-      shopName,
-      offerTitle,
-      description,
-      discount,
-      originalPrice,
-      discountedPrice,
-      expiryDate,
-      location,
-      category,
-      isHot,
-      isTrending,
-      image
-    };
-    await saveOffer(id, offerData);
+    setIsLoading(true);
+    try {
+      // Always save the offer first, regardless of login status
+      const offerData = {
+        id,
+        shopName,
+        offerTitle,
+        description,
+        discount,
+        originalPrice,
+        discountedPrice,
+        expiryDate,
+        location,
+        category,
+        isHot,
+        isTrending,
+        image
+      };
+      await saveOffer(id, offerData);
+      setShowSuccessModal(true);
+    } catch (error) {
+      console.error('Error saving offer:', error);
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleRedeemOffer = async () => {
@@ -247,11 +258,12 @@ export const OfferCard: React.FC<OfferCardProps> = ({
             className="w-full" 
             variant={isHot ? "hot-offer" : isTrending ? "trending" : "hero"}
             onClick={handleGetCoupon}
-            disabled={disableMerchantActions || isSaved || isRedeemed}
+            disabled={disableMerchantActions || isSaved || isRedeemed || isLoading}
           >
             {disableMerchantActions ? "View Only" : 
              isRedeemed ? "Redeemed" :
              isSaved ? "Offer Saved" : 
+             isLoading ? "Saving..." :
              "Get Coupon"}
           </Button>
         )}
@@ -290,6 +302,28 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           </div>
         )}
       </CardFooter>
+      
+      {/* Success Modal */}
+      <Dialog open={showSuccessModal} onOpenChange={setShowSuccessModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
+                <Check className="h-4 w-4 text-white" />
+              </div>
+              Offer Saved Successfully!
+            </DialogTitle>
+            <DialogDescription>
+              Great! You've saved "{offerTitle}" from {shopName}. You can find it in your "Your Offers" section to redeem later.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowSuccessModal(false)}>
+              Got it!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
     </Card>
   );
 };
