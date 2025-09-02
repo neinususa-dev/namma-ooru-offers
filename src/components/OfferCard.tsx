@@ -6,6 +6,7 @@ import { Badge } from '@/components/ui/badge';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
 import { useAuth } from '@/hooks/useAuth';
 import { useOffers } from '@/hooks/useOffers';
+import { useToast } from '@/hooks/use-toast';
 import { generateDefaultImage } from '@/utils/imageUtils';
 
 interface OfferCardProps {
@@ -57,9 +58,12 @@ export const OfferCard: React.FC<OfferCardProps> = ({
 }) => {
   const { user } = useAuth();
   const { saveOffer, redeemOffer } = useOffers();
+  const { toast } = useToast();
   const [showFullDescription, setShowFullDescription] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [isRedeeming, setIsRedeeming] = useState(false);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [showRedemptionModal, setShowRedemptionModal] = useState(false);
   
   // Generate default image with merchant name
   const defaultImageWithMerchantName = useMemo(() => 
@@ -104,7 +108,29 @@ export const OfferCard: React.FC<OfferCardProps> = ({
   };
 
   const handleRedeemOffer = async () => {
-    await redeemOffer(id);
+    // Don't allow redemption if already redeeming
+    if (isRedeeming) return;
+    
+    setIsRedeeming(true);
+    try {
+      await redeemOffer(id);
+      setShowRedemptionModal(true);
+      toast({
+        title: "Redemption Successful!",
+        description: `Your redemption request for "${offerTitle}" has been submitted successfully.`,
+        duration: 5000,
+      });
+    } catch (error) {
+      console.error('Error redeeming offer:', error);
+      toast({
+        title: "Redemption Failed",
+        description: "There was an error processing your redemption request. Please try again.",
+        variant: "destructive",
+        duration: 5000,
+      });
+    } finally {
+      setIsRedeeming(false);
+    }
   };
   return (
     <Card className="offer-card relative overflow-hidden bg-card border-primary/10 hover:border-primary/30 flex flex-col h-full">
@@ -273,8 +299,19 @@ export const OfferCard: React.FC<OfferCardProps> = ({
             className="w-full" 
             variant="hero"
             onClick={handleRedeemOffer}
+            disabled={isRedeeming}
           >
-            Redeem Now
+            {isRedeeming ? (
+              <>
+                <Gift className="w-4 h-4 mr-2 animate-spin" />
+                Redeeming...
+              </>
+            ) : (
+              <>
+                <Gift className="w-4 h-4 mr-2" />
+                Redeem Now
+              </>
+            )}
           </Button>
         )}
         
@@ -320,6 +357,28 @@ export const OfferCard: React.FC<OfferCardProps> = ({
           <div className="flex justify-end">
             <Button onClick={() => setShowSuccessModal(false)}>
               Got it!
+            </Button>
+          </div>
+        </DialogContent>
+      </Dialog>
+      
+      {/* Redemption Success Modal */}
+      <Dialog open={showRedemptionModal} onOpenChange={setShowRedemptionModal}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center">
+                <Gift className="h-4 w-4 text-white" />
+              </div>
+              Redemption Submitted!
+            </DialogTitle>
+            <DialogDescription>
+              Your redemption request for "{offerTitle}" from {shopName} has been submitted successfully. The merchant will review and approve your request shortly.
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-end">
+            <Button onClick={() => setShowRedemptionModal(false)}>
+              Understood!
             </Button>
           </div>
         </DialogContent>

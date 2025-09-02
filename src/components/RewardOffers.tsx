@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Gift, Coins, Clock, Users } from 'lucide-react';
+import { Gift, Coins, Clock, Users, Loader2 } from 'lucide-react';
 import { RewardOffer, UserReward } from '@/hooks/useRewards';
 import { toast } from 'sonner';
 
@@ -17,6 +17,8 @@ export const RewardOffers: React.FC<RewardOffersProps> = ({
   userReward,
   onRedeem
 }) => {
+  const [redeemingOffers, setRedeemingOffers] = useState<Set<string>>(new Set());
+  
   const handleRedeem = async (offer: RewardOffer) => {
     if (!userReward) {
       toast.error('Please log in to redeem offers');
@@ -33,9 +35,31 @@ export const RewardOffers: React.FC<RewardOffersProps> = ({
       return;
     }
 
-    const success = await onRedeem(offer.id, offer.points_required);
-    if (success) {
-      toast.success(`🎉 Successfully redeemed: ${offer.title}`);
+    // Prevent multiple clicks
+    if (redeemingOffers.has(offer.id)) {
+      return;
+    }
+
+    // Add offer to redeeming set
+    setRedeemingOffers(prev => new Set(prev).add(offer.id));
+
+    try {
+      const success = await onRedeem(offer.id, offer.points_required);
+      if (success) {
+        toast.success(`🎉 Successfully redeemed: ${offer.title}`);
+      } else {
+        toast.error('Failed to redeem offer. Please try again.');
+      }
+    } catch (error) {
+      console.error('Error redeeming offer:', error);
+      toast.error('An error occurred while redeeming the offer.');
+    } finally {
+      // Remove offer from redeeming set
+      setRedeemingOffers(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(offer.id);
+        return newSet;
+      });
     }
   };
 
@@ -133,11 +157,16 @@ export const RewardOffers: React.FC<RewardOffersProps> = ({
 
             <Button
               onClick={() => handleRedeem(offer)}
-              disabled={!canRedeem(offer) || isExpired(offer.expiry_date)}
+              disabled={!canRedeem(offer) || isExpired(offer.expiry_date) || redeemingOffers.has(offer.id)}
               className="w-full"
               variant={canRedeem(offer) ? "default" : "outline"}
             >
-              {!userReward ? (
+              {redeemingOffers.has(offer.id) ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  Redeeming...
+                </>
+              ) : !userReward ? (
                 "Login to Redeem"
               ) : userReward.current_points < offer.points_required ? (
                 `Need ${offer.points_required - userReward.current_points} more points`
